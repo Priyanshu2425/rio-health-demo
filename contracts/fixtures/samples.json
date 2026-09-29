@@ -1,0 +1,12 @@
+[
+  {
+    "sample_id": "typed_clinic_3",
+    "label": "Typed clinic Rx, 3 lines",
+    "thumbnail_url": "/api/samples/typed_clinic_3/image"
+  },
+  {
+    "sample_id": "handwritten_2",
+    "label": "Handwritten Rx, 2 lines",
+    "thumbnail_url": "/api/samples/handwritten_2/image"
+  }
+]

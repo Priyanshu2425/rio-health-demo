@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+node_modules/
+dist/
+.DS_Store
+graft/
+.claude/settings.local.json
+
+# Raw datasets are downloaded, not committed. Trimmed seeds under data/seed/ are committed.
+data/raw/
+kaggle.json

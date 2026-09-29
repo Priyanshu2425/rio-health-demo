@@ -1,0 +1,52 @@
+[
+  {
+    "sku": {
+      "sku_id": "sku_augmentin_625",
+      "brand_name": "Augmentin 625 Duo",
+      "manufacturer": "GlaxoSmithKline",
+      "form": "tablet",
+      "pack_size": 10,
+      "pack_label": "strip of 10 tablets",
+      "mrp_inr": 223.5,
+      "composition": [
+        {
+          "name": "amoxycillin",
+          "strength": "500mg"
+        },
+        {
+          "name": "clavulanic acid",
+          "strength": "125mg"
+        }
+      ],
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "rx_only": true,
+      "schedule": "H"
+    },
+    "score": 0.97
+  },
+  {
+    "sku": {
+      "sku_id": "sku_moxclav_625",
+      "brand_name": "Moxclav 625",
+      "manufacturer": "Sun Pharma",
+      "form": "tablet",
+      "pack_size": 10,
+      "pack_label": "strip of 10 tablets",
+      "mrp_inr": 181.0,
+      "composition": [
+        {
+          "name": "amoxycillin",
+          "strength": "500mg"
+        },
+        {
+          "name": "clavulanic acid",
+          "strength": "125mg"
+        }
+      ],
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "rx_only": true,
+      "schedule": "H"
+    },
+    "score": 0.81
+  }
+]

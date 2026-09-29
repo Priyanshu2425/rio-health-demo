@@ -1,0 +1,15 @@
+[
+  {
+    "order_id": "ord_demo_pending",
+    "created_at": "2026-09-29T18:30:00+05:30",
+    "source": "prescription",
+    "item_count": 3,
+    "counts": {
+      "green": 1,
+      "amber": 1,
+      "red": 1
+    },
+    "worst_triage": "red",
+    "total_inr": 412.1
+  }
+]

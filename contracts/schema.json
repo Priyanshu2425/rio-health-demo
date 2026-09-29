@@ -1,0 +1,1225 @@
+{
+  "$defs": {
+    "ApiError": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ApiError",
+      "type": "object"
+    },
+    "BacktestSummary": {
+      "properties": {
+        "horizon_days": {
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "model_mape": {
+          "title": "Model Mape",
+          "type": "number"
+        },
+        "naive_mape": {
+          "title": "Naive Mape",
+          "type": "number"
+        }
+      },
+      "required": [
+        "horizon_days",
+        "model_mape",
+        "naive_mape"
+      ],
+      "title": "BacktestSummary",
+      "type": "object"
+    },
+    "CartItem": {
+      "properties": {
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        },
+        "generic_alternative": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SKU"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Cheapest SKU with the same composition_key"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "line_total_inr": {
+          "minimum": 0,
+          "title": "Line Total Inr",
+          "type": "number"
+        },
+        "parsed": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParsedLine"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Null for typed-text orders"
+        },
+        "quantity_packs": {
+          "minimum": 0,
+          "title": "Quantity Packs",
+          "type": "integer"
+        },
+        "requested_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The typed request, for text orders",
+          "title": "Requested Text"
+        },
+        "savings_inr": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Per line, if the customer swaps",
+          "title": "Savings Inr"
+        },
+        "sku": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SKU"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null when nothing matched; always red"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "approved",
+            "edited",
+            "removed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "unit_price_inr": {
+          "minimum": 0,
+          "title": "Unit Price Inr",
+          "type": "number"
+        }
+      },
+      "required": [
+        "item_id",
+        "parsed",
+        "requested_text",
+        "sku",
+        "quantity_packs",
+        "unit_price_inr",
+        "line_total_inr",
+        "generic_alternative",
+        "savings_inr",
+        "confidence",
+        "status"
+      ],
+      "title": "CartItem",
+      "type": "object"
+    },
+    "Confidence": {
+      "properties": {
+        "completeness": {
+          "description": "Share of drug/strength/frequency/duration present",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completeness",
+          "type": "number"
+        },
+        "legibility": {
+          "description": "1 - illegible fields / fields read",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Legibility",
+          "type": "number"
+        },
+        "match_score": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Match Score",
+          "type": "number"
+        },
+        "reasons": {
+          "description": "Short, pharmacist-facing, e.g. 'strength unreadable'",
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "score": {
+          "description": "Combined score used for sorting",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "triage": {
+          "enum": [
+            "green",
+            "amber",
+            "red"
+          ],
+          "title": "Triage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "match_score",
+        "completeness",
+        "legibility",
+        "triage",
+        "reasons"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "Contract": {
+      "description": "Base for every contract model. In the exported schema, fields with defaults are\nstill marked required for responses, because the API always sends them.",
+      "properties": {},
+      "title": "Contract",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/ApiError"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "ForecastPoint": {
+      "properties": {
+        "actual": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Present inside the backtest window",
+          "title": "Actual"
+        },
+        "forecast": {
+          "minimum": 0,
+          "title": "Forecast",
+          "type": "number"
+        },
+        "ts": {
+          "description": "Start of the hour, Asia/Kolkata",
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ts",
+        "forecast",
+        "actual"
+      ],
+      "title": "ForecastPoint",
+      "type": "object"
+    },
+    "ForecastSummary": {
+      "properties": {
+        "areas": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Areas",
+          "type": "array"
+        },
+        "backtest": {
+          "$ref": "#/$defs/BacktestSummary"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "reorders": {
+          "description": "Stockout risks first",
+          "items": {
+            "$ref": "#/$defs/ReorderSuggestion"
+          },
+          "title": "Reorders",
+          "type": "array"
+        },
+        "skus": {
+          "description": "SKUs that have forecasts, for the picker",
+          "items": {
+            "$ref": "#/$defs/SkuRef"
+          },
+          "title": "Skus",
+          "type": "array"
+        }
+      },
+      "required": [
+        "generated_at",
+        "areas",
+        "skus",
+        "backtest",
+        "reorders"
+      ],
+      "title": "ForecastSummary",
+      "type": "object"
+    },
+    "ItemDecision": {
+      "properties": {
+        "action": {
+          "enum": [
+            "approve",
+            "edit",
+            "remove"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "quantity_packs": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity Packs"
+        },
+        "sku_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for edit when changing the SKU",
+          "title": "Sku Id"
+        }
+      },
+      "required": [
+        "item_id",
+        "action"
+      ],
+      "title": "ItemDecision",
+      "type": "object"
+    },
+    "MatchCandidate": {
+      "properties": {
+        "score": {
+          "description": "Trigram or re-rank score",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "sku": {
+          "$ref": "#/$defs/SKU"
+        }
+      },
+      "required": [
+        "sku",
+        "score"
+      ],
+      "title": "MatchCandidate",
+      "type": "object"
+    },
+    "MatchResult": {
+      "description": "What the matcher decided for one ParsedLine.",
+      "properties": {
+        "candidates": {
+          "description": "Top candidates considered, best first",
+          "items": {
+            "$ref": "#/$defs/MatchCandidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "reranked": {
+          "description": "True when the LLM re-rank ran",
+          "title": "Reranked",
+          "type": "boolean"
+        },
+        "score": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "sku": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SKU"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Chosen SKU, or null when nothing fits"
+        }
+      },
+      "required": [
+        "sku",
+        "score",
+        "candidates",
+        "reranked",
+        "reason"
+      ],
+      "title": "MatchResult",
+      "type": "object"
+    },
+    "Order": {
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "has_image": {
+          "description": "GET /api/orders/{id}/image serves it when true",
+          "title": "Has Image",
+          "type": "boolean"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/CartItem"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "order_id": {
+          "title": "Order Id",
+          "type": "string"
+        },
+        "parsed_rx": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParsedRx"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pharmacist_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pharmacist Note"
+        },
+        "requires_review": {
+          "title": "Requires Review",
+          "type": "boolean"
+        },
+        "reviewed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed At"
+        },
+        "source": {
+          "enum": [
+            "prescription",
+            "sample",
+            "text"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending_review",
+            "verified",
+            "rejected",
+            "confirmed_otc",
+            "needs_prescription",
+            "placed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "total_inr": {
+          "minimum": 0,
+          "title": "Total Inr",
+          "type": "number"
+        }
+      },
+      "required": [
+        "order_id",
+        "created_at",
+        "source",
+        "status",
+        "has_image",
+        "parsed_rx",
+        "items",
+        "total_inr",
+        "requires_review",
+        "pharmacist_note",
+        "reviewed_at"
+      ],
+      "title": "Order",
+      "type": "object"
+    },
+    "ParsedLine": {
+      "description": "One medicine line as read off the prescription. No catalog knowledge.",
+      "properties": {
+        "bbox": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 4,
+              "minItems": 4,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional [x0, y0, x1, y1] in 0..1 image coordinates; UI falls back to the full image",
+          "title": "Bbox"
+        },
+        "doses_per_day": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Normalized from frequency: '1-0-1' -> 2, 'TDS' -> 3, 'SOS' -> null",
+          "title": "Doses Per Day"
+        },
+        "drug": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Brand or generic name as written, e.g. 'Augmentin'",
+          "title": "Drug"
+        },
+        "duration_days": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Days"
+        },
+        "form": {
+          "anyOf": [
+            {
+              "enum": [
+                "tablet",
+                "capsule",
+                "syrup",
+                "suspension",
+                "injection",
+                "cream",
+                "ointment",
+                "gel",
+                "drops",
+                "inhaler",
+                "powder",
+                "sachet",
+                "other"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Form"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "As written, e.g. '1-0-1', 'BD', 'SOS'",
+          "title": "Frequency"
+        },
+        "illegible_fields": {
+          "description": "Fields the model could not read with confidence",
+          "items": {
+            "enum": [
+              "drug",
+              "strength",
+              "form",
+              "frequency",
+              "duration",
+              "quantity"
+            ],
+            "type": "string"
+          },
+          "title": "Illegible Fields",
+          "type": "array"
+        },
+        "line_no": {
+          "description": "1-based position on the prescription",
+          "minimum": 1,
+          "title": "Line No",
+          "type": "integer"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Only if an explicit count is written",
+          "title": "Quantity"
+        },
+        "raw_text": {
+          "description": "The line exactly as written, for the pharmacist",
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "strength": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "As written, e.g. '625', '500/125 mg', '5 ml'",
+          "title": "Strength"
+        }
+      },
+      "required": [
+        "line_no",
+        "raw_text",
+        "drug",
+        "strength",
+        "form",
+        "frequency",
+        "doses_per_day",
+        "duration_days",
+        "quantity",
+        "illegible_fields",
+        "bbox"
+      ],
+      "title": "ParsedLine",
+      "type": "object"
+    },
+    "ParsedRx": {
+      "description": "Everything the vision model extracted from one prescription image.",
+      "properties": {
+        "clinic_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clinic Name"
+        },
+        "cost_usd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        },
+        "doctor_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doctor Name"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/ParsedLine"
+          },
+          "title": "Lines",
+          "type": "array"
+        },
+        "model": {
+          "description": "OpenRouter model id that produced this parse",
+          "title": "Model",
+          "type": "string"
+        },
+        "patient_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Patient Name"
+        },
+        "rx_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rx Date"
+        }
+      },
+      "required": [
+        "doctor_name",
+        "clinic_name",
+        "patient_name",
+        "rx_date",
+        "lines",
+        "model",
+        "latency_ms",
+        "cost_usd"
+      ],
+      "title": "ParsedRx",
+      "type": "object"
+    },
+    "QueueItem": {
+      "description": "One row in the pharmacist queue. Worst triage first, then oldest first.",
+      "properties": {
+        "counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "enum": [
+              "green",
+              "amber",
+              "red"
+            ]
+          },
+          "title": "Counts",
+          "type": "object"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "item_count": {
+          "title": "Item Count",
+          "type": "integer"
+        },
+        "order_id": {
+          "title": "Order Id",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "prescription",
+            "sample",
+            "text"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "total_inr": {
+          "title": "Total Inr",
+          "type": "number"
+        },
+        "worst_triage": {
+          "enum": [
+            "green",
+            "amber",
+            "red"
+          ],
+          "title": "Worst Triage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order_id",
+        "created_at",
+        "source",
+        "item_count",
+        "counts",
+        "worst_triage",
+        "total_inr"
+      ],
+      "title": "QueueItem",
+      "type": "object"
+    },
+    "ReorderSuggestion": {
+      "properties": {
+        "area": {
+          "title": "Area",
+          "type": "string"
+        },
+        "brand_name": {
+          "title": "Brand Name",
+          "type": "string"
+        },
+        "forecast_over_lead_time": {
+          "minimum": 0,
+          "title": "Forecast Over Lead Time",
+          "type": "number"
+        },
+        "hours_to_stockout": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hours To Stockout"
+        },
+        "on_hand": {
+          "minimum": 0,
+          "title": "On Hand",
+          "type": "integer"
+        },
+        "reorder_qty": {
+          "minimum": 0,
+          "title": "Reorder Qty",
+          "type": "integer"
+        },
+        "sku_id": {
+          "title": "Sku Id",
+          "type": "string"
+        },
+        "stockout_risk": {
+          "title": "Stockout Risk",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "sku_id",
+        "brand_name",
+        "area",
+        "on_hand",
+        "forecast_over_lead_time",
+        "reorder_qty",
+        "stockout_risk",
+        "hours_to_stockout"
+      ],
+      "title": "ReorderSuggestion",
+      "type": "object"
+    },
+    "ReviewRequest": {
+      "properties": {
+        "decision": {
+          "enum": [
+            "approve",
+            "reject"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "items": {
+          "description": "Items not listed are approved as is",
+          "items": {
+            "$ref": "#/$defs/ItemDecision"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "decision"
+      ],
+      "title": "ReviewRequest",
+      "type": "object"
+    },
+    "SKU": {
+      "properties": {
+        "brand_name": {
+          "title": "Brand Name",
+          "type": "string"
+        },
+        "composition": {
+          "items": {
+            "$ref": "#/$defs/Salt"
+          },
+          "title": "Composition",
+          "type": "array"
+        },
+        "composition_key": {
+          "description": "Canonical sorted 'salt strength + salt strength'; equal keys = substitutable",
+          "title": "Composition Key",
+          "type": "string"
+        },
+        "form": {
+          "enum": [
+            "tablet",
+            "capsule",
+            "syrup",
+            "suspension",
+            "injection",
+            "cream",
+            "ointment",
+            "gel",
+            "drops",
+            "inhaler",
+            "powder",
+            "sachet",
+            "other"
+          ],
+          "title": "Form",
+          "type": "string"
+        },
+        "manufacturer": {
+          "title": "Manufacturer",
+          "type": "string"
+        },
+        "mrp_inr": {
+          "description": "Price per pack in rupees",
+          "minimum": 0,
+          "title": "Mrp Inr",
+          "type": "number"
+        },
+        "pack_label": {
+          "description": "Human label, e.g. 'strip of 10 tablets'",
+          "title": "Pack Label",
+          "type": "string"
+        },
+        "pack_size": {
+          "description": "Units per pack, e.g. 10 for a strip of 10",
+          "minimum": 1,
+          "title": "Pack Size",
+          "type": "integer"
+        },
+        "rx_only": {
+          "title": "Rx Only",
+          "type": "boolean"
+        },
+        "schedule": {
+          "anyOf": [
+            {
+              "enum": [
+                "H",
+                "H1",
+                "X"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schedule"
+        },
+        "sku_id": {
+          "title": "Sku Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sku_id",
+        "brand_name",
+        "manufacturer",
+        "form",
+        "pack_size",
+        "pack_label",
+        "mrp_inr",
+        "composition",
+        "composition_key",
+        "rx_only",
+        "schedule"
+      ],
+      "title": "SKU",
+      "type": "object"
+    },
+    "Salt": {
+      "properties": {
+        "name": {
+          "description": "Normalized lowercase salt, e.g. 'amoxycillin'",
+          "title": "Name",
+          "type": "string"
+        },
+        "strength": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Normalized, e.g. '500mg', '5mg/ml'",
+          "title": "Strength"
+        }
+      },
+      "required": [
+        "name",
+        "strength"
+      ],
+      "title": "Salt",
+      "type": "object"
+    },
+    "Sample": {
+      "properties": {
+        "label": {
+          "description": "e.g. 'Typed clinic Rx, 3 lines'",
+          "title": "Label",
+          "type": "string"
+        },
+        "sample_id": {
+          "title": "Sample Id",
+          "type": "string"
+        },
+        "thumbnail_url": {
+          "title": "Thumbnail Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sample_id",
+        "label",
+        "thumbnail_url"
+      ],
+      "title": "Sample",
+      "type": "object"
+    },
+    "SkuForecast": {
+      "properties": {
+        "area": {
+          "title": "Area",
+          "type": "string"
+        },
+        "brand_name": {
+          "title": "Brand Name",
+          "type": "string"
+        },
+        "model_mape": {
+          "description": "Backtest error of our model on this series",
+          "minimum": 0,
+          "title": "Model Mape",
+          "type": "number"
+        },
+        "naive_mape": {
+          "description": "Same hour last week",
+          "minimum": 0,
+          "title": "Naive Mape",
+          "type": "number"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/ForecastPoint"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "sku_id": {
+          "title": "Sku Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sku_id",
+        "brand_name",
+        "area",
+        "points",
+        "model_mape",
+        "naive_mape"
+      ],
+      "title": "SkuForecast",
+      "type": "object"
+    },
+    "SkuRef": {
+      "properties": {
+        "brand_name": {
+          "title": "Brand Name",
+          "type": "string"
+        },
+        "sku_id": {
+          "title": "Sku Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sku_id",
+        "brand_name"
+      ],
+      "title": "SkuRef",
+      "type": "object"
+    },
+    "SwapRequest": {
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "use_generic": {
+          "title": "Use Generic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "item_id",
+        "use_generic"
+      ],
+      "title": "SwapRequest",
+      "type": "object"
+    },
+    "TextOrderRequest": {
+      "properties": {
+        "text": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "TextOrderRequest",
+      "type": "object"
+    }
+  },
+  "title": "Rio contracts"
+}

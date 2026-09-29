@@ -1,0 +1,54 @@
+{
+  "doctor_name": "Dr. A. Mehta",
+  "clinic_name": "Sunrise Clinic",
+  "patient_name": "R. Sharma",
+  "rx_date": "2026-09-28",
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_text": "Tab. Augmentin 625  1-0-1 x 5 days",
+      "drug": "Augmentin",
+      "strength": "625",
+      "form": "tablet",
+      "frequency": "1-0-1",
+      "doses_per_day": 2.0,
+      "duration_days": 5,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 2,
+      "raw_text": "Tab Pan 40  1-0-0 before food x 5d",
+      "drug": "Pan",
+      "strength": "40",
+      "form": "tablet",
+      "frequency": "1-0-0",
+      "doses_per_day": 1.0,
+      "duration_days": null,
+      "quantity": null,
+      "illegible_fields": [
+        "duration"
+      ],
+      "bbox": null
+    },
+    {
+      "line_no": 3,
+      "raw_text": "Tab D?lo 650 SOS",
+      "drug": "Dolo",
+      "strength": "650",
+      "form": "tablet",
+      "frequency": "SOS",
+      "doses_per_day": null,
+      "duration_days": null,
+      "quantity": null,
+      "illegible_fields": [
+        "drug"
+      ],
+      "bbox": null
+    }
+  ],
+  "model": "example/vision-model",
+  "latency_ms": 6120,
+  "cost_usd": 0.0021
+}

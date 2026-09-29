@@ -1,0 +1,248 @@
+{
+  "order_id": "ord_demo_pending",
+  "created_at": "2026-09-29T18:30:00+05:30",
+  "source": "prescription",
+  "status": "pending_review",
+  "has_image": true,
+  "parsed_rx": {
+    "doctor_name": "Dr. A. Mehta",
+    "clinic_name": "Sunrise Clinic",
+    "patient_name": "R. Sharma",
+    "rx_date": "2026-09-28",
+    "lines": [
+      {
+        "line_no": 1,
+        "raw_text": "Tab. Augmentin 625  1-0-1 x 5 days",
+        "drug": "Augmentin",
+        "strength": "625",
+        "form": "tablet",
+        "frequency": "1-0-1",
+        "doses_per_day": 2.0,
+        "duration_days": 5,
+        "quantity": null,
+        "illegible_fields": [],
+        "bbox": null
+      },
+      {
+        "line_no": 2,
+        "raw_text": "Tab Pan 40  1-0-0 before food x 5d",
+        "drug": "Pan",
+        "strength": "40",
+        "form": "tablet",
+        "frequency": "1-0-0",
+        "doses_per_day": 1.0,
+        "duration_days": null,
+        "quantity": null,
+        "illegible_fields": [
+          "duration"
+        ],
+        "bbox": null
+      },
+      {
+        "line_no": 3,
+        "raw_text": "Tab D?lo 650 SOS",
+        "drug": "Dolo",
+        "strength": "650",
+        "form": "tablet",
+        "frequency": "SOS",
+        "doses_per_day": null,
+        "duration_days": null,
+        "quantity": null,
+        "illegible_fields": [
+          "drug"
+        ],
+        "bbox": null
+      }
+    ],
+    "model": "example/vision-model",
+    "latency_ms": 6120,
+    "cost_usd": 0.0021
+  },
+  "items": [
+    {
+      "item_id": "itm_1",
+      "parsed": {
+        "line_no": 1,
+        "raw_text": "Tab. Augmentin 625  1-0-1 x 5 days",
+        "drug": "Augmentin",
+        "strength": "625",
+        "form": "tablet",
+        "frequency": "1-0-1",
+        "doses_per_day": 2.0,
+        "duration_days": 5,
+        "quantity": null,
+        "illegible_fields": [],
+        "bbox": null
+      },
+      "requested_text": null,
+      "sku": {
+        "sku_id": "sku_augmentin_625",
+        "brand_name": "Augmentin 625 Duo",
+        "manufacturer": "GlaxoSmithKline",
+        "form": "tablet",
+        "pack_size": 10,
+        "pack_label": "strip of 10 tablets",
+        "mrp_inr": 223.5,
+        "composition": [
+          {
+            "name": "amoxycillin",
+            "strength": "500mg"
+          },
+          {
+            "name": "clavulanic acid",
+            "strength": "125mg"
+          }
+        ],
+        "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+        "rx_only": true,
+        "schedule": "H"
+      },
+      "quantity_packs": 1,
+      "unit_price_inr": 223.5,
+      "line_total_inr": 223.5,
+      "generic_alternative": {
+        "sku_id": "sku_moxclav_625",
+        "brand_name": "Moxclav 625",
+        "manufacturer": "Sun Pharma",
+        "form": "tablet",
+        "pack_size": 10,
+        "pack_label": "strip of 10 tablets",
+        "mrp_inr": 181.0,
+        "composition": [
+          {
+            "name": "amoxycillin",
+            "strength": "500mg"
+          },
+          {
+            "name": "clavulanic acid",
+            "strength": "125mg"
+          }
+        ],
+        "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+        "rx_only": true,
+        "schedule": "H"
+      },
+      "savings_inr": 42.5,
+      "confidence": {
+        "score": 0.94,
+        "match_score": 0.97,
+        "completeness": 1.0,
+        "legibility": 1.0,
+        "triage": "green",
+        "reasons": []
+      },
+      "status": "pending"
+    },
+    {
+      "item_id": "itm_2",
+      "parsed": {
+        "line_no": 2,
+        "raw_text": "Tab Pan 40  1-0-0 before food x 5d",
+        "drug": "Pan",
+        "strength": "40",
+        "form": "tablet",
+        "frequency": "1-0-0",
+        "doses_per_day": 1.0,
+        "duration_days": null,
+        "quantity": null,
+        "illegible_fields": [
+          "duration"
+        ],
+        "bbox": null
+      },
+      "requested_text": null,
+      "sku": {
+        "sku_id": "sku_pan_40",
+        "brand_name": "Pan 40",
+        "manufacturer": "Alkem",
+        "form": "tablet",
+        "pack_size": 15,
+        "pack_label": "strip of 15 tablets",
+        "mrp_inr": 155.0,
+        "composition": [
+          {
+            "name": "pantoprazole",
+            "strength": "40mg"
+          }
+        ],
+        "composition_key": "pantoprazole 40mg",
+        "rx_only": true,
+        "schedule": "H"
+      },
+      "quantity_packs": 1,
+      "unit_price_inr": 155.0,
+      "line_total_inr": 155.0,
+      "generic_alternative": null,
+      "savings_inr": null,
+      "confidence": {
+        "score": 0.72,
+        "match_score": 0.9,
+        "completeness": 0.75,
+        "legibility": 0.8,
+        "triage": "amber",
+        "reasons": [
+          "duration unreadable; assumed 1 strip"
+        ]
+      },
+      "status": "pending"
+    },
+    {
+      "item_id": "itm_3",
+      "parsed": {
+        "line_no": 3,
+        "raw_text": "Tab D?lo 650 SOS",
+        "drug": "Dolo",
+        "strength": "650",
+        "form": "tablet",
+        "frequency": "SOS",
+        "doses_per_day": null,
+        "duration_days": null,
+        "quantity": null,
+        "illegible_fields": [
+          "drug"
+        ],
+        "bbox": null
+      },
+      "requested_text": null,
+      "sku": {
+        "sku_id": "sku_dolo_650",
+        "brand_name": "Dolo 650",
+        "manufacturer": "Micro Labs",
+        "form": "tablet",
+        "pack_size": 15,
+        "pack_label": "strip of 15 tablets",
+        "mrp_inr": 33.6,
+        "composition": [
+          {
+            "name": "paracetamol",
+            "strength": "650mg"
+          }
+        ],
+        "composition_key": "paracetamol 650mg",
+        "rx_only": false,
+        "schedule": null
+      },
+      "quantity_packs": 1,
+      "unit_price_inr": 33.6,
+      "line_total_inr": 33.6,
+      "generic_alternative": null,
+      "savings_inr": null,
+      "confidence": {
+        "score": 0.48,
+        "match_score": 0.62,
+        "completeness": 0.5,
+        "legibility": 0.6,
+        "triage": "red",
+        "reasons": [
+          "drug name unclear",
+          "no duration (SOS)"
+        ]
+      },
+      "status": "pending"
+    }
+  ],
+  "total_inr": 412.1,
+  "requires_review": true,
+  "pharmacist_note": null,
+  "reviewed_at": null
+}

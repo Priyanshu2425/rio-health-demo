@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-09-29T18:30:00+05:30",
+  "areas": [
+    "Area A",
+    "Area B",
+    "Area C"
+  ],
+  "skus": [
+    {
+      "sku_id": "sku_dolo_650",
+      "brand_name": "Dolo 650"
+    },
+    {
+      "sku_id": "sku_electral_21g",
+      "brand_name": "Electral Powder"
+    },
+    {
+      "sku_id": "sku_pan_40",
+      "brand_name": "Pan 40"
+    }
+  ],
+  "backtest": {
+    "horizon_days": 14,
+    "model_mape": 0.21,
+    "naive_mape": 0.34
+  },
+  "reorders": [
+    {
+      "sku_id": "sku_dolo_650",
+      "brand_name": "Dolo 650",
+      "area": "Area A",
+      "on_hand": 12,
+      "forecast_over_lead_time": 40.5,
+      "reorder_qty": 48,
+      "stockout_risk": true,
+      "hours_to_stockout": 7.5
+    },
+    {
+      "sku_id": "sku_electral_21g",
+      "brand_name": "Electral Powder",
+      "area": "Area B",
+      "on_hand": 60,
+      "forecast_over_lead_time": 22.0,
+      "reorder_qty": 0,
+      "stockout_risk": false,
+      "hours_to_stockout": null
+    }
+  ]
+}
