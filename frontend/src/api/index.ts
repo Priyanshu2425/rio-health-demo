@@ -1,3 +1,4 @@
+import { resolveApiBase } from './config'
 import { createHttpApi } from './http'
 import type { RioApi } from './types'
 
@@ -32,7 +33,17 @@ async function loadMock(): Promise<MockHandle> {
 
 const mock: MockHandle | null = USE_MOCKS ? await loadMock() : null
 
-export const api: RioApi = mock ?? createHttpApi(import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000')
+const { baseUrl, error } = resolveApiBase({
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  DEV: import.meta.env.DEV,
+  mocks: USE_MOCKS,
+})
+
+/** Set when a production build has no API address; App.tsx shows it as a banner. */
+export const API_CONFIG_ERROR: string | null = error
+if (API_CONFIG_ERROR) console.error(`[rio] ${API_CONFIG_ERROR}`)
+
+export const api: RioApi = mock ?? createHttpApi(baseUrl)
 
 /** Mock only: wipe orders back to the seeded queue, for a clean Loom take. */
 export function resetMockState() {

@@ -14,7 +14,7 @@ import type {
 } from '../../contracts.gen'
 import samplesFixture from '../../../../contracts/fixtures/samples.json'
 import { ApiRequestError, type RioApi, type Triage } from '../types'
-import { findSku, searchCatalog } from './catalog'
+import { cheapestGeneric, findSku, searchCatalog } from './catalog'
 import { forecastSummary, synthSeries } from './forecast'
 import { FALLBACK_IMAGE, SAMPLE_IMAGES } from './images'
 import { PENDING_FIXTURE, greenSeed, priceOrder, sampleParse, type OrderSeed } from './orders'
@@ -243,7 +243,7 @@ export class MockServer implements RioApi {
         quantity_packs: qty,
         unit_price_inr: 0,
         line_total_inr: 0,
-        generic_alternative: null,
+        generic_alternative: hit ? cheapestGeneric(hit.sku) : null,
         savings_inr: null,
         confidence: {
           score: hit?.score ?? 0,
@@ -293,7 +293,7 @@ export class MockServer implements RioApi {
     await this.io()
     this.sync()
     const order = this.get(orderId)
-    if (order.status !== 'pending_review') {
+    if (order.status !== 'pending_review' && order.status !== 'confirmed_otc') {
       throw new ApiRequestError(409, 'invalid_transition', 'This order has already been reviewed, so it can’t be changed.')
     }
     const item = order.items.find((i) => i.item_id === body.item_id) ?? notFound('Item')

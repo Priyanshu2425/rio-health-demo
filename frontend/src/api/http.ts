@@ -1,14 +1,20 @@
 import type { ErrorResponse } from '../contracts.gen'
-import { ApiRequestError, PARSE_TIMEOUT_MS, timeoutError, type RioApi } from './types'
+import {
+  ApiRequestError,
+  FALLBACK_BY_CODE,
+  FALLBACK_BY_STATUS,
+  PARSE_TIMEOUT_MS,
+  timeoutError,
+  type RioApi,
+} from './types'
 
-// Used when an error body isn't our JSON (e.g. a proxy's HTML 413 or 502 page).
-const FALLBACK_MESSAGES: Record<number, string> = {
-  413: 'That photo is over 5 MB. Try a smaller one.',
-  429: 'Too many prescriptions this hour. Try again later, or try a sample.',
-  502: 'We couldn’t read that prescription. Try a clearer photo, or try a sample.',
-  503: 'Rio is restarting. Try again in a minute.',
-  504: 'Reading the prescription took too long. Try again, or try a sample.',
+/** Copy for a status when the body isn't our JSON (e.g. a proxy's HTML 413 or 502 page). */
+function statusMessage(status: number): string {
+  if (status === 503) return 'Rio is restarting. Try again in a minute.'
+  const code = FALLBACK_BY_STATUS[status]
+  return code ? FALLBACK_BY_CODE[code] : `Request failed (${status}).`
 }
+
 
 export function createHttpApi(baseUrl: string): RioApi {
   const base = baseUrl.replace(/\/+$/, '')
@@ -23,7 +29,7 @@ export function createHttpApi(baseUrl: string): RioApi {
     }
     if (!res.ok) {
       let code = 'http_' + res.status
-      let message = FALLBACK_MESSAGES[res.status] ?? `Request failed (${res.status}).`
+      let message = statusMessage(res.status)
       try {
         const body = (await res.json()) as ErrorResponse
         if (body?.error?.message) {
@@ -49,7 +55,8 @@ export function createHttpApi(baseUrl: string): RioApi {
     isMock: false,
     createPrescriptionOrder(image) {
       const form = new FormData()
-      form.append('image', image, 'prescription.jpg')
+      // A resized upload is a JPEG Blob; if resizing failed it's the original File, so keep its name.
+      form.append('image', image, image instanceof File ? image.name : 'prescription.jpg')
       return request('/api/orders/prescription', {
         method: 'POST',
         body: form,
@@ -58,7 +65,8 @@ export function createHttpApi(baseUrl: string): RioApi {
     },
     createSampleOrder: (id) =>
       request(`/api/orders/sample/${enc(id)}`, { ...json('POST'), signal: AbortSignal.timeout(PARSE_TIMEOUT_MS) }),
-    createTextOrder: (text) => request('/api/orders/text', json('POST', { text })),
+    createTextOrder: (text) =>
+      request('/api/orders/text', { ...json('POST', { text }), signal: AbortSignal.timeout(PARSE_TIMEOUT_MS) }),
     getOrder: (id) => request(`/api/orders/${enc(id)}`),
     orderImageUrl: (id) => `${base}/api/orders/${enc(id)}/image`,
     swap: (id, body) => request(`/api/orders/${enc(id)}/swap`, json('POST', body)),

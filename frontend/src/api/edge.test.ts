@@ -93,10 +93,14 @@ describe('real-data edge cases in the mock', () => {
 })
 
 describe('error copy', () => {
-  it('400 leads with a plain explanation and keeps the server message', () => {
-    const m = errorMessage(err(400, 'unsupported_image', 'Could not decode the upload.'))
-    expect(m).toMatch(/^That file isn’t a photo we can read/)
-    expect(m).toContain('Could not decode the upload.')
+  it('shows the server message alone when there is one', () => {
+    const server = 'We couldn’t open that image. Please take a new photo of the prescription and try again.'
+    expect(errorMessage(err(400, 'unsupported_image', server))).toBe(server)
+  })
+
+  it('uses our own copy only when the server sent no message', () => {
+    expect(errorMessage(err(400, 'unsupported_image', ''))).toMatch(/^That file isn’t a photo we can read/)
+    expect(errorMessage(err(502, 'http_502', ''))).toMatch(/^We couldn’t read that prescription/)
   })
 
   it('429 shows the retry minutes from the message', () => {
