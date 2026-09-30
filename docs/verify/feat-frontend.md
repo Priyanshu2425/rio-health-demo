@@ -6,7 +6,7 @@
 cd frontend
 npm install
 VITE_MOCKS=1 npm run dev          # http://localhost:5173, in-browser mock API
-npm test                          # vitest: 74 tests (mock state machine, money, review helpers, resize, edge cases, HTTP client)
+npm test                          # vitest: 77 tests (mock state machine, money, review helpers, resize, edge cases, HTTP client)
 npm run build                     # tsc + vite build
 npm run gen:contracts -- --check  # contracts.gen.ts is current
 ```
@@ -113,13 +113,71 @@ the (dropped) mock import, which holds when Pages builds from the repo root with
 | Zero lines parsed (390 px) | ![](feat-frontend/12-mobile-zero-lines.png) |
 | 429 with retry minutes (390 px) | ![](feat-frontend/13-mobile-rate-limited.png) |
 
-## Wave 2 notes
+## Part B: real API
 
-- Point `VITE_API_BASE_URL` at the local API, then `https://rio-api.buildspacelabs.com`, and build
-  without `VITE_MOCKS`.
-- The chat uses `api.sampleImageUrl()` / `api.orderImageUrl()` rather than `Sample.thumbnail_url`,
-  so relative URLs resolve against the API base.
-- Detecting a swap assumes that after `swap(use_generic: true)` the backend sets `sku` to the generic
-  and keeps `generic_alternative`, as the mock does. Check this against the real API.
-- Check against real data: long brand names, `sku: null` lines (the console forces edit or remove),
-  0 parsed lines, and 5–30 s parses (the typing bubble has no timeout).
+Run against `feat/backend-api` at bd7da57, in real mode with the Neon database:
+
+```bash
+# terminal 1: backend (from its worktree; .env linked, mocks off by default)
+cd <backend worktree>/backend && uv sync && uv run uvicorn app.main:app --port 8000
+curl localhost:8000/api/health      # {"ok":true,"mocks":false,"database":true}
+
+# terminal 2: frontend, no VITE_MOCKS
+cd frontend && VITE_API_BASE_URL=http://localhost:8000 npx vite --port 5173
+```
+
+Use port 5173. The backend's CORS allow-list accepts `http://localhost:5173`; a preflight from another
+port (for example 5199) gets a 400.
+
+**Walked on real data, at 1440×900 and 390 px, with no console errors and no failed requests:**
+
+1. On `/`, **Try a sample** lists the 3 real samples. **Hospital OPD Rx, 4 lines** gives a cart
+   (₹684.01) with 4 swap chips.
+2. **Swap chip** on Azithral 500 switches it to Zady 500, saving ₹20.77; the total becomes ₹663.24.
+   Checked live with curl: after `use_generic: true`, `sku == generic_alternative` and `savings_inr` keeps
+   the saving; `use_generic: false` restores the brand; a swap after review returns 409.
+3. The console opens the new order, marked **New**, among about 8 real pending orders. On the amber Montair LC line, **Edit**
+   opens the real catalog picker, pre-searched with "Montair LC". I picked #2 and set 2 packs, then
+   **Approve all green** and **Approve order**.
+4. Within 2 s the chat shows **Verified by pharmacist**, with Montair-LC struck through and the new line and
+   pack count shown, total ₹663.24 → ₹581.58. **Place order** gives "Order placed."
+5. At 390 px: typing `dolo and ORS` gives `confirmed_otc` (₹52.07) and Place order. Typing `augmentin` gives
+   "Augmentin 625 Duo needs a prescription. Upload one?" The **Handwritten-style Rx** sample → Pharmacist tab →
+   approve → the chat is verified. No horizontal scroll on any view.
+6. **Forecast** reads the real `/api/forecast/summary`: "Off by 23% on average" vs naive 29%, 50 SKUs × 3 areas,
+   150 reorder rows (14 at stockout risk).
+7. **One real photo upload** (the handwritten-style sample JPEG, 1179×1600, sent through the file input):
+   14 s end to end. The "Still reading…" message appeared at 8 s; the result was a 3-line cart with swap chips, and
+   the console opened it.
+
+**Not checkable on real data yet:** no real sample produces a **red** line, so the red-line path (blocked
+approval, `sku: null`, forced edit or remove) was checked on mocks only. Use the **Messy Rx (edge
+cases)** mock sample.
+
+**Frontend fixes from the real run:**
+- SKU picker: real search returns ties (for example 5 × 0.86 for "paracetamol 650"). Rows now show their rank
+  (`#1`, `#2`, …), print a match percent only when it differs from the row above ("same match"
+  otherwise), and a hint explains that ties are ranked by how often they sell.
+- Forecast opens on the at-risk series with the most demand (a spike SKU, e.g. Crocin 650 in Area B) instead
+  of the soonest stockout (Telma 40). The reorder table shows only the at-risk rows, with a "Show all 150"
+  toggle. The "Forecast (next 12 h)" column is renamed "Demand over lead time", because the lead time comes
+  from the backend.
+- Sample orders report `latency_ms: 0`, so the console hides "Read in" when it is 0.
+
+| | |
+|---|---|
+| Split screen, real cart and queue | ![](feat-frontend/20-real-demo-cart-and-queue.png) |
+| Pharmacist edit with the real picker | ![](feat-frontend/21-real-pharmacist-edit.png) |
+| Verified on real data | ![](feat-frontend/22-real-verified.png) |
+| Real forecast | ![](feat-frontend/23-real-forecast.png) |
+| 390 px: typed OTC and Rx-only | ![](feat-frontend/24-real-mobile-typed.png) |
+| 390 px: sample cart | ![](feat-frontend/25-real-mobile-cart.png) |
+| 390 px: pharmacist tab | ![](feat-frontend/26-real-mobile-pharmacist.png) |
+| 390 px: verified | ![](feat-frontend/27-real-mobile-verified.png) |
+| Real photo upload, still reading | ![](feat-frontend/28-real-upload-reading.png) |
+| Real photo upload, cart | ![](feat-frontend/29-real-upload-cart.png) |
+
+## Before production
+
+- Build with `VITE_API_BASE_URL=https://rio-api.buildspacelabs.com` and no `VITE_MOCKS`. The Pages origin
+  must be on the backend's CORS allow-list.
