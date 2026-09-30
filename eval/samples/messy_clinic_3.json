@@ -1,0 +1,52 @@
+{
+  "doctor_name": "Dr. Farah Siddiqui",
+  "clinic_name": "Shree Sai Polyclinic",
+  "patient_name": "Fatima Shaikh",
+  "rx_date": "2026-09-06",
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_text": "1) T. Azithral 500 0-0-1 x 7 days (A/F)",
+      "drug": "Azithral",
+      "strength": "500",
+      "form": "tablet",
+      "frequency": "0-0-1",
+      "doses_per_day": 1.0,
+      "duration_days": 7,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 2,
+      "raw_text": "2) T. ? 400 1-0-1 x 3 days (empty stomach)",
+      "drug": "?",
+      "strength": "400",
+      "form": "tablet",
+      "frequency": "1-0-1",
+      "doses_per_day": 2.0,
+      "duration_days": 3,
+      "quantity": null,
+      "illegible_fields": [
+        "drug"
+      ],
+      "bbox": null
+    },
+    {
+      "line_no": 3,
+      "raw_text": "3) T. Cetzine 10 1-0-0 for 5 days (A/F)",
+      "drug": "Cetzine",
+      "strength": "10",
+      "form": "tablet",
+      "frequency": "1-0-0",
+      "doses_per_day": 1.0,
+      "duration_days": 5,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    }
+  ],
+  "model": "google/gemini-3.8-flash",
+  "latency_ms": 11509,
+  "cost_usd": 0.0061845
+}

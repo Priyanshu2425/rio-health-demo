@@ -2,6 +2,7 @@
 
     cd backend && uv run python ../eval/make_synth.py            # eval/synth/s01..s20
     cd backend && uv run python ../eval/make_synth.py --samples  # eval/samples/ (then load_samples.py)
+    cd backend && uv run python ../eval/make_synth.py --messy    # only eval/samples/messy_clinic_3.jpg
 
 Four layouts (clinic letterhead, hospital OPD table, handwritten on a pad, minimal typed
 with clinical notes as distractors), several fonts including handwriting-style ones, 2-5
@@ -390,7 +391,38 @@ def layout_opd_table(rng: random.Random, hd: Header, items: list[RxItem]) -> Ima
     return img
 
 
-def layout_handwritten(rng: random.Random, hd: Header, items: list[RxItem], hand: str) -> Image.Image:
+def smudge(img: Image.Image, box: tuple[int, int, int, int], ink, seed: int, heavy: bool = False) -> None:
+    """Smear the ink inside `box` (a wet thumb across a word) and drop a blot on it.
+
+    Uses its own RNG so the page's layout RNG is untouched."""
+    rng = random.Random(seed)
+    x0, y0, x1, y1 = box
+    region = img.crop(box).filter(ImageFilter.GaussianBlur(8 if heavy else 5))
+    img.paste(region, box[:2])
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    w, h = x1 - x0, y1 - y0
+    start = 0.15 if heavy else 0.25  # leave the first letter or two
+    for _ in range(14 if heavy else 11):
+        cx = x0 + w * rng.uniform(start, 0.95)
+        cy = y0 + h * rng.uniform(0.35, 0.7)
+        rx, ry = w * rng.uniform(0.08, 0.18), h * rng.uniform(0.18, 0.35)
+        d.ellipse(
+            (cx - rx, cy - ry, cx + rx, cy + ry),
+            fill=(*ink, rng.randint(90, 170) if heavy else rng.randint(85, 135)),
+        )
+    layer = layer.filter(ImageFilter.GaussianBlur(7))
+    img.paste(Image.alpha_composite(img.convert("RGBA"), layer).convert("RGB"))
+
+
+def layout_handwritten(
+    rng: random.Random,
+    hd: Header,
+    items: list[RxItem],
+    hand: str,
+    smudge_line: int | None = None,
+    heavy: bool = False,
+) -> Image.Image:
     img = paper(rng)
     d = ImageDraw.Draw(img)
     face = rng.choice(["times", "georgia"])
@@ -416,7 +448,13 @@ def layout_handwritten(rng: random.Random, hd: Header, items: list[RxItem], hand
             hand_text(img, (110, y), f"Tab {wrong.written} 1-0-1", hf, rng, ink, strike=True)
             y += 100
         text = f"{i}) {it.text}"
-        hand_text(img, (110, y), text, fit_font(hand, hf.size, text, W - 200), rng, ink)
+        lf = fit_font(hand, hf.size, text, W - 200)
+        hand_text(img, (110, y), text, lf, rng, ink)
+        if smudge_line == i:
+            x_start = 110 + int(lf.getlength(f"{i}) {it.prefix} "))
+            x_end = x_start + int(lf.getlength(it.brand.drug))
+            box = (x_start - 12, y - 24, x_end + 16, y + int(lf.size * 1.3) + 24)
+            smudge(img, box, ink, seed=len(text) * 31 + i, heavy=heavy)
         y += 110 + rng.randint(-10, 20)
     hand_text(img, (110, y + 30), f"Adv: {rng.choice(ADVICE)}", font(hand, 38), rng, ink)
     hand_text(img, (860, H - 260), hd.doctor.split()[-1], font(hand, 56), rng, ink)
@@ -534,7 +572,15 @@ def to_jpeg(img: Image.Image, quality: int) -> bytes:
 LAYOUTS = ["letterhead", "opd_table", "handwritten", "minimal"]
 
 
-def render(rng: random.Random, layout: str, n_lines: int, hand: str = "bradley", names=None):
+def render(
+    rng: random.Random,
+    layout: str,
+    n_lines: int,
+    hand: str = "bradley",
+    names=None,
+    smudge_line: int | None = None,
+    heavy: bool = False,
+):
     hd = make_header(rng)
     items = pick_items(rng, n_lines, names)
     if layout == "letterhead":
@@ -542,7 +588,7 @@ def render(rng: random.Random, layout: str, n_lines: int, hand: str = "bradley",
     elif layout == "opd_table":
         img = layout_opd_table(rng, hd, items)
     elif layout == "handwritten":
-        img = layout_handwritten(rng, hd, items, hand)
+        img = layout_handwritten(rng, hd, items, hand, smudge_line, heavy)
     else:
         img = layout_minimal(rng, hd, items)
     truth = {
@@ -648,13 +694,48 @@ def make_samples(seed: int) -> None:
     (SAMPLES_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 
+# A demo sample with one smudged drug name, so the pharmacist console has a red line to
+# fix. It has no truth-derived parse: its cached parse must come from a real vision call
+# (`refresh_samples.py --only messy_clinic_3`), so the red line is the model's own call.
+MESSY_SAMPLE = (
+    "messy_clinic_3",
+    "Messy clinic Rx, 3 lines (one smudged)",
+    "handwritten",
+    "bradley",
+    ["Azithral 500", "Metrogyl 400", "Cetzine 10"],
+    2,  # the smudged line
+)
+
+
+def make_messy_sample(seed: int, heavy: bool = False) -> None:
+    """Write eval/samples/messy_clinic_3.jpg and add it to the manifest (last position)."""
+    sample_id, label, layout, hand, names, line = MESSY_SAMPLE
+    rng = random.Random(seed)
+    img, truth, _, _ = render(rng, layout, len(names), hand, names, smudge_line=line, heavy=heavy)
+    photo = degrade(img, rng, strength=0.5)
+    (SAMPLES_DIR / f"{sample_id}.jpg").write_bytes(to_jpeg(photo, 80))
+    path = SAMPLES_DIR / "manifest.json"
+    manifest = json.loads(path.read_text())
+    if not any(e["sample_id"] == sample_id for e in manifest):
+        manifest.append(
+            {"sample_id": sample_id, "label": label, "image": f"{sample_id}.jpg", "mime": "image/jpeg"}
+        )
+        path.write_text(json.dumps(manifest, indent=2) + "\n")
+    heaviness = ", heavy" if heavy else ""
+    print(f"{sample_id}: {', '.join(t['drug'] for t in truth['lines'])} (line {line} smudged{heaviness})")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--samples", action="store_true", help="write the demo samples instead of the eval set")
+    ap.add_argument("--messy", action="store_true", help="write only the smudged demo sample, messy_clinic_3")
+    ap.add_argument("--heavy", action="store_true", help="with --messy: a heavier smudge")
     args = ap.parse_args()
-    if args.samples:
+    if args.messy:
+        make_messy_sample(args.seed + 2000, heavy=args.heavy)
+    elif args.samples:
         make_samples(args.seed + 1000)
     else:
         make_synth(args.n, args.seed)
