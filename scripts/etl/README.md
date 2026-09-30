@@ -70,3 +70,19 @@ its salt forms (`metoprolol` covers `metoprolol succinate`). `rx_only` is true w
 salt is listed; `schedule` is the strictest (X > H1 > H). Paracetamol, cetirizine, ORS,
 antacids, vitamins and similar stay OTC. **This list is approximate and was written for a
 demo; it is not a regulatory reference.** 74.6% of the trimmed catalog is Rx-only.
+
+## Forecast data is synthetic
+
+**Every order in `synthetic_orders` and every stock level in `inventory` is made up.**
+`gen_orders.py` (logic in `backend/app/forecast/synthetic.py`) generates 90 days of hourly
+demand, ending at the current hour, for 50 real catalog SKUs in three areas, with a fixed
+random seed. The structure injected on purpose: an hour-of-week curve (near zero from
+01:00 to 06:00, a daytime plateau, an evening peak from 18:00 to 22:00, a Saturday lift
+and a Sunday bump); a different mix per area (Area A is chronic-heavy: metformin,
+telmisartan, amlodipine, statins; Area B is acute and OTC: antibiotics, PPIs, paracetamol,
+antihistamines; Area C is mixed); a flu-style outbreak over the last 21 days that ramps
+paracetamol, ORS, cetirizine and azithromycin SKUs up to 2.6x over a week; and Poisson
+noise on every hour. Inventory is 1 to 3 days of recent demand with a 24 h lead time,
+except 12 series (the outbreak SKUs in Area B plus four at random) seeded at under a
+day so the stockout alerts fire. Only non-zero hours are stored. The forecast model, the
+backtest and the reorder rule are described in `backend/app/forecast/model.py`.
