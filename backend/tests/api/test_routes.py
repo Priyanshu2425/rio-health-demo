@@ -9,9 +9,15 @@ from pydantic import TypeAdapter
 from app import contracts as c
 from app.orders import mocks
 
-PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
-JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 64
-WEBP = b"RIFF\x00\x00\x00\x00WEBPVP8 " + b"\x00" * 64
+
+def _image(fmt: str) -> bytes:
+    buf = io.BytesIO()
+    Image.new("RGB", (8, 8), (200, 180, 160)).save(buf, format=fmt)
+    return buf.getvalue()
+
+
+PNG, JPEG, WEBP = _image("PNG"), _image("JPEG"), _image("WEBP")
+BROKEN_JPEG = b"\xff\xd8\xff\xe0 truncated jpeg"  # right magic bytes, not decodable
 
 
 def ok(resp, shape=c.Order):
@@ -444,6 +450,13 @@ def test_undecodable_image_is_400(client, monkeypatch):
 
     monkeypatch.setattr(mocks.parser, "parse_prescription", staticmethod(bad))
     err(upload(client), 400, "unsupported_image")
+
+
+def test_magic_bytes_but_undecodable_is_400_and_free(client, mock_mode):
+    mock_mode.parse_rate_limit_per_hour = 1
+    ip = {"CF-Connecting-IP": "203.0.113.10"}
+    err(upload(client, BROKEN_JPEG, "image/jpeg", headers=ip), 400, "unsupported_image")
+    ok(upload(client, headers=ip))
 
 
 def test_rejected_images_do_not_use_up_the_rate_limit(client, mock_mode):

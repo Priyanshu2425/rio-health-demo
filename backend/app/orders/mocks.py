@@ -15,7 +15,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, UnidentifiedImageError
 from pydantic import TypeAdapter
 from rapidfuzz import fuzz
 
@@ -30,6 +30,7 @@ from app.contracts import (
     Sample,
     SkuForecast,
 )
+from app.parser.extract import UnsupportedImage
 from app.parser.split import split_request
 
 FIXTURES = Path(__file__).resolve().parents[3] / "contracts" / "fixtures"
@@ -229,6 +230,11 @@ def _render(sample_id: str) -> bytes:
 class parser:
     @staticmethod
     async def parse_prescription(image: bytes, mime: str) -> ParsedRx:
+        # Decode like the real parser does, so a broken image is a 400 in both modes.
+        try:
+            Image.open(io.BytesIO(image)).load()
+        except (UnidentifiedImageError, OSError) as exc:
+            raise UnsupportedImage(f"cannot read image: {exc}") from exc
         return _fixture_rx().model_copy(update={"model": "mock/vision", "latency_ms": MOCK_LATENCY_MS})
 
     @staticmethod

@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import io
 import math
 import threading
 import time
 from collections import deque
 
 from fastapi import HTTPException, Request, UploadFile
+from PIL import Image, UnidentifiedImageError
 
 from app.core.config import get_settings
 
@@ -51,9 +53,20 @@ async def read_image(request: Request, image: UploadFile) -> tuple[bytes, str]:
     if declared not in DECLARED_OK:
         raise error(400, "unsupported_image", f"{declared} is not supported; send a jpeg, png or webp photo")
     mime = sniff_image(data[:16])
-    if mime is None:
+    if mime is None or not decodable(data):
         raise error(400, "unsupported_image", "that file is not a readable jpeg, png or webp image")
     return data, mime
+
+
+def decodable(data: bytes) -> bool:
+    """Cheap structural check (headers, no full decode) so a broken file is refused
+    before it counts against the rate limit. The parser's full decode stays as backstop."""
+    try:
+        with Image.open(io.BytesIO(data)) as img:
+            img.verify()
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError):
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
