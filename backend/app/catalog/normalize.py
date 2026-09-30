@@ -272,7 +272,50 @@ def parse_pack(raw: str | None) -> Pack | None:
         if number < 1 or number != int(number):
             return None
         pack_size = int(number)
-    return Pack(form=form, pack_size=pack_size, pack_label=label)
+    return Pack(form=form, pack_size=pack_size, pack_label=tidy_pack_label(label))
+
+
+# The dataset abbreviates tablet/capsule modifiers after the noun ('strip of 15 capsule
+# pr'). Spelled out and moved in front: 'strip of 15 prolonged-release capsules'.
+PACK_MODIFIERS = {
+    "sr": "sustained-release",
+    "er": "extended-release",
+    "xr": "extended-release",
+    "xl": "extended-release",
+    "pr": "prolonged-release",
+    "cr": "controlled-release",
+    "mr": "modified-release",
+    "dr": "delayed-release",
+    "ir": "immediate-release",
+    "tr": "timed-release",
+    "dt": "dispersible",
+    "md": "mouth-dissolving",
+    "vt": "vaginal",
+}
+_UNIT_LABEL = re.compile(
+    r"^(?P<head>.+? of (?P<num>\d+(?:\.\d+)?) )(?P<pre>(?:[a-z\-]+ )*?)"
+    r"(?P<unit>tablet|capsule)s?(?: (?P<mod>[a-z]+))?$"
+)
+
+
+def tidy_pack_label(label: str) -> str:
+    """Readable tablet/capsule pack labels, idempotent on its own output.
+
+    'strip of 10 tablet er' -> 'strip of 10 extended-release tablets',
+    'strip of 10 tablet dt' -> 'strip of 10 dispersible tablets', 'strip of 10 capsule'
+    -> 'strip of 10 capsules', 'strip of 1 tablets' -> 'strip of 1 tablet'. An unknown
+    trailing word is kept in brackets ('strip of 3 tablets (combikit)'). Other labels
+    are returned unchanged.
+    """
+    m = _UNIT_LABEL.match(label)
+    if m is None:
+        return label
+    unit = m.group("unit") + ("" if float(m.group("num")) == 1 else "s")
+    mod = m.group("mod")
+    before = PACK_MODIFIERS.get(mod, "") if mod else ""
+    after = f" ({mod})" if mod and mod not in PACK_MODIFIERS else ""
+    prefix = f"{before} " if before and before not in m.group("pre").split() else ""
+    return f"{m.group('head')}{m.group('pre')}{prefix}{unit}{after}"
 
 
 # ---------------------------------------------------------------------------

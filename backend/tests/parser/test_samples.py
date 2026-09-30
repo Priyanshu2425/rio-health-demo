@@ -42,6 +42,13 @@ async def test_load_every_sample(conn):
         assert all(line.drug for line in parsed.lines)
 
 
+async def test_messy_sample_has_a_line_for_the_pharmacist(conn):
+    """messy_clinic_3's cached parse is a real vision parse that flagged the smudged drug."""
+    _, _, parsed = await parser.load_sample(conn, "messy_clinic_3")
+    assert parsed.model != "synthetic-truth"
+    assert [line.line_no for line in parsed.lines if "drug" in line.illegible_fields] == [2]
+
+
 async def test_unknown_sample(conn):
     with pytest.raises(KeyError):
         await parser.load_sample(conn, "nope")

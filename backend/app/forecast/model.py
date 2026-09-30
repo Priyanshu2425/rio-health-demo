@@ -27,7 +27,7 @@ PROFILE_WEEKS = 8
 LEVEL_SPAN_DAYS = 7
 LEVEL_WINDOW_DAYS = 28
 BACKTEST_DAYS = 14
-CHART_PAST_DAYS = 7
+CHART_PAST_DAYS = 28  # long enough to show the 21-day outbreak's onset
 CHART_FUTURE_HOURS = 48
 REORDER_BUFFER = 1.2  # order 20% above the lead-time forecast
 

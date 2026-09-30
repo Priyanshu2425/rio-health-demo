@@ -16,5 +16,11 @@
     "label": "Handwritten-style Rx, 3 lines",
     "image": "handwritten_style_3.jpg",
     "mime": "image/jpeg"
+  },
+  {
+    "sample_id": "messy_clinic_3",
+    "label": "Messy clinic Rx, 3 lines (one smudged)",
+    "image": "messy_clinic_3.jpg",
+    "mime": "image/jpeg"
   }
 ]

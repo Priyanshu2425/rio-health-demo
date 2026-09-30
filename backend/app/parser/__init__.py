@@ -34,7 +34,7 @@ async def match_text(conn: AsyncConnection, text: str) -> list[tuple[str, MatchR
     """
     pairs: list[tuple[str, MatchResult]] = []
     for i, item in enumerate(_split.split_request(text), start=1):
-        outcome = await _match.match_line_detailed(conn, _split.to_parsed_line(i, item))
+        outcome = await _match.match_text_line_detailed(conn, _split.to_parsed_line(i, item))
         pairs.append((item.requested_text, outcome.result))
     return pairs
 

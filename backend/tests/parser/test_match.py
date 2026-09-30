@@ -141,3 +141,88 @@ async def test_fallback_prefers_brand_without_extra_words(monkeypatch):
     install(monkeypatch, {"montair lc": [(kid, 0.8), (adult, 0.75)]})
     result = await parser.match_line(None, line("Montair LC"))
     assert result.sku.sku_id == "lc"
+
+
+DOLO_SUSP = fakes.sku("dolo", "Dolo", "suspension", [("paracetamol", "125mg")], rx=False)
+DOLO_MF = fakes.sku("dolomf", "Dolo-MF", "suspension", [("mefenamic acid", "50mg"), ("paracetamol", "125mg")])
+DOLO_250 = fakes.sku("dolo250", "Dolo 250", "suspension", [("paracetamol", "250mg")], rx=False)
+DOLO_500 = fakes.sku("dolo500", "Dolo 500", "tablet", [("paracetamol", "500mg")], rx=False)
+DOLO_TABLE = {
+    "dolo": [(DOLO_SUSP, 1.0), (DOLO_MF, 0.81), (DOLO_650, 0.78), (DOLO_250, 0.78), (DOLO_500, 0.77)]
+}
+
+
+def ranks(monkeypatch, table):
+    async def fake(conn, sku_ids):
+        return {s: table[s] for s in sku_ids if s in table}
+
+    monkeypatch.setattr(match, "popularity", fake)
+
+
+async def test_typed_bare_brand_prefers_its_tablet(monkeypatch, rerank_model):
+    _, fake = install(monkeypatch, DOLO_TABLE)
+    ranks(monkeypatch, {"dolo650": 1, "dolo500": 7})
+    [(text, result)] = await parser.match_text(None, "dolo")
+    assert (text, result.sku.sku_id) == ("dolo", "dolo650")
+    assert result.score == 0.78 and result.reranked is False
+    assert "tablet" in result.reason
+    assert fake.calls == []
+
+
+async def test_typed_near_tied_tablets_go_to_the_better_known_one(monkeypatch, rerank_model):
+    install(monkeypatch, DOLO_TABLE)
+    ranks(monkeypatch, {"dolo650": 9, "dolo500": 2})
+    [(_, result)] = await parser.match_text(None, "dolo")
+    assert result.sku.sku_id == "dolo500"
+
+
+async def test_typed_preference_ignores_brands_with_extra_words(monkeypatch, rerank_model):
+    liquid = fakes.sku("allegra", "Allegra", "suspension", [("fexofenadine", "30mg")])
+    combo = fakes.sku("allegram", "Allegra-M", "tablet", [("fexofenadine", "120mg"), ("montelukast", "10mg")])
+    tab = fakes.sku("allegra120", "Allegra 120mg", "tablet", [("fexofenadine", "120mg")])
+    install(monkeypatch, {"allegra": [(liquid, 1.0), (combo, 0.9), (tab, 0.79)]})
+    ranks(monkeypatch, {"allegram": 1, "allegra120": 5})
+    [(_, result)] = await parser.match_text(None, "allegra")
+    assert result.sku.sku_id == "allegra120"
+
+
+async def test_typed_strength_or_form_keeps_the_literal_match(monkeypatch, rerank_model):
+    table = {
+        "dolo 250": [(DOLO_250, 1.0), (DOLO_650, 0.7)],
+        "dolo syrup": [(DOLO_SUSP, 0.5), (DOLO_650, 0.4)],
+    }
+    install(monkeypatch, table, {"choice": 1, "reason": "the suspension"})
+    ranks(monkeypatch, {"dolo650": 1})
+    pairs = await parser.match_text(None, "dolo 250, dolo syrup")
+    assert [r.sku.sku_id for _, r in pairs] == ["dolo250", "dolo"]
+
+
+async def test_typed_preference_needs_a_close_tablet(monkeypatch, rerank_model):
+    install(monkeypatch, {"dolo": [(DOLO_SUSP, 1.0), (DOLO_650, 0.7)]})
+    ranks(monkeypatch, {"dolo650": 1})
+    [(_, result)] = await parser.match_text(None, "dolo")
+    assert result.sku.sku_id == "dolo"  # 0.3 below the top is a different product
+
+
+async def test_prescription_lines_keep_the_literal_match(monkeypatch, rerank_model):
+    """match_line is unchanged; only typed requests get the tablet preference."""
+    install(monkeypatch, DOLO_TABLE)
+    ranks(monkeypatch, {"dolo650": 1})
+    result = await parser.match_line(None, line("Dolo", form=None))
+    assert result.sku.sku_id == "dolo"
+
+
+@pytest.mark.parametrize("drug", ["?", "—", "??", " - "])
+async def test_letterless_drug_is_unreadable_without_a_search(monkeypatch, rerank_model, drug):
+    cat, fake = install(monkeypatch, {"? 400": [(PAN_40, 0.3)]})
+    result = await parser.match_line(None, line(drug, "400"))
+    assert result.sku is None
+    assert result.reason == "drug name unreadable"
+    assert cat.queries == [] and fake.calls == []
+    typed = await parser.match_text(None, "?")
+    assert all(r.sku is None for _, r in typed)
+
+
+def test_readable_drug():
+    assert match.readable_drug("Dolo") and match.readable_drug("B-12")
+    assert not match.readable_drug("?") and not match.readable_drug("") and not match.readable_drug(None)

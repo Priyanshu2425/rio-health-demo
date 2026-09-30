@@ -102,9 +102,18 @@ def test_outputs_validate_against_contracts(computed):
     one = SkuForecast.model_validate(series[0].model_dump(mode="json"))
     past = [p for p in one.points if p.actual is not None]
     future = [p for p in one.points if p.actual is None]
-    assert len(past) == 7 * 24
+    assert len(past) == model.CHART_PAST_DAYS * 24 == 28 * 24
     assert len(future) == 48
     assert all(p.ts.utcoffset() == IST.utcoffset(END) for p in one.points)
+
+
+def test_chart_shows_the_spike_onset(computed):
+    """The stored actuals reach back past the outbreak's start, so the chart shows the rise."""
+    _, series = computed
+    one = next(s for s in series if s.sku_id == "sku_crocin_650" and s.area == "Area B")
+    past = [p.actual for p in one.points if p.actual is not None]
+    first_week, last_week = sum(past[: 7 * 24]), sum(past[-7 * 24 :])
+    assert last_week > 1.8 * first_week
 
 
 @pytest.mark.parametrize(

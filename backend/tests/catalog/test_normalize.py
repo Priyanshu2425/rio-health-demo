@@ -11,6 +11,7 @@ from app.catalog.normalize import (
     parse_composition,
     parse_pack,
     schedule_for,
+    tidy_pack_label,
 )
 from app.catalog.query import pack_amount, same_whole_pack
 from app.contracts import SKU, Salt
@@ -137,6 +138,40 @@ def test_pack_mapping(label, form, size):
 def test_unmappable_pack_is_dropped():
     assert parse_pack("packet of 1 Kit") is None
     assert parse_pack(None) is None
+
+
+@pytest.mark.parametrize(
+    ("raw", "label"),
+    [
+        ("strip of 15 capsule pr", "strip of 15 prolonged-release capsules"),
+        ("strip of 10 tablet er", "strip of 10 extended-release tablets"),
+        ("strip of 10 tablet dt", "strip of 10 dispersible tablets"),
+        ("strip of 10 tablet sr", "strip of 10 sustained-release tablets"),
+        ("strip of 1 tablet dt", "strip of 1 dispersible tablet"),
+        ("bottle of 30 tablet cr", "bottle of 30 controlled-release tablets"),
+        ("packet of 7 tablet vt", "packet of 7 vaginal tablets"),
+        ("strip of 10 tablet", "strip of 10 tablets"),
+        ("strip of 1 tablet", "strip of 1 tablet"),
+        ("strip of 1 tablets", "strip of 1 tablet"),
+        ("strip of 4 effervescent tablet", "strip of 4 effervescent tablets"),
+        ("strip of 10 soft gelatin capsules", "strip of 10 soft gelatin capsules"),
+        ("strip of 3 tablet combikit", "strip of 3 tablets (combikit)"),
+        ("bottle of 60 ml syrup", "bottle of 60 ml syrup"),
+        ("vial of 1 injection", "vial of 1 injection"),
+    ],
+)
+def test_pack_label_is_readable(raw, label):
+    assert tidy_pack_label(raw) == label
+    assert tidy_pack_label(label) == label  # idempotent: the seed can be re-tidied
+
+
+def test_parse_pack_tidies_the_label_but_keeps_form_and_size():
+    pack = parse_pack("Strip of 15 Capsule PR")
+    assert (pack.form, pack.pack_size, pack.pack_label) == (
+        "capsule",
+        15,
+        "strip of 15 prolonged-release capsules",
+    )
 
 
 @pytest.mark.parametrize(

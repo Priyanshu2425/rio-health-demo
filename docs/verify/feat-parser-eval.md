@@ -160,3 +160,25 @@ noise, blur, JPEG quality 40–70.
   `refresh_samples.py` runs (3 calls, about $0.02).
 - **`UnsupportedImage`.** `parse_prescription` can raise it (a `ValueError`) for bytes
   Pillow cannot read. The backend maps it to 400 `unsupported_image`.
+
+## Loom polish (`fix/loom-polish`)
+
+- **Typed "dolo" → Dolo 650.** In a typed request with no strength and no form, a tablet
+  or capsule of the same brand (brand name adds nothing but a strength) within 0.25 of
+  the top trigram score wins over a literal hit on a liquid; near ties go to the best
+  `popularity_rank`. `match_text(conn, "dolo")` now gives Dolo 650 (was the 15 ml Dolo
+  suspension); `allegra` → Allegra 120mg (never Allegra-M), `pan` → Pan 40. Typed
+  strengths or forms (`dolo 250`, `dolo syrup`) and prescription lines are unchanged.
+  Tests: `tests/parser/test_match.py` (fakes) and `tests/parser/test_typed_db.py` (Neon).
+- **A red line in a real parse.** `messy_clinic_3` (position 4) is a handwritten 3-line
+  Rx with line 2's drug name smudged (`make_synth.py --messy`). Its cached parse is one
+  real call (`refresh_samples.py --only messy_clinic_3`, gemini-3.8-flash, $0.0062,
+  11.5 s). The model wrote the drug as `?` with `illegible_fields: ["drug"]`, so triage
+  is green (Azithral 500) / **red** (the smudged line, strength 400 read) / green
+  (Cetzine). The other three samples still carry synthetic-truth parses.
+
+```sh
+cd backend && uv run python ../eval/make_synth.py --messy                    # image + manifest entry only
+cd backend && uv run python ../eval/refresh_samples.py --only messy_clinic_3  # one vision call
+cd backend && uv run python ../eval/load_samples.py
+```
