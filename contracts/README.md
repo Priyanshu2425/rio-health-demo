@@ -9,12 +9,15 @@ What every branch builds against. Frozen on `main`.
 | `frontend/src/contracts.gen.ts` | TypeScript types | Generated: `cd frontend && npm run gen:contracts` |
 | `contracts/fixtures/*.json` | Mock payloads | Generated: `cd backend && uv run python -m scripts.make_fixtures` |
 | `contracts/API.md` | HTTP routes, error codes, order rules | Yes |
-| `backend/migrations/001_init.sql` | Database tables | Yes |
+| `backend/migrations/*.sql` | Database tables | Yes |
 | `backend/app/{catalog,parser,forecast}/__init__.py` | Function signatures between modules | Yes (the signatures, not the bodies) |
 | `backend/pyproject.toml`, `backend/uv.lock` | Python dependencies | Yes |
 
 ## Rules
 
+0. At runtime the app reads only the database (and, in `RIO_USE_MOCKS=1` dev mode, the
+   fixtures). Files under `data/`, `eval/` and sample images are ETL inputs that a script
+   loads into Neon; no request path opens a file.
 1. A feature branch never edits a file in the table above, apart from replacing the
    function bodies it owns.
 2. If you need a change, stop and report what you need and why. It lands on `main` as
