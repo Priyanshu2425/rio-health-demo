@@ -1,0 +1,100 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+.wordmark-sub {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.appnav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.appnav a {
+  padding: 7px 12px;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+.appnav a:hover {
+  color: var(--ink);
+  background: var(--panel-2);
+}
+.appnav a[aria-current='page'] {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+.mockflag {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+@media (max-width: 720px) {
+  .appbar {
+    gap: 10px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+  }
+  .wordmark-sub {
+    display: none;
+  }
+  .appnav {
+    order: 3;
+    width: 100%;
+  }
+  .appnav a {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+  /* The customer chat is the whole screen on a phone. */
+  .shell-chat .appnav {
+    display: none;
+  }
+}
+
+.config-error {
+  padding: 10px 20px;
+  background: var(--red-bg);
+  color: var(--red);
+  border-bottom: 1px solid var(--red-line);
+  font-size: 0.92rem;
+}

@@ -1,0 +1,159 @@
+.demo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 24px;
+  padding: 16px 20px 20px;
+}
+.demo-tabs {
+  display: none;
+}
+.demo-caption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 8px 4px;
+}
+.demo-phone-col,
+.demo-console-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+.phone {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 380px;
+  max-height: 800px;
+  padding: 12px;
+  border-radius: 46px;
+  background: #1a2421;
+  box-shadow: var(--shadow-2), inset 0 0 0 2px #33423d;
+}
+.phone-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 110px;
+  height: 24px;
+  transform: translateX(-50%);
+  background: #1a2421;
+  border-radius: 0 0 16px 16px;
+  z-index: 2;
+}
+.phone-screen {
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  background: var(--chat-wall);
+}
+.phone .chat-head {
+  padding-top: 30px;
+}
+.demo-console {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+}
+
+@media (max-width: 899px) {
+  .demo {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+  .demo-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .demo-tabs button {
+    flex: 1;
+    position: relative;
+    padding: 8px;
+    border: 0;
+    border-radius: var(--r-md);
+    background: transparent;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .demo-tabs button[aria-selected='true'] {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+  .demo-dot {
+    position: absolute;
+    top: 8px;
+    margin-left: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .demo-caption {
+    display: none;
+  }
+  .demo-tab-customer .demo-console-col,
+  .demo-tab-pharmacist .demo-phone-col {
+    display: none;
+  }
+  .demo-phone-col,
+  .demo-console-col {
+    flex: 1;
+  }
+  .phone {
+    width: 100%;
+    max-height: none;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .phone-notch {
+    display: none;
+  }
+  .phone-screen {
+    border-radius: 0;
+  }
+  .phone .chat-head {
+    padding-top: 10px;
+  }
+  .demo-console {
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+.chat-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+}
+.chat-page .chat {
+  width: 100%;
+  max-width: 560px;
+  border-inline: 1px solid var(--line);
+}
+@media (max-width: 720px) {
+  .chat-page .chat {
+    border: 0;
+  }
+}
+.pharm-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--panel);
+}
