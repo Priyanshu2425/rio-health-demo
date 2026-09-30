@@ -36,13 +36,15 @@ async def complete_json(
     *,
     temperature: float = 0.0,
     strict: bool = False,
+    max_tokens: int = 8000,
 ) -> LLMResult:
     """Call `model` and return JSON that validates against `schema`.
 
     `strict=True` asks the provider to enforce the schema, but only works when every
     property is required and `additionalProperties` is false; the response is validated
     against `schema` either way. Raises LLMError on HTTP errors, timeouts, or a response
-    that does not validate.
+    that does not validate. `max_tokens` caps output, reasoning included, so a runaway
+    generation costs cents rather than running to the timeout.
     """
     settings = get_settings()
     if not settings.openrouter_api_key:
@@ -54,6 +56,7 @@ async def complete_json(
         "model": model,
         "messages": messages,
         "temperature": temperature,
+        "max_tokens": max_tokens,
         "response_format": {
             "type": "json_schema",
             "json_schema": {"name": schema.__name__, "strict": strict, "schema": schema.model_json_schema()},
