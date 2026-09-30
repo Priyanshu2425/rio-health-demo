@@ -156,3 +156,9 @@ def test_merge_previous_replaces_only_rerun_prescriptions(tmp_path):
     merged = run.merge_previous(path, "synth", [{"rx_id": "s19", "v": "new"}])
     assert merged == [{"rx_id": "s01", "v": "old"}, {"rx_id": "s19", "v": "new"}]
     assert run.merge_previous(tmp_path / "missing.json", "synth", [{"rx_id": "s19"}]) == [{"rx_id": "s19"}]
+
+
+def test_written_quantity_stands_in_for_duration():
+    line = pline("Dolo", "650", 2, None) | {"quantity": 10}
+    assert metrics.completeness(line) == 1.0
+    assert metrics.completeness(pline("Dolo", "650", 2, None)) == 0.75

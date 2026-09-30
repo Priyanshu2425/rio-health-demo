@@ -99,11 +99,13 @@ def field_hits(truth: dict, pred: dict) -> dict[str, bool]:
 
 
 def completeness(line: dict) -> float:
+    """Share of drug/strength/frequency/duration present; a written quantity stands in for
+    duration (contracts/API.md order rules), exactly as the backend's triage does."""
     present = [
         bool(line.get("drug")),
         bool(line.get("strength")),
         bool(line.get("frequency")),
-        line.get("duration_days") is not None,
+        line.get("duration_days") is not None or line.get("quantity") is not None,
     ]
     return sum(present) / len(present)
 

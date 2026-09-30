@@ -274,7 +274,13 @@ async def main_async(args) -> int:
         "sets": per_set,
         "runs": raw,
     }
-    results_path(args.model).write_text(json.dumps(out, indent=2, default=str) + "\n")
+    path = results_path(args.model)
+    if args.only and path.exists():
+        # --only re-ran some prescriptions of the sets above; keep every other saved set.
+        saved = json.loads(path.read_text())
+        out["sets"] = {**saved.get("sets", {}), **per_set}
+        out["runs"] = {**saved.get("runs", {}), **raw}
+    path.write_text(json.dumps(out, indent=2, default=str) + "\n")
     summary = RESULTS / "summary.md"
     if not summary.exists():
         summary.write_text(SUMMARY_HEADER)

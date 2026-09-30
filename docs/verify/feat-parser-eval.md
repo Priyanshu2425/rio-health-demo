@@ -142,3 +142,21 @@ handwritten on a pad (with struck-through lines that are not in the truth) and m
 typed with C/O, O/E, advice and investigations as distractors. Degradation: page on a
 table, perspective warp, rotation ±4°, lighting gradient and vignette, paper tint,
 noise, blur, JPEG quality 40–70.
+
+## Design notes from code review
+
+- **Re-rank score.** When the re-rank model picks a candidate whose strength and form agree
+  with the parsed line (checked in code) and whose trigram score is at least 0.6, the
+  match score is raised to 0.85, so the line can be green. The model's own confidence is
+  never read (DECISIONS #6); the lift is gated on code checks. It is why % green rises
+  from 60% (no re-rank) to 77% (gpt-6-luna) on the oracle run with 0 green-but-wrong.
+- **Truth keys are not circular.** `sync_truth.py --write` sets a truth line's
+  `composition_key` from the catalog's entry for the brand written on the prescription,
+  never from what the matcher picked. SKU match then asks whether the matcher landed on
+  that composition.
+- **Only one vision model was compared**, by the owner's choice (google/gemini-3.8-flash,
+  passing the gate at 100%). `run.py` takes any OpenRouter id for a later comparison.
+- **Demo samples** still carry `"model": "synthetic-truth"` parses until
+  `refresh_samples.py` runs (3 calls, about $0.02).
+- **`UnsupportedImage`.** `parse_prescription` can raise it (a `ValueError`) for bytes
+  Pillow cannot read. The backend maps it to 400 `unsupported_image`.

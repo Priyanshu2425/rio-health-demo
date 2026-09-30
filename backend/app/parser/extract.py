@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import io
 import re
 
@@ -112,7 +113,8 @@ def to_parsed_rx(extraction: RxExtraction, model: str, latency_ms: int, cost_usd
 async def parse_prescription(image: bytes, mime: str, *, model: str | None = None) -> ParsedRx:
     """Downscale, one vision call, map to ParsedRx. `model` overrides VISION_MODEL (eval)."""
     del mime  # re-encoded as JPEG below, whatever came in
-    prepared, prepared_mime = prepare_image(image)
+    # Pillow decode/resize/encode is CPU work; keep it off the event loop.
+    prepared, prepared_mime = await asyncio.to_thread(prepare_image, image)
     model_id = model or get_settings().vision_model
     messages = [
         {"role": "system", "content": VISION_SYSTEM},
