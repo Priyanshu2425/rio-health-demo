@@ -69,7 +69,15 @@ class ParsedLine(Contract):
         None, ge=0, description="Normalized from frequency: '1-0-1' -> 2, 'TDS' -> 3, 'SOS' -> null"
     )
     duration_days: int | None = Field(None, ge=0)
-    quantity: int | None = Field(None, ge=0, description="Only if an explicit count is written")
+    quantity: int | None = Field(
+        None,
+        ge=0,
+        description=(
+            "Explicit count written on the Rx, in the same units as SKU.pack_size: tablets or "
+            "capsules for solid forms ('#10' -> 10), bottles/tubes/sachets/inhalers otherwise. "
+            "Null when absent or when written in packs ('2 strips')"
+        ),
+    )
     illegible_fields: list[ParsedField] = Field(
         default_factory=list, description="Fields the model could not read with confidence"
     )
@@ -109,7 +117,14 @@ class SKU(Contract):
     brand_name: str
     manufacturer: str
     form: Form
-    pack_size: int = Field(ge=1, description="Units per pack, e.g. 10 for a strip of 10")
+    pack_size: int = Field(
+        ge=1,
+        description=(
+            "Dispensable units per pack: tablets/capsules per strip or bottle (strip of 10 -> 10); "
+            "vials per pack for injections; 1 for anything sold by volume or weight (syrup, drops, "
+            "cream, inhaler) and for sachets, with the volume in pack_label"
+        ),
+    )
     pack_label: str = Field(description="Human label, e.g. 'strip of 10 tablets'")
     mrp_inr: float = Field(ge=0, description="Price per pack in rupees")
     composition: list[Salt]

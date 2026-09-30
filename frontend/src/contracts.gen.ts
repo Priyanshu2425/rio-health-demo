@@ -111,7 +111,7 @@ export interface SKU {
    */
   pack_label: string;
   /**
-   * Units per pack, e.g. 10 for a strip of 10
+   * Dispensable units per pack: tablets/capsules per strip or bottle (strip of 10 -> 10); vials per pack for injections; 1 for anything sold by volume or weight (syrup, drops, cream, inhaler) and for sachets, with the volume in pack_label
    */
   pack_size: number;
   rx_only: boolean;
@@ -182,7 +182,7 @@ export interface ParsedLine {
    */
   line_no: number;
   /**
-   * Only if an explicit count is written
+   * Explicit count written on the Rx, in the same units as SKU.pack_size: tablets or capsules for solid forms ('#10' -> 10), bottles/tubes/sachets/inhalers otherwise. Null when absent or when written in packs ('2 strips')
    */
   quantity: number | null;
   /**
