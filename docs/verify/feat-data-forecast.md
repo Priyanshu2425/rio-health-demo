@@ -135,3 +135,22 @@ Forecast tests (`tests/forecast/`): generator structure and reproducibility, the
 recovering a known seasonal pattern, backtest beating naive (overall and on the outbreak
 SKUs), reorder rule cases, `reorder_qty >= 0`, at least one stockout risk, contract
 validation, and one DB test that runs, stores and reads back a forecast.
+
+## Loom polish (`fix/loom-polish`)
+
+- **Spike visible in the chart.** Each stored series now carries 28 days of hourly actuals
+  (with their one-day-ahead forecasts) plus the 48 h forecast, up from 7 days
+  (`model.CHART_PAST_DAYS`). The outbreak starts 21 days before now, so the chart shows
+  its onset: Crocin 650 in Area B goes from ~60–85 units/day to 135–225. Payload: 720
+  points, ~50 KB of JSON per series, ~8 KB stored after TOAST compression (~1.1 MB per
+  run of 150 series). A fresh run was written after the change.
+- **Pack labels.** `tidy_pack_label` spells out the dataset's trailing modifiers and fixes
+  plurals: `strip of 15 capsule pr` → `strip of 15 prolonged-release capsules`,
+  `strip of 10 tablet er` → `strip of 10 extended-release tablets`, `strip of 10 tablet
+  dt` → `strip of 10 dispersible tablets`. The raw CSV isn't in the repo, so the
+  committed seed was re-tidied in place (909 of 9,303 rows, `pack_label` only) and
+  reloaded with `build_catalog.py --seed-only`; `popularity_rank` is 0–9,302 for every row.
+
+```sql
+SELECT count(*) FROM skus WHERE pack_label ~ '(tablet|capsule)s? [a-z]+$';  -- 0
+```
