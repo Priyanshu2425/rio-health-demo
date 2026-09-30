@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { api, errorMessage, type Order } from '../api'
+import { api, errorMessage, isConflict, type Order } from '../api'
 import { Dots, Money, Stamp, TriageBadge, timeAgo } from '../components/bits'
 import { RxImage } from './RxImage'
 import { LineCard } from './LineCard'
@@ -67,12 +67,24 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
       bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
       onReviewed()
     } catch (e) {
-      setSubmitError(errorMessage(e))
+      if (isConflict(e)) {
+        // Someone else already reviewed it: show the order as it is now.
+        setSubmitError(`${errorMessage(e)} Showing the latest version.`)
+        try {
+          setOrder(await api.getOrder(orderId))
+        } catch {
+          /* keep the error shown */
+        }
+        onReviewed()
+      } else {
+        setSubmitError(errorMessage(e))
+      }
     } finally {
       setSubmitting(false)
     }
   }
 
+  const noLines = items.filter((i) => i.status !== 'removed').length === 0
   const greensOpen = groups.green.filter((i) => !decisions[i.item_id])
 
   return (
@@ -128,6 +140,13 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
                   Next in queue
                 </button>
               )}
+            </div>
+          )}
+
+          {noLines && (
+            <div className="ov-nolines">
+              <strong>No medicines were read from this photo.</strong>
+              <p>Reject it with a note asking the customer for a clearer photo.</p>
             </div>
           )}
 
@@ -221,7 +240,7 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
                 </button>
                 <button
                   className="btn btn-primary"
-                  disabled={blocking.length > 0 || submitting || editing !== null}
+                  disabled={noLines || blocking.length > 0 || submitting || editing !== null}
                   onClick={() => submit('approve')}
                 >
                   {submitting ? 'Approving…' : 'Approve order'}

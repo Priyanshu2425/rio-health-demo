@@ -53,11 +53,41 @@ const handwritten = page(
   '#f7f4ea',
 )
 
+const messy = page(
+  `<text x="40" y="64" font-family="Georgia,serif" font-size="21" font-weight="700" fill="#2d5a3a">Shree Sai Polyclinic &amp; Diagnostic Centre</text>
+  <text x="40" y="86" font-family="Georgia,serif" font-size="13" fill="#2d5a3a">Kandivali (East), Mumbai</text>
+  <line x1="40" y1="100" x2="560" y2="100" stroke="#2d5a3a" stroke-width="1.5"/>
+  <text x="40" y="146" font-family="${HAND}" font-size="22" fill="#23306b">Mohd. Irfan Shaikh   52 M</text>
+  <g transform="rotate(-1.5 300 400)" font-family="${HAND}" fill="#23306b">
+    <text x="60" y="230" font-size="25">1) Augmentin Duo DT 625  1-0-1 × 5d</text>
+    <text x="60" y="300" font-size="25">2) Cap. R</text>
+    <path d="M150 292 q 10 -18 22 0 t 20 -4 t 18 6 t 16 -8" stroke="#23306b" stroke-width="2.5" fill="none"/>
+    <text x="240" y="300" font-size="25">Z?  1-0-1 × 7d</text>
+    <text x="60" y="370" font-size="25">3) Thyronorm 50mcg  1-0-0 × 30d</text>
+    <text x="60" y="440" font-size="25">4) Telma 40   0-0-1</text>
+  </g>
+  <ellipse cx="420" cy="520" rx="70" ry="26" fill="#8a6d3b" opacity="0.12"/>`,
+  '#f4f1e6',
+)
+
+const blurry = page(
+  `<defs><filter id="blur"><feGaussianBlur stdDeviation="7"/></filter></defs>
+  <g filter="url(#blur)" opacity="0.8">
+    <text x="40" y="80" font-family="Georgia,serif" font-size="28" font-weight="700" fill="#334">Clinic</text>
+    <text x="60" y="260" font-family="${HAND}" font-size="30" fill="#223">Tab ———— 1-0-1</text>
+    <text x="60" y="340" font-family="${HAND}" font-size="30" fill="#223">Syp ——— 5ml</text>
+    <text x="60" y="420" font-family="${HAND}" font-size="30" fill="#223">———— SOS</text>
+  </g>`,
+  '#e9e6dc',
+)
+
 const svgUrl = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
 export const SAMPLE_IMAGES: Record<string, string> = {
   typed_clinic_3: svgUrl(typedClinic),
   handwritten_2: svgUrl(handwritten),
+  messy_4: svgUrl(messy),
+  blank_0: svgUrl(blurry),
 }
 
 export const FALLBACK_IMAGE = SAMPLE_IMAGES.typed_clinic_3

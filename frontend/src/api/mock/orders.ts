@@ -133,6 +133,59 @@ const HANDWRITTEN_LINES: LineSpec[] = [
   },
 ]
 
+// Real-data edge cases: a long brand name, a line with no catalog match (sku null, always red),
+// a line whose SKU has no cheaper generic, and a missing duration.
+const MESSY_LINES: LineSpec[] = [
+  {
+    raw: 'Tab Augmentin Duo DT 625 1-0-1 x 5 days after food',
+    drug: 'Augmentin Duo DT',
+    strength: '625',
+    form: 'tablet',
+    frequency: '1-0-1',
+    dpd: 2,
+    days: 5,
+    skuId: 'sku_augmentin_duo_dt',
+    match: 0.88,
+  },
+  {
+    raw: 'Cap. R?x~l Z? 1-0-1 x 7d',
+    drug: null,
+    strength: null,
+    form: 'capsule',
+    frequency: '1-0-1',
+    dpd: 2,
+    days: 7,
+    illegible: ['drug', 'strength'],
+    skuId: null,
+    match: 0.21,
+    reasons: ['no catalog match', 'drug name illegible'],
+  },
+  {
+    raw: 'Tab Thyronorm 50mcg 1-0-0 empty stomach x 30 days',
+    drug: 'Thyronorm',
+    strength: '50mcg',
+    form: 'tablet',
+    frequency: '1-0-0',
+    dpd: 1,
+    days: 30,
+    skuId: 'sku_thyronorm_50',
+    match: 0.97,
+  },
+  {
+    raw: 'Tab Telma 40 0-0-1',
+    drug: 'Telma',
+    strength: '40',
+    form: 'tablet',
+    frequency: '0-0-1',
+    dpd: 1,
+    days: null,
+    illegible: ['duration'],
+    skuId: 'sku_telma_40',
+    match: 0.93,
+    reasons: ['duration not written; assumed 1 pack'],
+  },
+]
+
 export interface OrderSeed {
   items: CartItem[]
   parsed_rx: ParsedRx
@@ -142,6 +195,37 @@ export interface OrderSeed {
 export function sampleParse(sampleId: string): OrderSeed | null {
   if (sampleId === 'typed_clinic_3') {
     return { items: clone(PENDING_FIXTURE.items), parsed_rx: clone(PENDING_FIXTURE.parsed_rx!) }
+  }
+  if (sampleId === 'messy_4') {
+    const items = MESSY_LINES.map((l, i) => buildItem(l, i + 1))
+    return {
+      items,
+      parsed_rx: {
+        doctor_name: null,
+        clinic_name: 'Shree Sai Polyclinic & Diagnostic Centre, Kandivali (East)',
+        patient_name: 'Mohammed Irfan Shaikh',
+        rx_date: null,
+        lines: items.map((i) => i.parsed!),
+        model: 'example/vision-model',
+        latency_ms: 18420,
+        cost_usd: 0.0031,
+      },
+    }
+  }
+  if (sampleId === 'blank_0') {
+    return {
+      items: [],
+      parsed_rx: {
+        doctor_name: null,
+        clinic_name: null,
+        patient_name: null,
+        rx_date: null,
+        lines: [],
+        model: 'example/vision-model',
+        latency_ms: 9800,
+        cost_usd: 0.0012,
+      },
+    }
   }
   if (sampleId === 'handwritten_2') {
     const items = HANDWRITTEN_LINES.map((l, i) => buildItem(l, i + 1))

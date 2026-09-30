@@ -42,6 +42,8 @@ function sku(
 const strip = (n: number, what = 'tablets') => `strip of ${n} ${what}`
 
 const EXTRA: SKU[] = [
+  // Real catalog names run long; this one exercises wrapping in the cart, console and picker.
+  sku('sku_augmentin_duo_dt', 'Augmentin 625 Duo Tablet (Dispersible)', 'GlaxoSmithKline Pharmaceuticals Ltd', 'tablet', 10, strip(10), 228.9, [['amoxycillin', '500mg'], ['clavulanic acid', '125mg']], 'H'),
   sku('sku_clavam_625', 'Clavam 625', 'Alkem', 'tablet', 10, strip(10), 201.6, [['amoxycillin', '500mg'], ['clavulanic acid', '125mg']], 'H'),
   sku('sku_crocin_650', 'Crocin 650 Advance', 'GSK Consumer', 'tablet', 15, strip(15), 34.5, [['paracetamol', '650mg']], false),
   sku('sku_calpol_650', 'Calpol 650', 'GlaxoSmithKline', 'tablet', 15, strip(15), 31.2, [['paracetamol', '650mg']], false),

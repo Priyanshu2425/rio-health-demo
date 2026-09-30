@@ -49,8 +49,16 @@ const TRIAGE_RANK: Record<Triage, number> = { red: 0, amber: 1, green: 2 }
 const FAILS: Record<string, [number, string]> = {
   parser_failed: [502, 'We couldn’t read that photo. Try a sharper, well-lit picture, or try a sample.'],
   parser_timeout: [504, 'Reading the prescription took too long. Try again, or try a sample.'],
-  rate_limited: [429, 'You’ve sent a lot of prescriptions this hour. Try again in 20 minutes, or try a sample.'],
+  rate_limited: [429, 'Parse limit reached for this IP. Try again in 23 minutes.'],
+  unsupported_image: [400, 'Could not decode the upload as jpeg, png or webp.'],
+  image_too_large: [413, 'That photo is over 5 MB. Try a smaller one.'],
 }
+
+/** Mock-only samples that exercise real-data edge cases. */
+const EDGE_SAMPLES: Sample[] = [
+  { sample_id: 'messy_4', label: 'Messy Rx, 4 lines (edge cases)', thumbnail_url: '/api/samples/messy_4/image' },
+  { sample_id: 'blank_0', label: 'Blurry photo, nothing readable', thumbnail_url: '/api/samples/blank_0/image' },
+]
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -315,7 +323,7 @@ export class MockServer implements RioApi {
 
   async listSamples(): Promise<Sample[]> {
     await this.io()
-    return clone(samplesFixture as Sample[])
+    return [...clone(samplesFixture as Sample[]), ...EDGE_SAMPLES]
   }
 
   sampleImageUrl(sampleId: string): string {

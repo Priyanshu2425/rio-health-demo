@@ -730,3 +730,21 @@
     justify-items: start;
   }
 }
+
+.ov-nolines {
+  padding: 16px;
+  border: 1px dashed var(--red-line);
+  border-radius: var(--r-md);
+  background: var(--red-bg);
+  color: var(--red);
+  display: grid;
+  gap: 4px;
+}
+.ov-nolines p {
+  color: var(--ink-2);
+}
+.sku-brand,
+.qrow-title,
+.ov-title h2 {
+  overflow-wrap: anywhere;
+}

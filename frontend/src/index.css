@@ -164,6 +164,8 @@ img {
 
 /* ---------- triage ---------- */
 .triage {
+  /* Contains its .sr-only label so it can't widen the page from inside a scrolled list. */
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 5px;

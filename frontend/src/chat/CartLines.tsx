@@ -10,7 +10,7 @@ export function isSwapped(item: CartItem): boolean {
 }
 
 function lineName(item: CartItem): string {
-  return item.sku?.brand_name ?? item.parsed?.drug ?? item.requested_text ?? item.parsed?.raw_text ?? 'Unreadable line'
+  return item.sku?.brand_name ?? item.parsed?.drug ?? item.requested_text ?? (item.parsed ? `“${item.parsed.raw_text}”` : 'Unreadable line')
 }
 
 interface LineProps {
@@ -35,7 +35,7 @@ function Line({ item, swappable, busy, onSwap }: LineProps) {
             {item.sku.rx_only && <span className="pill pill-rx">Rx</span>}
           </>
         ) : (
-          <span>We couldn’t match this one. The pharmacist will pick it.</span>
+          <span>We couldn’t identify this line; the pharmacist will check.</span>
         )}
       </div>
       {swappable && item.generic_alternative && item.savings_inr != null && item.savings_inr > 0 && onSwap && (

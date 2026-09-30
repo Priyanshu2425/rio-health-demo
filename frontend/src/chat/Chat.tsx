@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { api, errorMessage, isParserTrouble, type CartItem, type Order, type Sample } from '../api'
+import {
+  PARSE_TIMEOUT_MS,
+  api,
+  errorMessage,
+  isConflict,
+  isParserTrouble,
+  withTimeout,
+  type CartItem,
+  type Order,
+  type Sample,
+} from '../api'
 import { Dots, Money, Stamp } from '../components/bits'
 import { resizeImage } from '../lib/resizeImage'
 import { usePoll } from '../lib/usePoll'
@@ -12,19 +22,41 @@ type Msg =
   | { id: number; kind: 'rio'; text: string; quick?: Quick[] }
   | { id: number; kind: 'user-text'; text: string }
   | { id: number; kind: 'user-photo'; src: string; caption?: string }
-  | { id: number; kind: 'typing'; text: string }
+  | { id: number; kind: 'typing'; text: string; slowText?: string }
   | { id: number; kind: 'samples' }
   | { id: number; kind: 'cart'; orderId: string }
   | { id: number; kind: 'verified'; orderId: string }
   | { id: number; kind: 'rejected'; orderId: string }
   | { id: number; kind: 'placed'; orderId: string }
   | { id: number; kind: 'needs-rx'; orderId: string }
+  | { id: number; kind: 'empty'; orderId: string }
   | { id: number; kind: 'error'; text: string; offerSample: boolean }
 
 const QUICK_LABEL: Record<Quick, string> = {
   upload: '📷 Upload prescription',
   sample: 'Try a sample',
   type: 'Type medicines',
+}
+
+/** After this long, the typing bubble reassures: real handwritten parses take 10–25 s. */
+const SLOW_AFTER_MS = 8000
+const READING = 'Reading your prescription…'
+const READING_SLOW = 'Still reading… handwritten prescriptions take a little longer.'
+
+function Typing({ text, slowText }: { text: string; slowText?: string }) {
+  const [slow, setSlow] = useState(false)
+  useEffect(() => {
+    if (!slowText) return
+    const t = setTimeout(() => setSlow(true), SLOW_AFTER_MS)
+    return () => clearTimeout(t)
+  }, [slowText])
+  const shown = slow && slowText ? slowText : text
+  return (
+    <div className="bubble bubble-in bubble-typing" aria-live="polite">
+      <Dots label={shown} />
+      <span>{shown}</span>
+    </div>
+  )
 }
 
 let seq = 0
@@ -72,29 +104,47 @@ export function Chat({ onOrderCreated }: ChatProps) {
 
   // Poll every order still waiting on the pharmacist.
   const waiting = Object.values(orders).filter((o) => o.status === 'pending_review')
+  const applyFresh = useCallback(
+    (old: Order | undefined, fresh: Order) => {
+      setOrders((prev) => ({ ...prev, [fresh.order_id]: fresh }))
+      if (old?.status === fresh.status) return
+      if (fresh.status === 'verified') push({ id: mid(), kind: 'verified', orderId: fresh.order_id })
+      else if (fresh.status === 'rejected') push({ id: mid(), kind: 'rejected', orderId: fresh.order_id })
+    },
+    [push],
+  )
+
+  /** After a 409 the order changed under us (usually: the pharmacist reviewed it). Show the latest. */
+  async function reload(orderId: string) {
+    try {
+      applyFresh(orders[orderId], await api.getOrder(orderId))
+    } catch (err) {
+      push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
+    }
+  }
+
   usePoll(
     async () => {
       for (const o of waiting) {
         const fresh = await api.getOrder(o.order_id)
-        if (fresh.status === o.status) continue
-        setOrders((prev) => ({ ...prev, [fresh.order_id]: fresh }))
-        if (fresh.status === 'verified') push({ id: mid(), kind: 'verified', orderId: fresh.order_id })
-        else if (fresh.status === 'rejected') push({ id: mid(), kind: 'rejected', orderId: fresh.order_id })
+        if (fresh.status !== o.status) applyFresh(o, fresh)
       }
     },
     2000,
     waiting.length > 0,
   )
 
-  async function run(label: string, create: () => Promise<Order>) {
+  async function run(label: string, create: () => Promise<Order>, slowText?: string) {
     setBusy(true)
     const typingId = mid()
-    push({ id: typingId, kind: 'typing', text: label })
+    push({ id: typingId, kind: 'typing', text: label, slowText })
     try {
-      const order = await create()
+      const order = await withTimeout(create(), PARSE_TIMEOUT_MS)
       drop(typingId)
       track(order)
+      const lines = order.items.filter((i) => i.status !== 'removed')
       if (order.status === 'needs_prescription') push({ id: mid(), kind: 'needs-rx', orderId: order.order_id })
+      else if (lines.length === 0) push({ id: mid(), kind: 'empty', orderId: order.order_id })
       else push({ id: mid(), kind: 'cart', orderId: order.order_id })
       if (order.status === 'pending_review') onOrderCreated?.(order.order_id)
     } catch (err) {
@@ -109,7 +159,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
     if (!file) return
     const blob = await resizeImage(file)
     push({ id: mid(), kind: 'user-photo', src: URL.createObjectURL(blob) })
-    await run('Reading your prescription…', () => api.createPrescriptionOrder(blob))
+    await run(READING, () => api.createPrescriptionOrder(blob), READING_SLOW)
   }
 
   async function showSamples() {
@@ -126,7 +176,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
   async function pickSample(s: Sample) {
     setMsgs((prev) => prev.filter((m) => m.kind !== 'samples'))
     push({ id: mid(), kind: 'user-photo', src: api.sampleImageUrl(s.sample_id), caption: s.label })
-    await run('Reading your prescription…', () => api.createSampleOrder(s.sample_id))
+    await run(READING, () => api.createSampleOrder(s.sample_id), READING_SLOW)
   }
 
   async function sendText() {
@@ -143,7 +193,8 @@ export function Chat({ onOrderCreated }: ChatProps) {
       const o = await api.swap(orderId, { item_id: item.item_id, use_generic: useGeneric })
       track(o)
     } catch (err) {
-      push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
+      if (isConflict(err)) await reload(orderId)
+      else push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
     } finally {
       setBusy(false)
     }
@@ -157,6 +208,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
       push({ id: mid(), kind: 'user-text', text: 'Place order' }, { id: mid(), kind: 'placed', orderId })
     } catch (err) {
       push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
+      if (isConflict(err)) await reload(orderId)
     } finally {
       setBusy(false)
     }
@@ -225,10 +277,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
             case 'typing':
               return (
                 <div key={m.id} className="row row-in">
-                  <div className="bubble bubble-in bubble-typing">
-                    <Dots label={m.text} />
-                    <span>{m.text}</span>
-                  </div>
+                  <Typing text={m.text} slowText={m.slowText} />
                 </div>
               )
             case 'samples':
@@ -381,6 +430,27 @@ export function Chat({ onOrderCreated }: ChatProps) {
                 </div>
               )
             }
+            case 'empty':
+              return (
+                <div key={m.id} className="row row-in">
+                  <div className="bubble bubble-in bubble-error">
+                    <p>
+                      We couldn’t read any medicines in that photo. Try a clearer photo in good light, or try a
+                      sample.
+                    </p>
+                  </div>
+                  {!busy && (
+                    <div className="quick">
+                      <button className="quick-btn" onClick={() => quick('upload')}>
+                        {QUICK_LABEL.upload}
+                      </button>
+                      <button className="quick-btn" onClick={() => quick('sample')}>
+                        {QUICK_LABEL.sample}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
             case 'error':
               return (
                 <div key={m.id} className="row row-in">
