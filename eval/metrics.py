@@ -221,12 +221,18 @@ def aggregate(scores: list[RxScore], latencies_ms: list[float], costs: list[floa
         if costs and any(c is not None for c in costs)
         else None,
     }
-    if scores and all(s.sku_evaluated for s in scores):
-        items = [t for s in scores for t in s.triage]
-        out["sku_match_accuracy"] = sum(s.sku_correct for s in scores) / n_truth
+    # SKU metrics cover the prescriptions that were matched. A prescription whose parse
+    # failed is not matched, so it is left out here and reported in sku_scored_prescriptions
+    # (it still counts as missed lines in line_recall and field_accuracy above).
+    scored = [s for s in scores if s.sku_evaluated]
+    out["sku_scored_prescriptions"] = len(scored)
+    if scored:
+        n_scored = sum(s.truth_lines for s in scored) or 1
+        items = [t for s in scored for t in s.triage]
+        out["sku_match_accuracy"] = sum(s.sku_correct for s in scored) / n_scored
         out["pct_green"] = (items.count("green") / len(items)) if items else 0.0
         out["triage_counts"] = {k: items.count(k) for k in ("green", "amber", "red")}
-        out["green_but_wrong"] = sum(s.green_wrong for s in scores)
+        out["green_but_wrong"] = sum(s.green_wrong for s in scored)
     else:
         out["sku_match_accuracy"] = None
         out["pct_green"] = None

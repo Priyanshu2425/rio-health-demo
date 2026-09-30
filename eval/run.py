@@ -156,8 +156,34 @@ async def eval_one(rx_id, image_path, truth, args, search_fn, conn, sem) -> dict
         }
 
 
+def results_path(model: str) -> Path:
+    return RESULTS / (model.replace("/", "__").replace(":", "_") + ".json")
+
+
 def fmt_pct(x):
     return "n/a" if x is None else f"{100 * x:.0f}%"
+
+
+def coverage(agg: dict) -> str:
+    """' (18/20 Rx)' when some prescriptions could not be matched, else ''."""
+    scored = agg.get("sku_scored_prescriptions")
+    if scored is None or agg["sku_match_accuracy"] is None or scored == agg["prescriptions"]:
+        return ""
+    return f" ({scored}/{agg['prescriptions']} Rx)"
+
+
+def merge_previous(path: Path, name: str, runs: list[dict]) -> list[dict]:
+    """Replace, in the saved runs of set `name`, the prescriptions that were just re-run.
+
+    Used with --only: re-running two failed prescriptions keeps the other results and
+    the whole set is re-scored, so no paid call is repeated.
+    """
+    if not path.exists():
+        return runs
+    saved = json.loads(path.read_text()).get("runs", {}).get(name, [])
+    fresh = {r["rx_id"]: r for r in runs}
+    merged = [fresh.pop(r["rx_id"], r) for r in saved]
+    return merged + list(fresh.values())
 
 
 def summary_rows(model: str, rerank: str | None, catalog_label: str, sets: dict[str, dict]) -> list[str]:
@@ -170,7 +196,7 @@ def summary_rows(model: str, rerank: str | None, catalog_label: str, sets: dict[
             f"| {date} | {name} | `{model}` | `{rerank or '-'}` | {agg['prescriptions']} | "
             f"{fmt_pct(agg['line_recall'])} | {fmt_pct(fa['drug'])} | {fmt_pct(fa['strength'])} | "
             f"{fmt_pct(fa['doses_per_day'])} | {fmt_pct(fa['duration_days'])} | "
-            f"**{fmt_pct(agg['sku_match_accuracy'])}** | {fmt_pct(agg['pct_green'])} | "
+            f"**{fmt_pct(agg['sku_match_accuracy'])}**{coverage(agg)} | {fmt_pct(agg['pct_green'])} | "
             f"{agg.get('green_but_wrong', 'n/a')} | "
             f"{(agg['p50_latency_ms'] or 0) / 1000:.1f} s | {(agg['p95_latency_ms'] or 0) / 1000:.1f} s | "
             f"{'n/a' if cost is None else f'${cost:.4f}'} |"
@@ -206,7 +232,13 @@ async def main_async(args) -> int:
     raw: dict[str, list] = {}
     try:
         for name in names:
-            items = load_set(name)[: args.limit or None]
+            all_items = load_set(name)
+            items = all_items[: args.limit or None]
+            if args.only:
+                items = [it for it in all_items if it[0] in args.only]
+                unknown = args.only - {it[0] for it in items}
+                if unknown:
+                    print(f"{name}: no such prescriptions: {', '.join(sorted(unknown))}", file=sys.stderr)
             if not items:
                 print(f"{name}: no images with checked truth; skipped")
                 continue
@@ -214,9 +246,12 @@ async def main_async(args) -> int:
             runs = await asyncio.gather(
                 *(eval_one(rx_id, img, truth, args, search_fn, conn, sem) for rx_id, img, truth in items)
             )
+            if args.only:
+                runs = merge_previous(results_path(args.model), name, list(runs))
+            truths = {rx_id: truth for rx_id, _, truth in all_items}
             scores = []
-            for (rx_id, _, truth), run in zip(items, runs, strict=True):
-                s = metrics.score_rx(rx_id, truth, run["parsed"], run["matches"])
+            for run in runs:
+                s = metrics.score_rx(run["rx_id"], truths[run["rx_id"]], run["parsed"], run["matches"])
                 run["score"] = s.__dict__
                 scores.append(s)
             agg = metrics.aggregate(scores, [r["latency_ms"] for r in runs], [r["cost_usd"] for r in runs])
@@ -231,7 +266,6 @@ async def main_async(args) -> int:
     if not per_set:
         return 1
     RESULTS.mkdir(exist_ok=True)
-    safe = args.model.replace("/", "__").replace(":", "_")
     out = {
         "model": args.model,
         "rerank_model": args.rerank_model,
@@ -240,13 +274,13 @@ async def main_async(args) -> int:
         "sets": per_set,
         "runs": raw,
     }
-    (RESULTS / f"{safe}.json").write_text(json.dumps(out, indent=2, default=str) + "\n")
+    results_path(args.model).write_text(json.dumps(out, indent=2, default=str) + "\n")
     summary = RESULTS / "summary.md"
     if not summary.exists():
         summary.write_text(SUMMARY_HEADER)
     with summary.open("a") as f:
         f.write("\n".join(summary_rows(args.model, args.rerank_model, catalog_label, per_set)) + "\n")
-    print(f"wrote {RESULTS / f'{safe}.json'} and appended to {summary}")
+    print(f"wrote {results_path(args.model)} and appended to {summary}")
     return 0
 
 
@@ -260,6 +294,12 @@ def main() -> None:
     ap.add_argument("--catalog", choices=["auto", "app", "adapter", "off"], default="auto")
     ap.add_argument("--limit", type=int, default=0, help="only the first N prescriptions per set")
     ap.add_argument("--concurrency", type=int, default=4)
+    ap.add_argument(
+        "--only",
+        type=lambda v: {x.strip() for x in v.split(",") if x.strip()},
+        default=None,
+        help="re-run only these rx ids (e.g. s19,s20) and merge them into the saved results for --model",
+    )
     sys.exit(asyncio.run(main_async(ap.parse_args())))
 
 

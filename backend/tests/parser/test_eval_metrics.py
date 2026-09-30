@@ -133,3 +133,26 @@ def test_synth_truth_files_are_well_formed():
     truth = json.loads(files[0].read_text())
     s = metrics.score_rx("self", truth, truth, None)
     assert s.found == len(truth["lines"]) and all(v == len(truth["lines"]) for v in s.fields.values())
+
+
+def test_aggregate_scores_matched_prescriptions_when_one_parse_failed():
+    matched = metrics.score_rx(
+        "ok", TRUTH, TRUTH, [match(line["composition_key"], 0.9) for line in TRUTH["lines"]]
+    )
+    failed = metrics.score_rx("failed", TRUTH, {"lines": []}, None)
+    agg = metrics.aggregate([matched, failed], [1000, 2000], [0.01, None])
+    assert agg["prescriptions"] == 2
+    assert agg["sku_scored_prescriptions"] == 1
+    assert agg["sku_match_accuracy"] == pytest.approx(1.0)  # over the matched Rx only
+    assert agg["line_recall"] == pytest.approx(0.5)  # the failed Rx still counts as missed lines
+
+
+def test_merge_previous_replaces_only_rerun_prescriptions(tmp_path):
+    import run
+
+    saved = {"runs": {"synth": [{"rx_id": "s01", "v": "old"}, {"rx_id": "s19", "v": "old"}]}}
+    path = tmp_path / "model.json"
+    path.write_text(json.dumps(saved))
+    merged = run.merge_previous(path, "synth", [{"rx_id": "s19", "v": "new"}])
+    assert merged == [{"rx_id": "s01", "v": "old"}, {"rx_id": "s19", "v": "new"}]
+    assert run.merge_previous(tmp_path / "missing.json", "synth", [{"rx_id": "s19"}]) == [{"rx_id": "s19"}]
