@@ -112,3 +112,24 @@ async def test_search_leaves_trigram_threshold_alone(conn):
 async def test_typo_still_finds_brand(conn):
     results = await search(conn, "augmantin")
     assert results and results[0].sku.brand_name.lower().startswith("augmentin")
+
+
+async def test_popularity_rank_is_loaded(conn):
+    cur = await conn.execute(
+        "SELECT count(*) AS n, count(popularity_rank) AS ranked, "
+        "count(DISTINCT popularity_rank) AS distinct_ranks FROM skus"
+    )
+    row = await cur.fetchone()
+    assert row["n"] == row["ranked"] == row["distinct_ranks"]
+
+
+async def test_equal_scores_prefer_better_known_brand(conn):
+    results = await search(conn, "paracetamol 650", limit=10)
+    top_score = results[0].score
+    tied = [r.sku.sku_id for r in results if r.score == top_score]
+    cur = await conn.execute(
+        "SELECT sku_id FROM skus WHERE sku_id = ANY(%s) ORDER BY popularity_rank",
+        (tied,),
+    )
+    assert tied == [r["sku_id"] for r in await cur.fetchall()]
+    assert {"sku_crocin_650", "sku_dolo_650"} <= set(tied[:3])

@@ -26,6 +26,7 @@ SALT_ALIASES: dict[str, str] = {
     "clavulanate": "clavulanic acid",
     "clavulanate potassium": "clavulanic acid",
     "tazobactum": "tazobactam",
+    "clinidipine": "cilnidipine",
     "cephalexin": "cefalexin",
     "cefpodoxime": "cefpodoxime proxetil",
     "albuterol": "salbutamol",

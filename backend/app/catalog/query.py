@@ -7,7 +7,6 @@ from psycopg import AsyncConnection, sql
 from psycopg.rows import dict_row
 
 from app.catalog.normalize import normalize_query
-from app.catalog.popularity import load_popularity
 from app.contracts import SKU, MatchCandidate
 
 COLUMNS = (
@@ -20,7 +19,9 @@ COLUMNS = (
 # (similarity, default 0.3) catches misspelt brands such as 'augmantin'. The defaults
 # are used as they are, so search never changes a connection setting. The score is the
 # better of brand and composition, each the mean of similarity() and word_similarity(),
-# so it lies in 0..1.
+# so it lies in 0..1. Equal scores (e.g. every SKU of one composition) go to the
+# better-known brand (`popularity_rank`, written by the catalog ETL), then the lower
+# price per unit.
 SEARCH_SQL = """
 WITH cand AS (
     SELECT sku_id FROM skus WHERE {q} <% lower(brand_name)
@@ -29,14 +30,16 @@ WITH cand AS (
     UNION
     SELECT sku_id FROM skus WHERE {q} <% composition_key
 )
-SELECT {columns},
-    greatest(
-        (similarity(lower(brand_name), {q}) + word_similarity({q}, lower(brand_name))) / 2,
-        (similarity(composition_key, {q}) + word_similarity({q}, composition_key)) / 2
-    ) AS score
-FROM skus JOIN cand USING (sku_id)
-ORDER BY score DESC
-LIMIT {pool}
+SELECT * FROM (
+    SELECT {columns}, popularity_rank,
+        greatest(
+            (similarity(lower(brand_name), {q}) + word_similarity({q}, lower(brand_name))) / 2,
+            (similarity(composition_key, {q}) + word_similarity({q}, composition_key)) / 2
+        ) AS score
+    FROM skus JOIN cand USING (sku_id)
+) scored
+ORDER BY round(score::numeric, 4) DESC, popularity_rank NULLS LAST, mrp_inr / pack_size, sku_id
+LIMIT {limit}
 """
 
 # Same guard as the ETL: listings under a fifth of the median unit price for their
@@ -99,25 +102,14 @@ async def search(conn: AsyncConnection, query: str, limit: int) -> list[MatchCan
     if not q:
         return []
     statement = sql.SQL(SEARCH_SQL).format(
-        q=sql.Literal(q), columns=sql.SQL(COLUMNS), pool=sql.Literal(max(limit * 4, 20))
+        q=sql.Literal(q), columns=sql.SQL(COLUMNS), limit=sql.Literal(limit)
     )
     async with conn.cursor(row_factory=dict_row) as cur:
         await cur.execute(statement)
         rows = await cur.fetchall()
-
-    ranks = await load_popularity()
-    worst = len(ranks) + 1
-
-    def order(row: dict[str, Any]) -> tuple:
-        # equal scores (e.g. every SKU of one composition) go to the better-known brand,
-        # then to the lower price per unit
-        unit_price = float(row["mrp_inr"]) / row["pack_size"]
-        return (-round(float(row["score"]), 4), ranks.get(row["sku_id"], worst), unit_price)
-
-    rows.sort(key=order)
     return [
         MatchCandidate(sku=to_sku(row), score=min(1.0, max(0.0, round(float(row["score"]), 4))))
-        for row in rows[:limit]
+        for row in rows
     ]
 
 

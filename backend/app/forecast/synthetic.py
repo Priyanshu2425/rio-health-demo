@@ -21,7 +21,7 @@ SEED = 20260930
 
 Category = Literal["chronic", "acute", "otc"]
 
-# (sku_id, category). Ids come from data/seed/skus.csv.gz.
+# (sku_id, category). Ids are catalog SKU ids, stable across catalog rebuilds.
 PLAN: list[tuple[str, Category]] = [
     # chronic: diabetes, hypertension, lipids, thyroid
     ("sku_glycomet_500_sr", "chronic"),

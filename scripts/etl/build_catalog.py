@@ -269,9 +269,11 @@ def load(seed: pd.DataFrame) -> None:
 
     Rows are upserted and stale ids deleted, so forecast tables that reference stable ids
     survive a catalog rebuild; forecast rows for ids that disappear are deleted first.
+    The seed is written in popularity order, so its row number becomes `popularity_rank`
+    (0 = best known), which search uses to break ties.
     """
     records = []
-    for r in seed.to_dict("records"):
+    for rank, r in enumerate(seed.to_dict("records")):
         schedule = r["schedule"] or None
         records.append(
             (
@@ -286,13 +288,14 @@ def load(seed: pd.DataFrame) -> None:
                 r["composition_key"],
                 str(r["rx_only"]).lower() == "true",
                 schedule,
+                rank,
             )
         )
     with connect() as conn, conn.transaction():
         conn.execute("CREATE TEMP TABLE skus_new (LIKE skus INCLUDING DEFAULTS) ON COMMIT DROP")
         with conn.cursor().copy(
             "COPY skus_new (sku_id, brand_name, manufacturer, form, pack_size, pack_label, mrp_inr, "
-            "composition, composition_key, rx_only, schedule) FROM STDIN"
+            "composition, composition_key, rx_only, schedule, popularity_rank) FROM STDIN"
         ) as copy:
             for rec in records:
                 copy.write_row(rec)
@@ -307,7 +310,8 @@ def load(seed: pd.DataFrame) -> None:
                 form = EXCLUDED.form, pack_size = EXCLUDED.pack_size,
                 pack_label = EXCLUDED.pack_label, mrp_inr = EXCLUDED.mrp_inr,
                 composition = EXCLUDED.composition, composition_key = EXCLUDED.composition_key,
-                rx_only = EXCLUDED.rx_only, schedule = EXCLUDED.schedule
+                rx_only = EXCLUDED.rx_only, schedule = EXCLUDED.schedule,
+                popularity_rank = EXCLUDED.popularity_rank
             """
         )
         count = conn.execute("SELECT count(*), avg(rx_only::int) FROM skus").fetchone()
