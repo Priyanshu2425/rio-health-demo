@@ -6,7 +6,7 @@
 cd frontend
 npm install
 VITE_MOCKS=1 npm run dev          # http://localhost:5173, in-browser mock API
-npm test                          # vitest: 77 tests (mock state machine, money, review helpers, resize, edge cases, HTTP client)
+npm test                          # vitest: 93 tests (mock state machine, money, review helpers, resize, edge cases, HTTP client, chat actions)
 npm run build                     # tsc + vite build
 npm run gen:contracts -- --check  # contracts.gen.ts is current
 ```

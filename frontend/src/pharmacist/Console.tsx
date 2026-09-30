@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, errorMessage, type QueueItem } from '../api'
 import { Money, TriageBadge, timeAgo } from '../components/bits'
+import { TRIAGE_META } from '../lib/triage'
 import { usePoll } from '../lib/usePoll'
 import { OrderView } from './OrderView'
 import './pharmacist.css'
@@ -82,7 +83,7 @@ export function Console({ focusOrderId }: { focusOrderId?: string | null }) {
                     {(['red', 'amber', 'green'] as const).map((t) =>
                       q.counts[t] ? (
                         <span key={t} className={`qc qc-${t}`}>
-                          {q.counts[t]} {t === 'red' ? 'fix' : t === 'amber' ? 'check' : 'clear'}
+                          {q.counts[t]} {TRIAGE_META[t].label.toLowerCase()}
                         </span>
                       ) : null,
                     )}

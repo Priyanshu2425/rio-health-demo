@@ -1,11 +1,7 @@
 import type { Triage } from '../api'
 import { formatINR } from '../lib/money'
+import { TRIAGE_META } from '../lib/triage'
 
-const TRIAGE_META: Record<Triage, { icon: string; label: string }> = {
-  green: { icon: '✓', label: 'Clear' },
-  amber: { icon: '!', label: 'Check' },
-  red: { icon: '✕', label: 'Fix' },
-}
 
 /** Colour-blind-safe triage badge: shape + glyph + word, never colour alone. */
 export function TriageBadge({ triage, label, bare }: { triage: Triage; label?: string | false; bare?: boolean }) {

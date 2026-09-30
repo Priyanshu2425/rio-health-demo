@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { USE_MOCKS, resetMockState } from './api'
+import { API_CONFIG_ERROR, USE_MOCKS, resetMockState } from './api'
 import { navigate, useRoute, type Route } from './lib/router'
 import { ChatPage } from './pages/ChatPage'
 import { DemoPage } from './pages/DemoPage'
@@ -68,6 +68,11 @@ export default function App() {
           </div>
         )}
       </header>
+      {API_CONFIG_ERROR && (
+        <div className="config-error" role="alert">
+          <strong>Not connected.</strong> {API_CONFIG_ERROR}
+        </div>
+      )}
       <main className="stage">
         {route === '/' && <DemoPage />}
         {route === '/chat' && <ChatPage />}

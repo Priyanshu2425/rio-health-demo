@@ -90,3 +90,11 @@
     display: none;
   }
 }
+
+.config-error {
+  padding: 10px 20px;
+  background: var(--red-bg);
+  color: var(--red);
+  border-bottom: 1px solid var(--red-line);
+  font-size: 0.92rem;
+}

@@ -3,7 +3,6 @@ import {
   PARSE_TIMEOUT_MS,
   api,
   errorMessage,
-  isConflict,
   isParserTrouble,
   withTimeout,
   type CartItem,
@@ -13,6 +12,7 @@ import {
 import { Dots, Money, Stamp } from '../components/bits'
 import { resizeImage } from '../lib/resizeImage'
 import { usePoll } from '../lib/usePoll'
+import { canSwap, placeOrder, pollWaiting, swapItem } from './actions'
 import { CartLines, CartTotal, DiffLines } from './CartLines'
 import './chat.css'
 
@@ -21,7 +21,7 @@ type Quick = 'upload' | 'sample' | 'type'
 type Msg =
   | { id: number; kind: 'rio'; text: string; quick?: Quick[] }
   | { id: number; kind: 'user-text'; text: string }
-  | { id: number; kind: 'user-photo'; src: string; caption?: string }
+  | { id: number; kind: 'user-photo'; src: string | Blob; caption?: string }
   | { id: number; kind: 'typing'; text: string; slowText?: string }
   | { id: number; kind: 'samples' }
   | { id: number; kind: 'cart'; orderId: string }
@@ -42,6 +42,26 @@ const QUICK_LABEL: Record<Quick, string> = {
 const SLOW_AFTER_MS = 8000
 const READING = 'Reading your prescription…'
 const READING_SLOW = 'Still reading… handwritten prescriptions take a little longer.'
+
+/** A photo bubble. For a local Blob it owns the object URL and revokes it on unmount. */
+function Photo({ src, caption }: { src: string | Blob; caption?: string }) {
+  const [url, setUrl] = useState<string | null>(typeof src === 'string' ? src : null)
+  useEffect(() => {
+    if (typeof src === 'string') {
+      setUrl(src)
+      return
+    }
+    const u = URL.createObjectURL(src)
+    setUrl(u)
+    return () => URL.revokeObjectURL(u)
+  }, [src])
+  return (
+    <figure className="bubble bubble-out bubble-photo">
+      {url && <img src={url} alt="Prescription photo you sent" />}
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+}
 
 function Typing({ text, slowText }: { text: string; slowText?: string }) {
   const [slow, setSlow] = useState(false)
@@ -110,25 +130,14 @@ export function Chat({ onOrderCreated }: ChatProps) {
       if (old?.status === fresh.status) return
       if (fresh.status === 'verified') push({ id: mid(), kind: 'verified', orderId: fresh.order_id })
       else if (fresh.status === 'rejected') push({ id: mid(), kind: 'rejected', orderId: fresh.order_id })
+      else if (fresh.status === 'placed') push({ id: mid(), kind: 'placed', orderId: fresh.order_id })
     },
     [push],
   )
 
-  /** After a 409 the order changed under us (usually: the pharmacist reviewed it). Show the latest. */
-  async function reload(orderId: string) {
-    try {
-      applyFresh(orders[orderId], await api.getOrder(orderId))
-    } catch (err) {
-      push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
-    }
-  }
-
   usePoll(
     async () => {
-      for (const o of waiting) {
-        const fresh = await api.getOrder(o.order_id)
-        if (fresh.status !== o.status) applyFresh(o, fresh)
-      }
+      for (const { before: old, after } of await pollWaiting(api, waiting)) applyFresh(old, after)
     },
     2000,
     waiting.length > 0,
@@ -158,7 +167,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
   async function onFile(file: File | undefined) {
     if (!file) return
     const blob = await resizeImage(file)
-    push({ id: mid(), kind: 'user-photo', src: URL.createObjectURL(blob) })
+    push({ id: mid(), kind: 'user-photo', src: blob })
     await run(READING, () => api.createPrescriptionOrder(blob), READING_SLOW)
   }
 
@@ -190,11 +199,12 @@ export function Chat({ onOrderCreated }: ChatProps) {
   async function swap(orderId: string, item: CartItem, useGeneric: boolean) {
     setBusy(true)
     try {
-      const o = await api.swap(orderId, { item_id: item.item_id, use_generic: useGeneric })
-      track(o)
+      // On a 409 this reloads the order, so the chat shows its current state instead of an error.
+      const { order, applied } = await swapItem(api, orderId, item.item_id, useGeneric)
+      if (applied) track(order)
+      else applyFresh(orders[orderId], order)
     } catch (err) {
-      if (isConflict(err)) await reload(orderId)
-      else push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
+      push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
     } finally {
       setBusy(false)
     }
@@ -203,12 +213,16 @@ export function Chat({ onOrderCreated }: ChatProps) {
   async function place(orderId: string) {
     setBusy(true)
     try {
-      const o = await api.place(orderId)
-      setOrders((prev) => ({ ...prev, [o.order_id]: o }))
-      push({ id: mid(), kind: 'user-text', text: 'Place order' }, { id: mid(), kind: 'placed', orderId })
+      // One bubble either way: placed, or (after a 409) the order's current state.
+      const { order, applied } = await placeOrder(api, orderId)
+      if (applied) {
+        setOrders((prev) => ({ ...prev, [order.order_id]: order }))
+        push({ id: mid(), kind: 'user-text', text: 'Place order' }, { id: mid(), kind: 'placed', orderId })
+      } else {
+        applyFresh(orders[orderId], order)
+      }
     } catch (err) {
       push({ id: mid(), kind: 'error', text: errorMessage(err), offerSample: false })
-      if (isConflict(err)) await reload(orderId)
     } finally {
       setBusy(false)
     }
@@ -268,10 +282,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
             case 'user-photo':
               return (
                 <div key={m.id} className="row row-out">
-                  <figure className="bubble bubble-out bubble-photo">
-                    <img src={m.src} alt="Prescription photo you sent" />
-                    {m.caption && <figcaption>{m.caption}</figcaption>}
-                  </figure>
+                  <Photo src={m.src} caption={m.caption} />
                 </div>
               )
             case 'typing':
@@ -319,7 +330,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
                     </div>
                     <CartLines
                       order={shown}
-                      swappable={pending}
+                      swappable={canSwap(order)}
                       busy={busy}
                       onSwap={(item, g) => swap(order.order_id, item, g)}
                     />
