@@ -170,6 +170,21 @@ def test_triage(has_sku, score, complete, illegible, expected):
     assert (len(reasons) > 0) == (level != "green"), "every amber and red is explained"
 
 
+@pytest.mark.parametrize(
+    "kw,reason",
+    [
+        ({"strength": None}, "strength not written"),
+        ({"strength": None, "duration_days": None}, "strength, duration not written"),
+        # an illegible field is reported as unreadable, not as missing
+        ({"duration_days": None, "illegible_fields": ["duration"]}, "duration unreadable"),
+    ],
+)
+def test_incomplete_reason_names_fields(kw, reason):
+    c = rules.confidence(match(BRAND), line(**kw))
+    assert c.triage == "amber"
+    assert reason in c.reasons
+
+
 def test_confidence_uses_zero_match_when_no_sku():
     c = rules.confidence(match(None, 0.9), line())
     assert c.match_score == 0.0

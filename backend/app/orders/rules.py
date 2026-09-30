@@ -114,17 +114,23 @@ def packs_from_text(text: str) -> int:
 # ---------------------------------------------------------------------------
 
 
+def missing_fields(line: ParsedLine | None) -> list[str]:
+    """Which of drug / strength / frequency / duration are absent. A written quantity
+    stands in for duration. Typed text has nothing missing."""
+    if line is None:
+        return []
+    present = {
+        "drug": line.drug is not None,
+        "strength": line.strength is not None,
+        "frequency": line.frequency is not None,
+        "duration": line.duration_days is not None or line.quantity is not None,
+    }
+    return [name for name, ok in present.items() if not ok]
+
+
 def completeness(line: ParsedLine | None) -> float:
     """Share of drug / strength / frequency / duration present. Typed text counts as 1."""
-    if line is None:
-        return 1.0
-    present = [
-        line.drug is not None,
-        line.strength is not None,
-        line.frequency is not None,
-        line.duration_days is not None or line.quantity is not None,
-    ]
-    return sum(present) / len(present)
+    return 1 - len(missing_fields(line)) / 4
 
 
 def legibility(line: ParsedLine | None) -> float:
@@ -147,7 +153,12 @@ def legibility(line: ParsedLine | None) -> float:
 
 
 def triage(
-    has_sku: bool, match_score: float, complete: float, legible: float, illegible: Iterable[str]
+    has_sku: bool,
+    match_score: float,
+    complete: float,
+    legible: float,
+    illegible: Iterable[str],
+    missing: Iterable[str] = (),
 ) -> tuple[Triage, list[str]]:
     """Red / amber / green exactly per contracts/API.md, with a reason for each flag."""
     illegible = list(illegible)
@@ -163,7 +174,9 @@ def triage(
     if has_sku and RED_BELOW <= match_score < GREEN_FROM:
         amber.append(f"catalog match not certain ({match_score:.2f})")
     if complete < 1:
-        amber.append("prescription line incomplete")
+        # Illegible fields get their own reason below; name only the ones not written.
+        unwritten = [FIELD_LABEL.get(f, f) for f in missing if f not in illegible]
+        amber.append(f"{', '.join(unwritten)} not written" if unwritten else "prescription line incomplete")
     for field in illegible:
         if field != "drug":
             amber.append(f"{FIELD_LABEL.get(field, field)} unreadable")
@@ -180,7 +193,9 @@ def confidence(match: MatchResult, line: ParsedLine | None, extra_reasons: Itera
     complete = completeness(line)
     legible = legibility(line)
     illegible = line.illegible_fields if line else []
-    level, reasons = triage(match.sku is not None, match_score, complete, legible, illegible)
+    level, reasons = triage(
+        match.sku is not None, match_score, complete, legible, illegible, missing_fields(line)
+    )
     score = W_MATCH * match_score + W_COMPLETE * complete + W_LEGIBLE * legible
     return Confidence(
         score=round(min(1.0, max(0.0, score)), 3),
