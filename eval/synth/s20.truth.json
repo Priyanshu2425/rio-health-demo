@@ -1,52 +1,39 @@
 {
   "lines": [
     {
-      "drug": "Omez",
-      "strength": "20",
-      "doses_per_day": 1,
-      "duration_days": 5,
-      "composition_key": "omeprazole 20mg",
-      "raw_text": "Cap Omez 20  OD  for 5 days  (after food)"
+      "drug": "Calpol",
+      "strength": "500",
+      "doses_per_day": 2,
+      "duration_days": 10,
+      "quantity": null,
+      "composition_key": "paracetamol 500mg",
+      "raw_text": "Tab Calpol 500  1-0-1  x 10 days  (B/F)"
     },
     {
-      "drug": "Clavam",
+      "drug": "Augmentin Duo",
       "strength": "625",
       "doses_per_day": 2,
-      "duration_days": 5,
-      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
-      "raw_text": "Tab Clavam 625  1-0-1  5/7  (empty stomach)"
-    },
-    {
-      "drug": "Pantocid",
-      "strength": "40",
-      "doses_per_day": 2,
-      "duration_days": 3,
-      "composition_key": "pantoprazole 40mg",
-      "raw_text": "T. Pantocid 40  1-0-1  3/7"
-    },
-    {
-      "drug": "Zifi",
-      "strength": "200",
-      "doses_per_day": 1,
-      "duration_days": 5,
-      "composition_key": "cefixime 200mg",
-      "raw_text": "T. Zifi 200  1-0-0  5d  (after food)"
-    },
-    {
-      "drug": "Crocin",
-      "strength": "650",
-      "doses_per_day": 1,
       "duration_days": 7,
-      "composition_key": "paracetamol 650mg",
-      "raw_text": "Tab Crocin 650  1-0-0  x 7 days  (after food)"
+      "quantity": 14,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab. Augmentin 625 Duo #14  1-0-1  x 7 days"
+    },
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "quantity": null,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "T. Atorva 10  BD  1/12  (before food)"
     }
   ],
   "meta": {
     "layout": "minimal",
     "hand_font": null,
-    "doctor": "Dr. Kavita Rao",
-    "clinic": "Sunrise Clinic",
-    "patient": "Rahul Sharma",
-    "date": "28/08/2026"
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "Arogya Health Centre",
+    "patient": "Mohd. Imran",
+    "date": "14/04/2026"
   }
 }

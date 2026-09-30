@@ -35,7 +35,7 @@ class TextItem:
     requested_text: str  # as the customer wrote it
     drug: str  # name for the catalog search
     strength: str | None
-    quantity: int | None  # packs, if the customer said a number
+    quantity: int | None  # the number the customer typed ("2 ORS", "2 strips of dolo"); unit unknown
     form: str | None
 
 
@@ -75,5 +75,6 @@ def to_parsed_line(i: int, item: TextItem) -> ParsedLine:
         drug=item.drug,
         strength=item.strength,
         form=item.form,  # type: ignore[arg-type]
-        quantity=item.quantity,
+        # ParsedLine.quantity means units written on a prescription; a typed "2" may mean
+        # strips, so it is not passed through. The caller has it on TextItem if needed.
     )

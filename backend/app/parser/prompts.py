@@ -30,8 +30,11 @@ not written. Never infer a strength that is not on the page.
 "once weekly". Copy the notation; do not convert it.
 - duration: exactly as written: "x 5 days", "5d", "5/7" (= 5 days), "2/52" (= 2 weeks), \
 "1/12" (= 1 month), "x 1 week", "continue". Null if not written.
-- quantity: an explicit count only ("No. 10", "#15", "1 strip" = null unless a number \
-of units is written), otherwise null.
+- quantity: only an explicit count written on the prescription, in dispensable units: \
+tablets or capsules for tablets and capsules ("Tab Dolo 650 #10", "No. 10", "10 tabs" = \
+10); bottles, tubes, sachets or inhalers for everything else ("Syp Calpol 1 bottle" = 1, \
+"ORS 4 sachets" = 4). If the count is in packs or strips ("2 strips"), quantity is null \
+(it stays in raw_text). Never compute a quantity from frequency and duration.
 - instructions: "before food", "after food", "AC", "PC", "empty stomach", "at bedtime".
 - illegible_fields: list each field (drug, strength, form, frequency, duration, \
 quantity) that is written but you cannot read with confidence. Mark it instead of \

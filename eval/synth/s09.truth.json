@@ -1,36 +1,48 @@
 {
   "lines": [
     {
-      "drug": "Atorva",
+      "drug": "Amlong",
+      "strength": "5",
+      "doses_per_day": 2,
+      "duration_days": 15,
+      "quantity": null,
+      "composition_key": "amlodipine 5mg",
+      "raw_text": "Tab Amlong 5  1-0-1  x 15 days  (empty stomach)"
+    },
+    {
+      "drug": "Cetzine",
       "strength": "10",
       "doses_per_day": 1,
-      "duration_days": 14,
-      "composition_key": "atorvastatin 10mg",
-      "raw_text": "Tab. Atorva 10  1-0-0  2/52  (B/F)"
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  0-0-1  5d  (B/F)"
     },
     {
-      "drug": "Zifi",
-      "strength": "200",
+      "drug": "Azithral",
+      "strength": "500",
       "doses_per_day": 1,
       "duration_days": 7,
-      "composition_key": "cefixime 200mg",
-      "raw_text": "Tab Zifi 200  1-0-0  x 7 days  (after food)"
+      "quantity": null,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "T. Azithral 500  OD  x 7 days  (empty stomach)"
     },
     {
-      "drug": "Combiflam",
+      "drug": "Montair LC",
       "strength": null,
-      "doses_per_day": null,
-      "duration_days": null,
-      "composition_key": "ibuprofen 400mg + paracetamol 325mg",
-      "raw_text": "Tab. Combiflam  SOS  (A/F)"
+      "doses_per_day": 3,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab Montair LC  1-1-1  x 1 week  (B/F)"
     }
   ],
   "meta": {
     "layout": "letterhead",
     "hand_font": null,
-    "doctor": "Dr. Arjun Nair",
-    "clinic": "Sunrise Clinic",
-    "patient": "Rahul Sharma",
-    "date": "14/01/2026"
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "LifeCare Family Clinic",
+    "patient": "Anjali Gupta",
+    "date": "01/07/2026"
   }
 }

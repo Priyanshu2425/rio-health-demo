@@ -1,44 +1,57 @@
 {
   "lines": [
     {
-      "drug": "Cetzine",
-      "strength": "10",
+      "drug": "Combiflam",
+      "strength": null,
       "doses_per_day": 2,
       "duration_days": 5,
-      "composition_key": "cetirizine 10mg",
-      "raw_text": "Tab Cetzine 10  1-0-1  for 5 days"
+      "quantity": null,
+      "composition_key": "ibuprofen 400mg + paracetamol 325mg",
+      "raw_text": "Tab. Combiflam  BD  x 5 days  (B/F)"
     },
     {
-      "drug": "Dolo",
-      "strength": "650",
-      "doses_per_day": 1,
-      "duration_days": 5,
-      "composition_key": "paracetamol 650mg",
-      "raw_text": "T. Dolo 650  0-0-1  for 5 days  (B/F)"
-    },
-    {
-      "drug": "Atorva",
+      "drug": "Cetzine",
       "strength": "10",
+      "doses_per_day": 3,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  1-1-1  x 7 days  (B/F)"
+    },
+    {
+      "drug": "Glycomet",
+      "strength": "500",
       "doses_per_day": 1,
-      "duration_days": 30,
-      "composition_key": "atorvastatin 10mg",
-      "raw_text": "Tab. Atorva 10  0-0-1  x 30 days  (after food)"
+      "duration_days": 14,
+      "quantity": 14,
+      "composition_key": "metformin 500mg",
+      "raw_text": "Tab. Glycomet 500 #14  1-0-0  2/52  (before food)"
     },
     {
       "drug": "Ecosprin",
       "strength": "75",
       "doses_per_day": 1,
-      "duration_days": 14,
+      "duration_days": 30,
+      "quantity": null,
       "composition_key": "aspirin 75mg",
-      "raw_text": "Tab. Ecosprin 75  1-0-0  2/52  (B/F)"
+      "raw_text": "T. Ecosprin 75  1-0-0  x 1 month  (before food)"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "quantity": 30,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "Tab. Thyronorm 50 #30  0-0-1  x 1 month  (after food)"
     }
   ],
   "meta": {
     "layout": "letterhead",
     "hand_font": null,
-    "doctor": "Dr. Anil Mehta",
-    "clinic": "Arogya Health Centre",
+    "doctor": "Dr. Kavita Rao",
+    "clinic": "Apex Heart & Diabetes Clinic",
     "patient": "Sneha Patil",
-    "date": "01/01/2026"
+    "date": "08/01/2026"
   }
 }

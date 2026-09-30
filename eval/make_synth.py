@@ -172,10 +172,12 @@ class RxItem:
     duration: str | None
     duration_days: int | None
     instruction: str
+    quantity: int | None = None  # explicit count in tablets/capsules, written as "#N"
 
     @property
     def med(self) -> str:
-        return f"{self.prefix} {self.brand.written}"
+        count = f" #{self.quantity}" if self.quantity else ""
+        return f"{self.prefix} {self.brand.written}{count}"
 
     @property
     def text(self) -> str:
@@ -192,6 +194,7 @@ class RxItem:
             "strength": self.brand.strength,
             "doses_per_day": self.doses_per_day,
             "duration_days": self.duration_days,
+            "quantity": self.quantity,
             "composition_key": self.brand.composition_key,
             "raw_text": self.text,
         }
@@ -221,7 +224,10 @@ def pick_items(rng: random.Random, n: int, names: list[str] | None = None) -> li
         else:
             freq, dpd = rng.choice(CHRONIC_FREQ if b.chronic else ACUTE_FREQ)
             dur, days = rng.choice(CHRONIC_DUR if b.chronic else ACUTE_DUR)
-        items.append(RxItem(b, rng.choice(PREFIX[b.form]), freq, dpd, dur, days, rng.choice(INSTRUCTIONS)))
+        item = RxItem(b, rng.choice(PREFIX[b.form]), freq, dpd, dur, days, rng.choice(INSTRUCTIONS))
+        if not names and rng.random() < 0.15:
+            item.quantity = int(dpd * days) if dpd and days else 10
+        items.append(item)
     return items
 
 
@@ -620,6 +626,7 @@ def make_samples(seed: int) -> None:
                 frequency=it.frequency,
                 doses_per_day=doses_per_day(it.frequency),
                 duration_days=duration_days(it.duration),
+                quantity=it.quantity,
             )
             for i, it in enumerate(items, start=1)
         ]

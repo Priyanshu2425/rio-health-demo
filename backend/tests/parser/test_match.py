@@ -7,6 +7,7 @@ from app.core.config import get_settings
 from app.core.llm import LLMError
 from app.parser import match
 
+from . import fakes
 from .fakes import AUGMENTIN_375, AUGMENTIN_625, AUGMENTIN_SYP, DOLO_650, PAN_40, FakeCatalog, FakeLLM
 
 
@@ -131,3 +132,12 @@ def test_agreement_rules():
     assert match.strength_agrees(line("Augmentin"), AUGMENTIN_375) is None
     assert match.form_agrees(line("Augmentin", form="syrup"), AUGMENTIN_SYP) is True
     assert match.agrees(line("Augmentin", form=None), AUGMENTIN_625) is False  # nothing to check
+
+
+async def test_fallback_prefers_brand_without_extra_words(monkeypatch):
+    monkeypatch.setattr(get_settings(), "rerank_model", "")
+    kid = fakes.sku("kid", "Montair LC Kid", "tablet", [("levocetirizine", "2.5mg"), ("montelukast", "4mg")])
+    adult = fakes.sku("lc", "Montair-LC", "tablet", [("levocetirizine", "5mg"), ("montelukast", "10mg")])
+    install(monkeypatch, {"montair lc": [(kid, 0.8), (adult, 0.75)]})
+    result = await parser.match_line(None, line("Montair LC"))
+    assert result.sku.sku_id == "lc"

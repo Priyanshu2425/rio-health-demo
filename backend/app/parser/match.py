@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 
 from psycopg import AsyncConnection
@@ -73,11 +74,25 @@ def is_confident(candidates: list[MatchCandidate]) -> bool:
     return top >= CONFIDENT_SCORE and top - second >= CONFIDENT_MARGIN
 
 
+_FORM_WORDS = {"tab", "tablet", "tablets", "cap", "capsule", "capsules", "syrup", "suspension", "mg", "ml"}
+
+
+def extra_tokens(line: ParsedLine, sku: SKU) -> int:
+    """Words in the brand name the line did not write, e.g. 'Kid' in 'Montair LC Kid'."""
+
+    def words(text: str | None) -> set[str]:
+        return {w for w in re.split(r"[^a-z0-9.]+", (text or "").lower()) if w and w not in _FORM_WORDS}
+
+    wanted = words(line.drug) | words(line.strength) | set(strength_numbers(line.strength))
+    return len({w for w in words(sku.brand_name) if not re.fullmatch(r"[\d.]+(mg|mcg|g|ml)?", w)} - wanted)
+
+
 def _fallback(line: ParsedLine, candidates: list[MatchCandidate], why: str) -> MatchResult:
-    """No re-rank available: take the best-scoring candidate that agrees, else the top one."""
+    """No re-rank available: among candidates near the top score, prefer one whose strength
+    and form agree, then the one with the fewest unrequested brand words, then the score."""
     top = candidates[0]
     near = [c for c in candidates if c.score >= top.score - CONFIDENT_MARGIN]
-    pick = next((c for c in near if agrees(line, c.sku)), top)
+    pick = min(near, key=lambda c: (not agrees(line, c.sku), extra_tokens(line, c.sku), -c.score))
     return MatchResult(
         sku=pick.sku,
         score=pick.score,

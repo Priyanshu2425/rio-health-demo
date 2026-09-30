@@ -50,6 +50,23 @@ _TRAILING_STRENGTH = re.compile(
 )
 
 
+_PACK_WORDS = re.compile(r"\b\d+\s*(?:strips?|packs?|packets?|boxes?)\b", re.IGNORECASE)
+_UNIT_COUNT = re.compile(
+    r"(?:#|\bno\.?\s*)\s*\d+|\b\d+\s*(?:tabs?|tablets?|caps?|capsules?)\b", re.IGNORECASE
+)
+
+
+def written_quantity(raw: RxLine) -> int | None:
+    """ParsedLine.quantity is in dispensable units (tablets for solids, bottles/tubes/
+    sachets otherwise). A count written only in strips or packs is not a unit count, so it
+    is dropped and the cart falls back to frequency x duration."""
+    if not raw.quantity or raw.quantity <= 0:
+        return None
+    if _PACK_WORDS.search(raw.raw_text) and not _UNIT_COUNT.search(raw.raw_text):
+        return None
+    return raw.quantity
+
+
 def to_parsed_line(line_no: int, raw: RxLine) -> ParsedLine:
     drug = _clean(raw.drug)
     strength = _clean(raw.strength)
@@ -71,7 +88,7 @@ def to_parsed_line(line_no: int, raw: RxLine) -> ParsedLine:
         frequency=frequency,
         doses_per_day=doses_per_day(frequency),
         duration_days=duration_days(raw.duration),
-        quantity=raw.quantity if raw.quantity and raw.quantity > 0 else None,
+        quantity=written_quantity(raw),
         illegible_fields=illegible,
     )
 

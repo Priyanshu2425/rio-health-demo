@@ -128,3 +128,21 @@ async def test_parse_propagates_llm_error(monkeypatch):
     monkeypatch.setattr(llm, "complete_json", fake.complete_json)
     with pytest.raises(llm.LLMError):
         await parser.parse_prescription(jpeg(100, 100), "image/png")
+
+
+@pytest.mark.parametrize(
+    "raw,qty,expected",
+    [
+        ("Tab Dolo 650 #10 SOS", 10, 10),
+        ("Tab Dolo 650 2 strips", 2, None),
+        ("Tab Dolo 650 No. 10 (1 strip)", 10, 10),
+        ("Syp Calpol 1 bottle", 1, 1),
+        ("Tab Pan 40 OD", None, None),
+        ("Tab Pan 40 OD", 0, None),
+    ],
+)
+def test_written_quantity_is_in_units(raw, qty, expected):
+    from app.parser.extract import written_quantity
+    from app.parser.models import RxLine
+
+    assert written_quantity(RxLine.model_validate(line(raw, quantity=qty))) == expected

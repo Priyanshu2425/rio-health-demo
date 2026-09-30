@@ -40,7 +40,10 @@ class RxLine(_Strict):
     strength: str | None = Field(description="Strength exactly as written, e.g. '625', '500 mg', '5ml'")
     frequency: str | None = Field(description="Frequency exactly as written, e.g. '1-0-1', 'BD', 'SOS'")
     duration: str | None = Field(description="Duration exactly as written, e.g. 'x 5 days', '5/7'")
-    quantity: int | None = Field(description="Only if an explicit count is written, e.g. 'No. 10'")
+    quantity: int | None = Field(
+        description="Explicit count written, in tablets/capsules for solid forms or bottles/tubes/"
+        "sachets otherwise, e.g. '#10' -> 10; null if not written or written in strips/packs"
+    )
     instructions: str | None = Field(description="e.g. 'after food', 'before breakfast'")
     illegible_fields: list[LLMField] = Field(description="Fields you could not read with confidence")
 

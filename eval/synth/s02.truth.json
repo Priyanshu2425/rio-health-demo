@@ -1,44 +1,57 @@
 {
   "lines": [
     {
-      "drug": "Glycomet",
+      "drug": "Azithral",
       "strength": "500",
-      "doses_per_day": 1,
-      "duration_days": 30,
-      "composition_key": "metformin 500mg",
-      "raw_text": "Tab. Glycomet 500  0-0-1  x 30 days"
+      "doses_per_day": 3,
+      "duration_days": 3,
+      "quantity": null,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "Tab. Azithral 500  TDS  3/7  (B/F)"
     },
     {
-      "drug": "Telma",
-      "strength": "40",
+      "drug": "Calpol",
+      "strength": "500",
+      "doses_per_day": null,
+      "duration_days": null,
+      "quantity": null,
+      "composition_key": "paracetamol 500mg",
+      "raw_text": "Tab. Calpol 500  SOS  (before food)"
+    },
+    {
+      "drug": "Pan-D",
+      "strength": null,
       "doses_per_day": 1,
-      "duration_days": 30,
-      "composition_key": "telmisartan 40mg",
-      "raw_text": "Tab Telma 40  0-0-1  x 1 month  (empty stomach)"
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "domperidone 30mg + pantoprazole 40mg",
+      "raw_text": "Cap. Pan-D  1-0-0  x 1 week"
+    },
+    {
+      "drug": "Omez",
+      "strength": "20",
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "omeprazole 20mg",
+      "raw_text": "Cap Omez 20  BD  x 5 days  (empty stomach)"
     },
     {
       "drug": "Augmentin Duo",
       "strength": "625",
-      "doses_per_day": 2,
-      "duration_days": 5,
-      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
-      "raw_text": "Tab Augmentin 625 Duo  BD  5/7  (A/F)"
-    },
-    {
-      "drug": "Ecosprin",
-      "strength": "75",
       "doses_per_day": 1,
-      "duration_days": 30,
-      "composition_key": "aspirin 75mg",
-      "raw_text": "Tab Ecosprin 75  1-0-0  x 30 days"
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab Augmentin 625 Duo  OD  for 5 days  (B/F)"
     }
   ],
   "meta": {
     "layout": "opd_table",
     "hand_font": null,
-    "doctor": "Dr. Pooja Bansal",
-    "clinic": "Sanjeevani Medical Centre",
-    "patient": "Ramesh Kumar",
-    "date": "01/08/2026"
+    "doctor": "Dr. Rajiv Malhotra",
+    "clinic": "City Care Multispeciality Hospital",
+    "patient": "Anjali Gupta",
+    "date": "12/03/2026"
   }
 }

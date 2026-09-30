@@ -1,52 +1,48 @@
 {
   "lines": [
     {
-      "drug": "Amlong",
-      "strength": "5",
-      "doses_per_day": 2,
-      "duration_days": 30,
-      "composition_key": "amlodipine 5mg",
-      "raw_text": "T. Amlong 5  1-0-1  x 1 month"
-    },
-    {
-      "drug": "Crocin",
+      "drug": "Dolo",
       "strength": "650",
-      "doses_per_day": 2,
-      "duration_days": 5,
-      "composition_key": "paracetamol 650mg",
-      "raw_text": "Tab. Crocin 650  1-0-1  for 5 days"
-    },
-    {
-      "drug": "Omez",
-      "strength": "20",
       "doses_per_day": 3,
       "duration_days": 5,
-      "composition_key": "omeprazole 20mg",
-      "raw_text": "Cap Omez 20  TDS  5d  (empty stomach)"
+      "quantity": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "T. Dolo 650  TDS  x 5 days"
     },
     {
-      "drug": "Azithral",
-      "strength": "500",
+      "drug": "Ondem",
+      "strength": "4",
       "doses_per_day": 2,
-      "duration_days": 7,
-      "composition_key": "azithromycin 500mg",
-      "raw_text": "Tab. Azithral 500  1-0-1  x 7 days"
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "ondansetron 4mg",
+      "raw_text": "Tab. Ondem 4  1-0-1  5d"
     },
     {
-      "drug": "Pantocid",
-      "strength": "40",
-      "doses_per_day": 1,
+      "drug": "Taxim-O",
+      "strength": "200",
+      "doses_per_day": 2,
       "duration_days": 3,
-      "composition_key": "pantoprazole 40mg",
-      "raw_text": "Tab. Pantocid 40  OD  3/7"
+      "quantity": 6,
+      "composition_key": "cefixime 200mg",
+      "raw_text": "T. Taxim-O 200 #6  BD  x 3 days"
+    },
+    {
+      "drug": "Ciplox",
+      "strength": "500",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "quantity": 15,
+      "composition_key": "ciprofloxacin 500mg",
+      "raw_text": "Tab Ciplox 500 #15  TDS  5d  (empty stomach)"
     }
   ],
   "meta": {
     "layout": "opd_table",
     "hand_font": null,
-    "doctor": "Dr. Neha Kulkarni",
-    "clinic": "Apex Heart & Diabetes Clinic",
-    "patient": "Vikram Singh",
-    "date": "02/09/2026"
+    "doctor": "Dr. Farah Siddiqui",
+    "clinic": "Shree Sai Polyclinic",
+    "patient": "Deepak Joshi",
+    "date": "22/07/2026"
   }
 }
