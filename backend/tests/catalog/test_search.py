@@ -102,6 +102,35 @@ async def test_whole_pack_generic_has_the_same_volume(conn, sku_id):
         assert generic.mrp_inr < brand.mrp_inr
 
 
+async def test_same_volume_generic_not_crowded_out_by_cheaper_sizes(conn):
+    """60 cheaper 5 ml bottles must not hide the one cheaper 30 ml bottle."""
+    key = "zz test salt 10mg/5ml"
+
+    def row(sku_id: str, label: str, mrp: float) -> tuple:
+        composition = '[{"name": "zz test salt", "strength": "10mg/5ml"}]'
+        return (sku_id, sku_id, "Test Pharma", "syrup", 1, label, mrp, composition, key, False, None)
+
+    rows = [row(f"sku_zz_small_{i:02d}", "bottle of 5 ml syrup", 10 + i / 100) for i in range(60)]
+    rows.append(row("sku_zz_brand", "bottle of 30 ml syrup", 100))
+    rows.append(row("sku_zz_generic", "bottle of 30 ml syrup", 50))
+    rows.append(row("sku_zz_other_label", "bottle of 30 ml oral solution", 40))  # same volume, cheapest
+    # inserted inside a savepoint that is always rolled back: the catalog is untouched
+    async with conn.transaction(force_rollback=True):
+        async with conn.cursor() as cur:
+            await cur.executemany(
+                "INSERT INTO skus (sku_id, brand_name, manufacturer, form, pack_size, pack_label, "
+                "mrp_inr, composition, composition_key, rx_only, schedule) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                rows,
+            )
+        brand = await get_sku(conn, "sku_zz_brand")
+        generic = await cheapest_generic(conn, brand)
+    assert generic is not None
+    assert generic.sku_id == "sku_zz_other_label"  # same 30 ml, cheapest of those
+    assert pack_amount(generic.pack_label) == (30.0, "ml")
+    assert await get_sku(conn, "sku_zz_brand") is None
+
+
 async def test_search_leaves_trigram_threshold_alone(conn):
     await search(conn, "augmentin 625")
     await search(conn, "augmantin")

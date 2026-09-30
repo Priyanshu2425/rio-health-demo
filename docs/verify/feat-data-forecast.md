@@ -121,7 +121,7 @@ cd backend && uv run ruff check . && uv run ruff format --check . && uv run pyte
 ```
 All checks passed!
 All files formatted
-120 passed
+121 passed
 ```
 
 Catalog tests (`tests/catalog/`): pure parser and pack tests (including rotacap, respule and MDI packs and

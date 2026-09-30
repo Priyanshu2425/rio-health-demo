@@ -46,21 +46,42 @@ LIMIT {limit}
 # composition and form are almost always data errors, so never offer one as the generic
 # (only applied when the group has at least 3 SKUs).
 PRICE_FLOOR = 0.2
+# Measured amount in a pack label, e.g. 'bottle of 15 ml oral drops' -> {15, ml}. The SQL
+# pattern mirrors _AMOUNT below; units 'g' and 'ltr' are folded to 'gm' and 'l'.
+AMOUNT_PATTERN = r"(\d+(?:\.\d+)?)\s*(ml|gm|g|mg|mcg|mdi|l|ltr)"
+
+# For one-unit packs (bottles, tubes, sachets, inhalers) the candidate must hold the same
+# amount, or have an identical label when either side has no amount. This filter runs in
+# the WHERE clause, before ORDER BY / LIMIT, so a same-size generic is never crowded out
+# by cheaper packs of another size.
 GENERIC_SQL = f"""
 WITH grp AS (
     SELECT count(*) AS n,
            percentile_cont(0.5) WITHIN GROUP (ORDER BY mrp_inr / pack_size) AS median_unit
     FROM skus WHERE composition_key = %(key)s AND form = %(form)s
 )
-SELECT {COLUMNS} FROM skus, grp
+SELECT {COLUMNS} FROM skus
+CROSS JOIN grp
+CROSS JOIN LATERAL (
+    SELECT regexp_match(lower(pack_label), '{AMOUNT_PATTERN}\\y') AS m
+) amt
 WHERE composition_key = %(key)s AND form = %(form)s AND sku_id <> %(id)s
   AND mrp_inr * %(pack)s < %(mrp)s::numeric * pack_size
   AND (grp.n < 3 OR mrp_inr / pack_size >= {PRICE_FLOOR} * grp.median_unit)
+  AND (
+    NOT %(whole)s
+    OR (%(amount)s::numeric IS NULL AND pack_label = %(label)s)
+    OR (
+        %(amount)s::numeric IS NOT NULL
+        AND amt.m[1]::numeric = %(amount)s::numeric
+        AND CASE amt.m[2] WHEN 'g' THEN 'gm' WHEN 'ltr' THEN 'l' ELSE amt.m[2] END = %(unit)s
+    )
+  )
 ORDER BY mrp_inr / pack_size, mrp_inr, sku_id
-LIMIT 50
+LIMIT 1
 """
 
-_AMOUNT = re.compile(r"(\d+(?:\.\d+)?)\s*(ml|gm|g|mg|mcg|mdi|l|ltr)\b")
+_AMOUNT = re.compile(AMOUNT_PATTERN + r"\b")
 
 
 def pack_amount(pack_label: str) -> tuple[float, str] | None:
@@ -121,6 +142,7 @@ async def get_sku(conn: AsyncConnection, sku_id: str) -> SKU | None:
 
 
 async def cheapest_generic(conn: AsyncConnection, sku: SKU) -> SKU | None:
+    amount = pack_amount(sku.pack_label)
     async with conn.cursor(row_factory=dict_row) as cur:
         await cur.execute(
             GENERIC_SQL,
@@ -130,14 +152,11 @@ async def cheapest_generic(conn: AsyncConnection, sku: SKU) -> SKU | None:
                 "id": sku.sku_id,
                 "pack": sku.pack_size,
                 "mrp": str(sku.mrp_inr),
+                "whole": sku.pack_size == 1,
+                "amount": None if amount is None else str(amount[0]),
+                "unit": None if amount is None else amount[1],
+                "label": sku.pack_label,
             },
         )
-        rows = await cur.fetchall()
-    for row in rows:
-        candidate = to_sku(row)
-        # a one-unit pack is only comparable with the same bottle / tube size, or a
-        # 15 ml bottle would look like a cheaper generic of a 60 ml one
-        if sku.pack_size == 1 and not same_whole_pack(sku, candidate):
-            continue
-        return candidate
-    return None
+        row = await cur.fetchone()
+    return to_sku(row) if row else None
