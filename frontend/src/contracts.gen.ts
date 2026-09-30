@@ -111,7 +111,7 @@ export interface SKU {
    */
   pack_label: string;
   /**
-   * Units per pack, e.g. 10 for a strip of 10
+   * Countable units per pack (tablets, capsules, rotacaps, vials); 1 for bottles, tubes, sachets, inhalers
    */
   pack_size: number;
   rx_only: boolean;
@@ -182,7 +182,7 @@ export interface ParsedLine {
    */
   line_no: number;
   /**
-   * Only if an explicit count is written
+   * Explicit count in SKU.pack_size units ('#10' tablets -> 10); null if absent or written in packs
    */
   quantity: number | null;
   /**

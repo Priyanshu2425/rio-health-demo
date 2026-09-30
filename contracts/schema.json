@@ -676,7 +676,7 @@
             }
           ],
           "default": null,
-          "description": "Only if an explicit count is written",
+          "description": "Explicit count in SKU.pack_size units ('#10' tablets -> 10); null if absent or written in packs",
           "title": "Quantity"
         },
         "raw_text": {
@@ -1025,7 +1025,7 @@
           "type": "string"
         },
         "pack_size": {
-          "description": "Units per pack, e.g. 10 for a strip of 10",
+          "description": "Countable units per pack (tablets, capsules, rotacaps, vials); 1 for bottles, tubes, sachets, inhalers",
           "minimum": 1,
           "title": "Pack Size",
           "type": "integer"

@@ -36,13 +36,16 @@ async def complete_json(
     *,
     temperature: float = 0.0,
     strict: bool = False,
+    max_tokens: int | None = None,
 ) -> LLMResult:
     """Call `model` and return JSON that validates against `schema`.
 
     `strict=True` asks the provider to enforce the schema, but only works when every
     property is required and `additionalProperties` is false; the response is validated
     against `schema` either way. Raises LLMError on HTTP errors, timeouts, or a response
-    that does not validate.
+    that does not validate. `max_tokens` (default OPENROUTER_MAX_TOKENS) caps output,
+    reasoning included, so a runaway generation costs cents rather than running to the
+    timeout; hitting the cap raises LLMError saying so.
     """
     settings = get_settings()
     if not settings.openrouter_api_key:
@@ -54,6 +57,7 @@ async def complete_json(
         "model": model,
         "messages": messages,
         "temperature": temperature,
+        "max_tokens": max_tokens or settings.openrouter_max_tokens,
         "response_format": {
             "type": "json_schema",
             "json_schema": {"name": schema.__name__, "strict": strict, "schema": schema.model_json_schema()},
@@ -78,7 +82,10 @@ async def complete_json(
 
     payload = resp.json()
     try:
-        content = payload["choices"][0]["message"]["content"]
+        choice = payload["choices"][0]
+        if choice.get("finish_reason") == "length":
+            raise LLMError(f"{model} hit max_tokens before finishing; raise OPENROUTER_MAX_TOKENS")
+        content = choice["message"]["content"]
         data = schema.model_validate(json.loads(content)).model_dump(mode="json")
     except (KeyError, IndexError, TypeError, ValueError) as exc:
         raise LLMError(f"response did not match {schema.__name__}: {exc}") from exc
