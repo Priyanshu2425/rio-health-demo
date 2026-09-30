@@ -21,13 +21,12 @@ WORKDIR /app/backend
 COPY backend/pyproject.toml backend/uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-# 2. Copy the rest of the repo needed at runtime, keeping the repo-relative
-#    layout so app.orders.mocks can find contracts/fixtures three parents up
-#    from backend/app/orders/mocks.py (i.e. /app/contracts/fixtures).
+# 2. Copy the backend only. At runtime the app reads only the database
+#    (contracts/README.md rule 0), so data/ and contracts/fixtures/ stay out of
+#    the image; mock mode (RIO_USE_MOCKS=1) is for local development and does
+#    not work in this image.
 WORKDIR /app
 COPY backend/ backend/
-COPY contracts/ contracts/
-COPY data/ data/
 
 # Install the project itself now that its code is present.
 WORKDIR /app/backend

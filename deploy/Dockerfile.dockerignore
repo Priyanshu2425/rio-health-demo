@@ -14,5 +14,11 @@ eval/
 docs/
 graft/
 .claude/
-data/raw/
+# Runtime reads only the database; ETL inputs and fixtures stay out of the image.
+data/
+contracts/
+scripts/
 kaggle.json
+**/.pytest_cache
+**/.ruff_cache
+backend/tests/

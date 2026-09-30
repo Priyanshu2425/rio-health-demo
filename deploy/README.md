@@ -7,13 +7,30 @@ security group; public traffic reaches the box through a Cloudflare Tunnel at
 Repo lives at `/opt/rio/app` on the server. Environment values live in
 `/opt/rio/.env`, outside the repo, `chmod 600`.
 
-The app runs as a single uvicorn worker. Its rate limiter is in-memory, so
-running more than one worker or replica would let requests dodge the limit.
-Do not raise `--workers` or scale the compose service without changing that.
+A deploy is the code plus the database URL. At runtime the app reads only Neon
+(`contracts/README.md` rule 0), so the image holds `backend/` only: no `data/`,
+no fixtures. `docker-compose.yml` pins `RIO_USE_MOCKS=0`; mock mode is for
+local development and does not work in the image. With mocks off, the app
+refuses to start if `RIO_HEALTH_DATABASE_URL` is missing or the database is
+unreachable. Check `docker compose ... logs api` if the container keeps
+restarting.
 
-The rate limiter keys on the `CF-Connecting-IP` header. That is only safe
-because the port is bound to `127.0.0.1`, so every request arrives through the
-tunnel, where Cloudflare sets the header. Never publish port 8000 publicly.
+**One worker, one container.** The per-IP rate limiter and the startup state
+(the background forecast run when `forecast_runs` is empty) live in process
+memory. More workers or replicas would split the limiter and run the forecast
+bootstrap more than once. Do not raise `--workers` or scale the service.
+
+**`CF-Connecting-IP` is trusted only because of the port binding.** The rate
+limiter keys on that header. That is safe only because compose binds the port
+to `127.0.0.1`, so every request arrives through the tunnel, where Cloudflare
+sets the header. Anyone reaching the port directly could forge it. Never
+publish port 8000 on a public interface.
+
+**Database prerequisites.** Neon schema `app_rio_health` must already hold the
+catalog (`skus`, loaded by `scripts/etl/build_catalog.py`) and the demo samples
+(`samples`, loaded by `eval/load_samples.py`). Those ETL scripts run from a dev
+machine, not from this host. `deploy.sh` applies pending migrations on every
+deploy.
 
 ## One-time server setup
 
@@ -41,16 +58,18 @@ tunnel, where Cloudflare sets the header. Never publish port 8000 publicly.
    sudo chown "$USER" /opt/rio/.env
    chmod 600 /opt/rio/.env
    ```
-   Fill in these names (no values here):
+   Fill in these names (no values here). The first four are required; the
+   rest have defaults (10 parses per IP per hour, 5 MB, 45 s, 8000 tokens).
+   `RIO_USE_MOCKS` is ignored: compose sets it to 0.
    ```
-   RIO_HEALTH_DATABASE_URL=
-   OPENROUTER_API_KEY=
-   VISION_MODEL=
+   RIO_HEALTH_DATABASE_URL=     # direct (non-pooled) Neon endpoint
+   OPENROUTER_API_KEY=          # with a monthly spend limit set on the key
+   VISION_MODEL=                # e.g. google/gemini-3.8-flash (chosen by eval/)
    RERANK_MODEL=
-   RIO_USE_MOCKS=
    PARSE_RATE_LIMIT_PER_HOUR=
    MAX_UPLOAD_MB=
    OPENROUTER_TIMEOUT_S=
+   OPENROUTER_MAX_TOKENS=
    ```
 
 5. Install cloudflared:
