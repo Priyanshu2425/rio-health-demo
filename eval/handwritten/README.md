@@ -48,5 +48,5 @@ lines. `run.py` ignores truth files that are still marked, so an unchecked prefi
 counts as ground truth.
 
 When one of these replaces the handwritten-style demo sample, copy it to
-`backend/app/parser/samples/`, add it to `manifest.json`, and run
-`eval/refresh_samples.py`.
+`eval/samples/`, add it to `manifest.json`, and run `eval/refresh_samples.py` (which
+also upserts it into the `samples` table).

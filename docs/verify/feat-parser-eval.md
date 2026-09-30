@@ -84,13 +84,12 @@ cd backend && uv run python ../eval/refresh_samples.py
 ```sh
 cd backend && uv run python -c "
 import asyncio, json
-from app import parser
+from pathlib import Path
 from app.parser.extract import parse_prescription
 async def main():
-    for s in parser.list_samples():
-        img, mime, _ = parser.load_sample(s.sample_id)
-        rx = await parse_prescription(img, mime)
-        print(s.sample_id, rx.model, rx.latency_ms, 'ms', rx.cost_usd)
+    for sid in ('typed_clinic_3', 'hospital_opd_4', 'handwritten_style_3'):
+        rx = await parse_prescription(Path('../eval/samples', sid + '.jpg').read_bytes(), 'image/jpeg')
+        print(sid, rx.model, rx.latency_ms, 'ms', rx.cost_usd)
         for l in rx.lines: print('  ', json.dumps(l.model_dump(mode='json', exclude={'bbox'})))
 asyncio.run(main())"
 ```
@@ -110,19 +109,30 @@ deletes the `_prefilled` lines.** `run.py` skips files that are still marked.
 
 ## 5. Demo samples
 
-`backend/app/parser/samples/`: `typed_clinic_3` (Augmentin 625 Duo, Pan 40, Dolo 650),
-`hospital_opd_4` (Azithral 500, Montair LC, Pan-D, Calpol 500) and `handwritten_style_3`
-(Telma 40, Glycomet 500, Atorva 10, in a handwriting font). All three are synthetic for
-now; `handwritten_style_3` should be replaced by one of the owner's handwritten photos
-(copy it in, edit `manifest.json`, run `refresh_samples.py`). Their cached parses are
-built from the generator's truth (`"model": "synthetic-truth"`) until
-`refresh_samples.py` runs.
+Served from the `samples` table (migration 002). `list_samples(conn)` and
+`load_sample(conn, id)` are plain queries; no request path opens a file (a grep of
+`backend/app/parser` for `read_bytes`, `read_text` or `open(` finds only
+`Image.open(io.BytesIO(...))`). The images and cached parses in `eval/samples/` are ETL
+input, loaded with an idempotent upsert:
+
+```sh
+cd backend && uv run python ../eval/load_samples.py            # prints "samples rows: 3"
+cd backend && uv run pytest -q tests/parser/test_samples.py    # db-marked, read-only
+```
+
+The samples are `typed_clinic_3` (Augmentin 625 Duo, Pan 40, Dolo 650), `hospital_opd_4`
+(Azithral 500, Montair LC, Pan-D, Calpol 500) and `handwritten_style_3` (Telma 40,
+Glycomet 500, Atorva 10, in a handwriting font). All three are synthetic for now;
+`handwritten_style_3` should be replaced by one of the owner's handwritten photos (copy
+it into `eval/samples/`, edit `manifest.json`, run `load_samples.py`). Their cached
+parses are built from the generator's truth (`"model": "synthetic-truth"`) until
+`refresh_samples.py` runs; it writes the live parse to both the JSON file and the table.
 
 ## 6. Regenerating the synthetic set
 
 ```sh
 cd backend && uv run python ../eval/make_synth.py            # eval/synth/s01..s20 (+ .truth.json)
-cd backend && uv run python ../eval/make_synth.py --samples  # app/parser/samples/
+cd backend && uv run python ../eval/make_synth.py --samples  # eval/samples/, then load_samples.py
 ```
 
 Deterministic for a given `--seed`, using macOS system fonts (Arial, Georgia, Times,

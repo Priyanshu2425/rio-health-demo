@@ -1,9 +1,10 @@
 """Live OpenRouter calls. Skipped unless RUN_LLM=1 (they cost money)."""
 
+from pathlib import Path
+
 import pytest
 
-from app import parser
-from app.contracts import MatchCandidate, ParsedLine
+from app.contracts import MatchCandidate, ParsedLine, ParsedRx
 from app.core.config import get_settings
 from app.parser import match
 from app.parser.extract import parse_prescription
@@ -22,8 +23,9 @@ def settings():
 
 
 async def test_parse_typed_sample(settings):
-    image, mime, cached = parser.load_sample("typed_clinic_3")
-    rx = await parse_prescription(image, mime)
+    samples = Path(__file__).resolve().parents[3] / "eval" / "samples"
+    cached = ParsedRx.model_validate_json((samples / "typed_clinic_3.json").read_text())
+    rx = await parse_prescription((samples / "typed_clinic_3.jpg").read_bytes(), "image/jpeg")
     drugs = " ".join((line.drug or "").lower() for line in rx.lines)
     assert len(rx.lines) == len(cached.lines)
     for expected in ("augmentin", "pan", "dolo"):

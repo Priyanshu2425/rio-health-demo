@@ -3,24 +3,25 @@
     cd backend && uv run python ../eval/refresh_samples.py [--model <id>]
 
 `make_synth.py --samples` writes truth-derived parses (model "synthetic-truth") so the
-fallback works before an API key exists. Run this once the key is set so the cached
-parses are real model output, then review the diff before committing.
+fallback works before an API key exists. This re-parses each image in eval/samples/,
+writes the parse to eval/samples/<id>.json and upserts it into the `samples` table.
+Review the JSON diff before committing it. Costs one vision call per sample.
 """
 
 from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "backend"))
+EVAL_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(EVAL_DIR.parent / "backend"))
+
+from load_samples import SAMPLES_DIR, connect, manifest, upsert_sample
 
 from app.core.config import get_settings
 from app.parser.extract import parse_prescription
-from app.parser.samples import SAMPLES_DIR
 
 
 async def main_async(model: str | None) -> int:
@@ -29,11 +30,18 @@ async def main_async(model: str | None) -> int:
     if not settings.openrouter_api_key or not model:
         print("OPENROUTER_API_KEY and --model (or VISION_MODEL) are required", file=sys.stderr)
         return 2
-    for entry in json.loads((SAMPLES_DIR / "manifest.json").read_text()):
-        image = SAMPLES_DIR / entry["image"]
-        parsed = await parse_prescription(image.read_bytes(), entry["mime"], model=model)
-        (SAMPLES_DIR / f"{entry['sample_id']}.json").write_text(parsed.model_dump_json(indent=2) + "\n")
-        print(f"{entry['sample_id']}: {len(parsed.lines)} lines, {parsed.latency_ms} ms, ${parsed.cost_usd}")
+    conn = await connect()
+    try:
+        for position, entry in enumerate(manifest(), start=1):
+            image = SAMPLES_DIR / entry["image"]
+            parsed = await parse_prescription(image.read_bytes(), entry["mime"], model=model)
+            (SAMPLES_DIR / f"{entry['sample_id']}.json").write_text(parsed.model_dump_json(indent=2) + "\n")
+            await upsert_sample(conn, entry, position, parsed)
+            print(
+                f"{entry['sample_id']}: {len(parsed.lines)} lines, {parsed.latency_ms} ms, ${parsed.cost_usd}"
+            )
+    finally:
+        await conn.close()
     return 0
 
 

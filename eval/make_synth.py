@@ -1,7 +1,7 @@
 """Render synthetic Indian prescriptions and degrade them to look like phone photos.
 
     cd backend && uv run python ../eval/make_synth.py            # eval/synth/s01..s20
-    cd backend && uv run python ../eval/make_synth.py --samples  # app/parser/samples/
+    cd backend && uv run python ../eval/make_synth.py --samples  # eval/samples/ (then load_samples.py)
 
 Four layouts (clinic letterhead, hospital OPD table, handwritten on a pad, minimal typed
 with clinical notes as distractors), several fonts including handwriting-style ones, 2-5
@@ -27,7 +27,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 SYNTH_DIR = ROOT / "eval" / "synth"
-SAMPLES_DIR = ROOT / "backend" / "app" / "parser" / "samples"
+SAMPLES_DIR = ROOT / "eval" / "samples"  # ETL input for the samples table
 
 W, H = 1240, 1754  # A4 at 150 dpi
 

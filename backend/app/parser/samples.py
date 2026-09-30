@@ -1,38 +1,37 @@
 """Demo prescriptions with cached parses: the 'try a sample' fallback.
 
-Each sample is `samples/<id>.jpg` plus `samples/<id>.json` (a ParsedRx), listed in
-`samples/manifest.json` as `[{"sample_id", "label", "mime"}]`.
+Read from the `samples` table (migration 002). The images and parses in `eval/samples/`
+are ETL input only, loaded by `eval/load_samples.py`; nothing here opens a file.
 """
 
 from __future__ import annotations
 
-import json
-from functools import lru_cache
-from pathlib import Path
+from psycopg import AsyncConnection
+from psycopg.rows import dict_row
 
 from app.contracts import ParsedRx, Sample
 
-SAMPLES_DIR = Path(__file__).parent / "samples"
+
+def thumbnail_url(sample_id: str) -> str:
+    return f"/api/samples/{sample_id}/image"
 
 
-@lru_cache
-def _manifest() -> list[dict[str, str]]:
-    return json.loads((SAMPLES_DIR / "manifest.json").read_text())
-
-
-def list_samples() -> list[Sample]:
+async def list_samples(conn: AsyncConnection) -> list[Sample]:
+    async with conn.cursor(row_factory=dict_row) as cur:
+        await cur.execute("SELECT sample_id, label FROM samples ORDER BY position, sample_id")
+        rows = await cur.fetchall()
     return [
-        Sample(
-            sample_id=s["sample_id"], label=s["label"], thumbnail_url=f"/api/samples/{s['sample_id']}/image"
-        )
-        for s in _manifest()
+        Sample(sample_id=r["sample_id"], label=r["label"], thumbnail_url=thumbnail_url(r["sample_id"]))
+        for r in rows
     ]
 
 
-def load_sample(sample_id: str) -> tuple[bytes, str, ParsedRx]:
-    entry = next((s for s in _manifest() if s["sample_id"] == sample_id), None)
-    if entry is None:
+async def load_sample(conn: AsyncConnection, sample_id: str) -> tuple[bytes, str, ParsedRx]:
+    async with conn.cursor(row_factory=dict_row) as cur:
+        await cur.execute(
+            "SELECT image, image_mime, parsed_rx FROM samples WHERE sample_id = %s", (sample_id,)
+        )
+        row = await cur.fetchone()
+    if row is None:
         raise KeyError(sample_id)
-    image = (SAMPLES_DIR / entry["image"]).read_bytes()
-    parsed = ParsedRx.model_validate_json((SAMPLES_DIR / f"{sample_id}.json").read_text())
-    return image, entry["mime"], parsed
+    return bytes(row["image"]), row["image_mime"], ParsedRx.model_validate(row["parsed_rx"])
