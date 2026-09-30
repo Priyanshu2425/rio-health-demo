@@ -73,9 +73,9 @@ same volume. Examples: `Oflox 200` (₹88.57 / 10) → Zenflox 200 ₹69.90 / 10
 used to offer Oflocin at ₹1.14 a tablet against a ₹7.98 median; `Dolo` drops (15 ml,
 ₹30.07) → Babygesic 15 ml ₹22.09; `Dolo 250` (60 ml) only considers 60 ml bottles.
 
-Search ranks ties by brand popularity, read from the seed file. The backend can call
-`app.catalog.popularity.warm()` at startup; otherwise the first search loads it in a
-worker thread.
+Search breaks score ties in SQL with `skus.popularity_rank` (written by the catalog load
+from the seed's row order), then price per unit. The running app reads only the
+database; no code under `backend/app` opens the seed or any other data file.
 
 ## 3. Synthetic orders, inventory and a forecast run
 
@@ -121,7 +121,7 @@ cd backend && uv run ruff check . && uv run ruff format --check . && uv run pyte
 ```
 All checks passed!
 All files formatted
-109 passed
+120 passed
 ```
 
 Catalog tests (`tests/catalog/`): pure parser and pack tests (including rotacap, respule and MDI packs and
@@ -129,7 +129,8 @@ pack-volume comparison); DB tests for `augmentin 625` top 1, the amox-clav compo
 the top 3, `pan 40` → pantoprazole 40mg, a cheaper generic with the same key and form,
 the generic price floor (Oflox 200), same-volume generics for bottles, search leaving
 the trigram threshold at its default, a typo query, fixture ids resolving, and Rx/OTC
-flags for 10 salts.
+flags for 10 salts; `popularity_rank` loaded for every SKU and used for ties. A pure guard
+test keeps look-alike salts (cefixime/cefepime, quinine/quinidine, …) from being folded.
 Forecast tests (`tests/forecast/`): generator structure and reproducibility, the model
 recovering a known seasonal pattern, backtest beating naive (overall and on the outbreak
 SKUs), reorder rule cases, `reorder_qty >= 0`, at least one stockout risk, contract
