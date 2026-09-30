@@ -205,6 +205,10 @@ def form_from_text(text: str | None) -> Form | None:
     lowered = text.lower().strip()
     if lowered in FORMS:
         return lowered  # type: ignore[return-value]
+    if lowered in ("t", "t."):
+        return "tablet"
+    if lowered in ("c", "c."):
+        return "capsule"
     for prefix, form in _FORM_WORDS:
         if re.search(rf"\b{prefix}", lowered):
             return form

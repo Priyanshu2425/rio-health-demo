@@ -88,7 +88,9 @@ def test_duration_days(duration, expected):
     "text,expected",
     [
         ("Tab.", "tablet"),
-        ("T.", None),
+        ("T.", "tablet"),
+        ("C.", "capsule"),
+        ("Tbs", None),
         ("Cap", "capsule"),
         ("Syp.", "syrup"),
         ("Syr", "syrup"),

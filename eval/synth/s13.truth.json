@@ -1,0 +1,44 @@
+{
+  "lines": [
+    {
+      "drug": "Cetzine",
+      "strength": "10",
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab Cetzine 10  1-0-1  for 5 days"
+    },
+    {
+      "drug": "Dolo",
+      "strength": "650",
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "T. Dolo 650  0-0-1  for 5 days  (B/F)"
+    },
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "Tab. Atorva 10  0-0-1  x 30 days  (after food)"
+    },
+    {
+      "drug": "Ecosprin",
+      "strength": "75",
+      "doses_per_day": 1,
+      "duration_days": 14,
+      "composition_key": "aspirin 75mg",
+      "raw_text": "Tab. Ecosprin 75  1-0-0  2/52  (B/F)"
+    }
+  ],
+  "meta": {
+    "layout": "letterhead",
+    "hand_font": null,
+    "doctor": "Dr. Anil Mehta",
+    "clinic": "Arogya Health Centre",
+    "patient": "Sneha Patil",
+    "date": "01/01/2026"
+  }
+}

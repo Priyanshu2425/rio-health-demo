@@ -1,0 +1,28 @@
+{
+  "lines": [
+    {
+      "drug": "Augmentin Duo",
+      "strength": "625",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab Augmentin 625 Duo  OD  x 3 days  (before food)"
+    },
+    {
+      "drug": "Azithral",
+      "strength": "500",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "Tab. Azithral 500  1-0-0  x 7 days"
+    }
+  ],
+  "meta": {
+    "layout": "opd_table",
+    "hand_font": null,
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "Apex Heart & Diabetes Clinic",
+    "patient": "Rahul Sharma",
+    "date": "21/03/2026"
+  }
+}

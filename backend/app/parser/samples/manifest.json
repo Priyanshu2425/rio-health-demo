@@ -1,0 +1,20 @@
+[
+  {
+    "sample_id": "typed_clinic_3",
+    "label": "Typed clinic Rx, 3 lines",
+    "image": "typed_clinic_3.jpg",
+    "mime": "image/jpeg"
+  },
+  {
+    "sample_id": "hospital_opd_4",
+    "label": "Hospital OPD Rx, 4 lines",
+    "image": "hospital_opd_4.jpg",
+    "mime": "image/jpeg"
+  },
+  {
+    "sample_id": "handwritten_style_3",
+    "label": "Handwritten-style Rx, 3 lines",
+    "image": "handwritten_style_3.jpg",
+    "mime": "image/jpeg"
+  }
+]

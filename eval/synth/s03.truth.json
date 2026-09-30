@@ -1,0 +1,44 @@
+{
+  "lines": [
+    {
+      "drug": "Rosuvas",
+      "strength": "10",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "composition_key": "rosuvastatin 10mg",
+      "raw_text": "Tab. Rosuvas 10  BD  x 30 days  (empty stomach)"
+    },
+    {
+      "drug": "Cetzine",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  0-0-1  3/7"
+    },
+    {
+      "drug": "Azithral",
+      "strength": "500",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "T. Azithral 500  0-0-1  x 1 week  (after food)"
+    },
+    {
+      "drug": "Montair LC",
+      "strength": null,
+      "doses_per_day": 2,
+      "duration_days": 7,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab Montair LC  1-0-1  x 7 days  (A/F)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "bradley",
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "Shree Sai Polyclinic",
+    "patient": "Lakshmi Narayanan",
+    "date": "16/05/2026"
+  }
+}

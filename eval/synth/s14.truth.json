@@ -1,0 +1,28 @@
+{
+  "lines": [
+    {
+      "drug": "Ondem",
+      "strength": "4",
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "composition_key": "ondansetron 4mg",
+      "raw_text": "Tab. Ondem 4  BD  x 5 days  (B/F)"
+    },
+    {
+      "drug": "Amlong",
+      "strength": "5",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "composition_key": "amlodipine 5mg",
+      "raw_text": "T. Amlong 5  HS  x 30 days  (A/F)"
+    }
+  ],
+  "meta": {
+    "layout": "opd_table",
+    "hand_font": null,
+    "doctor": "Dr. Rajiv Malhotra",
+    "clinic": "LifeCare Family Clinic",
+    "patient": "Rahul Sharma",
+    "date": "24/05/2026"
+  }
+}

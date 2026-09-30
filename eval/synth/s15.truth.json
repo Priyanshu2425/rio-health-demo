@@ -1,0 +1,52 @@
+{
+  "lines": [
+    {
+      "drug": "Amlong",
+      "strength": "5",
+      "doses_per_day": 2,
+      "duration_days": 14,
+      "composition_key": "amlodipine 5mg",
+      "raw_text": "Tab. Amlong 5  1-0-1  2/52  (A/F)"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "T. Thyronorm 50  1-0-1  x 1 month"
+    },
+    {
+      "drug": "Clavam",
+      "strength": "625",
+      "doses_per_day": 3,
+      "duration_days": 3,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "T. Clavam 625  1-1-1  x 3 days  (empty stomach)"
+    },
+    {
+      "drug": "Dolo",
+      "strength": "650",
+      "doses_per_day": null,
+      "duration_days": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "Tab. Dolo 650  SOS"
+    },
+    {
+      "drug": "Cetzine",
+      "strength": "10",
+      "doses_per_day": 3,
+      "duration_days": 7,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  1-1-1  x 7 days  (after food)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "chalkboard",
+    "doctor": "Dr. Kavita Rao",
+    "clinic": "LifeCare Family Clinic",
+    "patient": "Sneha Patil",
+    "date": "02/02/2026"
+  }
+}

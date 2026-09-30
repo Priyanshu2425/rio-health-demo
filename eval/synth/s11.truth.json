@@ -1,0 +1,36 @@
+{
+  "lines": [
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 15,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "T. Atorva 10  1-0-0  x 15 days"
+    },
+    {
+      "drug": "Cetzine",
+      "strength": "10",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  1-1-1  for 5 days"
+    },
+    {
+      "drug": "Crocin",
+      "strength": "650",
+      "doses_per_day": null,
+      "duration_days": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "Tab Crocin 650  SOS  (A/F)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "marker",
+    "doctor": "Dr. Kavita Rao",
+    "clinic": "Green Park Clinic",
+    "patient": "Mohd. Imran",
+    "date": "25/01/2026"
+  }
+}

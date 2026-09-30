@@ -1,0 +1,52 @@
+{
+  "lines": [
+    {
+      "drug": "Pan-D",
+      "strength": null,
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "composition_key": "domperidone 30mg + pantoprazole 40mg",
+      "raw_text": "Cap Pan-D  0-0-1  x 7 days"
+    },
+    {
+      "drug": "Omez",
+      "strength": "20",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "composition_key": "omeprazole 20mg",
+      "raw_text": "Cap Omez 20  OD  3/7"
+    },
+    {
+      "drug": "Mox",
+      "strength": "500",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "composition_key": "amoxycillin 500mg",
+      "raw_text": "Cap. Mox 500  1-1-1  for 5 days  (after food)"
+    },
+    {
+      "drug": "Taxim-O",
+      "strength": "200",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "composition_key": "cefixime 200mg",
+      "raw_text": "Tab. Taxim-O 200  0-0-1  x 7 days  (after food)"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 1,
+      "duration_days": 15,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "T. Thyronorm 50  0-0-1  x 15 days"
+    }
+  ],
+  "meta": {
+    "layout": "minimal",
+    "hand_font": null,
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "LifeCare Family Clinic",
+    "patient": "Sneha Patil",
+    "date": "17/02/2026"
+  }
+}

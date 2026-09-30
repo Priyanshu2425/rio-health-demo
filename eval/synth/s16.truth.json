@@ -1,0 +1,36 @@
+{
+  "lines": [
+    {
+      "drug": "Calpol",
+      "strength": "500",
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "composition_key": "paracetamol 500mg",
+      "raw_text": "Tab. Calpol 500  1-0-1  x 5 days  (B/F)"
+    },
+    {
+      "drug": "Pan",
+      "strength": "40",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "composition_key": "pantoprazole 40mg",
+      "raw_text": "T. Pan 40  0-0-1  x 1 week  (A/F)"
+    },
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "Tab Atorva 10  1-0-0  x 30 days"
+    }
+  ],
+  "meta": {
+    "layout": "minimal",
+    "hand_font": null,
+    "doctor": "Dr. Neha Kulkarni",
+    "clinic": "Sunrise Clinic",
+    "patient": "Lakshmi Narayanan",
+    "date": "09/09/2026"
+  }
+}

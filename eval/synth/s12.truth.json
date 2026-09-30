@@ -1,0 +1,44 @@
+{
+  "lines": [
+    {
+      "drug": "Augmentin Duo",
+      "strength": "625",
+      "doses_per_day": 2,
+      "duration_days": 3,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab. Augmentin 625 Duo  1-0-1  3/7  (B/F)"
+    },
+    {
+      "drug": "Ondem",
+      "strength": "4",
+      "doses_per_day": null,
+      "duration_days": null,
+      "composition_key": "ondansetron 4mg",
+      "raw_text": "T. Ondem 4  SOS  (A/F)"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "Tab Thyronorm 50  1-0-1  x 30 days  (after food)"
+    },
+    {
+      "drug": "Ciplox",
+      "strength": "500",
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "composition_key": "ciprofloxacin 500mg",
+      "raw_text": "Tab. Ciplox 500  OD  for 5 days"
+    }
+  ],
+  "meta": {
+    "layout": "minimal",
+    "hand_font": null,
+    "doctor": "Dr. Kavita Rao",
+    "clinic": "Sunrise Clinic",
+    "patient": "Ramesh Kumar",
+    "date": "01/02/2026"
+  }
+}

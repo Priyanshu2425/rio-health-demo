@@ -1,0 +1,44 @@
+{
+  "lines": [
+    {
+      "drug": "Crocin",
+      "strength": "650",
+      "doses_per_day": 2,
+      "duration_days": 3,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "T. Crocin 650  BD  x 3 days  (after food)"
+    },
+    {
+      "drug": "Taxim-O",
+      "strength": "200",
+      "doses_per_day": 2,
+      "duration_days": 3,
+      "composition_key": "cefixime 200mg",
+      "raw_text": "Tab Taxim-O 200  BD  3/7"
+    },
+    {
+      "drug": "Amlong",
+      "strength": "5",
+      "doses_per_day": 2,
+      "duration_days": 15,
+      "composition_key": "amlodipine 5mg",
+      "raw_text": "Tab Amlong 5  BD  x 15 days  (B/F)"
+    },
+    {
+      "drug": "Montair LC",
+      "strength": null,
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab Montair LC  BD  5d  (A/F)"
+    }
+  ],
+  "meta": {
+    "layout": "letterhead",
+    "hand_font": null,
+    "doctor": "Dr. Suresh Iyer",
+    "clinic": "City Care Multispeciality Hospital",
+    "patient": "Rahul Sharma",
+    "date": "12/01/2026"
+  }
+}
