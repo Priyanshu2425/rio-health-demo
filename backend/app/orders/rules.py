@@ -7,7 +7,6 @@ was looked up. That keeps every rule table-testable (tests/orders/).
 from __future__ import annotations
 
 import math
-import re
 from collections.abc import Iterable, Mapping
 from datetime import datetime
 
@@ -25,6 +24,7 @@ from app.contracts import (
     SwapRequest,
     Triage,
 )
+from app.parser.split import split_request
 
 # ---------------------------------------------------------------------------
 # Errors the API maps to HTTP statuses
@@ -95,16 +95,18 @@ def quantity_packs(
     return max(1, math.ceil(doses_per_day * duration_days / pack_size)), None
 
 
-_LEADING_COUNT = re.compile(
-    r"^\s*(\d{1,2})\s*(?:x\s*)?(?:strips?|packs?|boxes|box|bottles?|sachets?|of)?\b", re.IGNORECASE
-)
+MAX_TYPED_PACKS = 20
 
 
 def packs_from_text(text: str) -> int:
-    """'2 strips of dolo' -> 2; anything else -> 1."""
-    m = _LEADING_COUNT.match(text)
-    n = int(m.group(1)) if m else 1
-    return n if 1 <= n <= 20 else 1
+    """Packs for one typed request: '2 strips of dolo' or 'two strips of dolo' -> 2.
+
+    The count comes from the parser's splitter (app.parser.split), the same code that
+    split the request, so the two never disagree. Missing or implausible counts -> 1.
+    """
+    items = split_request(text)
+    n = items[0].quantity if items else None
+    return n if n is not None and 1 <= n <= MAX_TYPED_PACKS else 1
 
 
 # ---------------------------------------------------------------------------

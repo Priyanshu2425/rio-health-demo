@@ -14,6 +14,7 @@ from app.core.config import get_settings
 from app.core.llm import LLMError
 from app.orders import service
 from app.orders.deps import get_conn, modules, orders
+from app.parser.extract import UnsupportedImage
 
 router = APIRouter()
 Conn = Annotated[Any, Depends(get_conn)]
@@ -34,14 +35,16 @@ def _parser_error(exc: BaseException) -> Exception:
 async def create_from_prescription(
     request: Request, image: Annotated[UploadFile, File()], conn: Conn
 ) -> Order:
-    check_parse_rate(request)
     data, mime = await read_image(request, image)
+    check_parse_rate(request)  # after the image checks, so a 400 / 413 costs no upload
     mods = modules()
     budget = get_settings().openrouter_timeout_s + PIPELINE_SLACK_S
     try:
         async with asyncio.timeout(budget):
             parsed = await mods.parser.parse_prescription(data, mime)
             return await service.create_rx_order(mods, conn, "prescription", parsed, data, mime)
+    except UnsupportedImage as exc:
+        raise error(400, "unsupported_image", "that image could not be read; try another photo") from exc
     except (LLMError, TimeoutError) as exc:
         raise _parser_error(exc) from exc
 
@@ -50,7 +53,7 @@ async def create_from_prescription(
 async def create_from_sample(sample_id: str, conn: Conn) -> Order:
     mods = modules()
     try:
-        data, mime, parsed = mods.parser.load_sample(sample_id)
+        data, mime, parsed = await mods.parser.load_sample(conn, sample_id)
     except KeyError as exc:
         raise error(404, "not_found", f"no sample {sample_id}") from exc
     try:
@@ -92,14 +95,14 @@ async def place_order(order_id: str, conn: Conn) -> Order:
 
 
 @router.get("/samples", response_model=list[Sample])
-async def list_samples() -> list[Sample]:
-    return modules().parser.list_samples()
+async def list_samples(conn: Conn) -> list[Sample]:
+    return await modules().parser.list_samples(conn)
 
 
 @router.get("/samples/{sample_id}/image")
-async def sample_image(sample_id: str) -> Response:
+async def sample_image(sample_id: str, conn: Conn) -> Response:
     try:
-        data, mime, _ = modules().parser.load_sample(sample_id)
+        data, mime, _ = await modules().parser.load_sample(conn, sample_id)
     except KeyError as exc:
         raise error(404, "not_found", f"no sample {sample_id}") from exc
     return Response(data, media_type=mime, headers={"Cache-Control": "public, max-age=86400"})

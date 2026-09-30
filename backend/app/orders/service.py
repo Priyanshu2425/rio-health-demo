@@ -131,9 +131,8 @@ async def place(conn: Any, order_id: str) -> Order:
 async def review(mods: Modules, conn: Any, order_id: str, req: ReviewRequest) -> Order:
     record = await get_record(conn, order_id)
     before = record.order.status
-    target = "verified" if req.decision == "approve" else "rejected"
-    rules.check_transition(before, target)
-    ids = sorted(rules.edit_sku_ids(req))
+    # apply_review owns the transition check; only look SKUs up for a reviewable order.
+    ids = sorted(rules.edit_sku_ids(req)) if before == "pending_review" else []
     skus = {i: await mods.catalog.get_sku(conn, i) for i in ids}
     generics = {i: await _generic(mods, conn, s) for i, s in skus.items()}
     order = rules.apply_review(record.order, req, skus, generics, now(), record.swapped_from)

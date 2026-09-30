@@ -429,3 +429,34 @@ def test_forecast_not_run_yet(client, monkeypatch):
     monkeypatch.setattr(mocks.forecast, "get_summary", staticmethod(none))
     err(client.get("/api/forecast/summary"), 404, "no_forecast")
     err(client.get("/api/forecast/sku/sku_dolo_650"), 404, "no_forecast")
+
+
+# ---------------------------------------------------------------------------
+# Wave 2 review fixes
+# ---------------------------------------------------------------------------
+
+
+def test_undecodable_image_is_400(client, monkeypatch):
+    from app.parser.extract import UnsupportedImage
+
+    async def bad(image, mime):
+        raise UnsupportedImage("truncated")
+
+    monkeypatch.setattr(mocks.parser, "parse_prescription", staticmethod(bad))
+    err(upload(client), 400, "unsupported_image")
+
+
+def test_rejected_images_do_not_use_up_the_rate_limit(client, mock_mode):
+    mock_mode.parse_rate_limit_per_hour = 1
+    mock_mode.max_upload_mb = 1
+    ip = {"CF-Connecting-IP": "203.0.113.9"}
+    err(upload(client, b"not an image", headers=ip), 400, "unsupported_image")
+    err(upload(client, PNG + b"\x00" * (1024 * 1024), headers=ip), 413, "image_too_large")
+    ok(upload(client, headers=ip))
+    err(upload(client, headers=ip), 429, "rate_limited")
+
+
+def test_typed_word_counts(client):
+    order = ok(client.post("/api/orders/text", json={"text": "two strips of dolo and ORS"}))
+    assert [i.quantity_packs for i in order.items] == [2, 1]
+    assert order.total_inr == round(2 * 33.6 + 22.0, 2)

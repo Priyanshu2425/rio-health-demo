@@ -96,7 +96,17 @@ def test_quantity_packs(doses, days, qty, pack, expected, has_reason):
 
 @pytest.mark.parametrize(
     "text,expected",
-    [("dolo", 1), ("2 dolo", 2), ("3 strips of crocin", 3), ("2x ORS", 2), ("dolo 650", 1), ("99 dolo", 1)],
+    [
+        ("dolo", 1),
+        ("2 dolo", 2),
+        ("3 strips of crocin", 3),
+        ("two strips of dolo", 2),
+        ("please send 2 strips of dolo", 2),
+        ("dolo x 3", 3),
+        ("2x ORS", 2),
+        ("dolo 650", 1),
+        ("99 dolo", 1),
+    ],
 )
 def test_packs_from_text(text, expected):
     assert rules.packs_from_text(text) == expected

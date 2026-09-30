@@ -30,6 +30,7 @@ from app.contracts import (
     Sample,
     SkuForecast,
 )
+from app.parser.split import split_request
 
 FIXTURES = Path(__file__).resolve().parents[3] / "contracts" / "fixtures"
 
@@ -225,22 +226,6 @@ def _render(sample_id: str) -> bytes:
     return buf.getvalue()
 
 
-def _split(text: str) -> list[str]:
-    parts = re.split(r",|;|\n|\+|&|\band\b|\bplus\b", text, flags=re.IGNORECASE)
-    return [p.strip(" .") for p in parts if p.strip(" .")]
-
-
-_FILLER = re.compile(
-    r"^\s*(?:\d{1,2}\s*(?:x\s*)?)?(?:strips?|packs?|boxes|box|bottles?|sachets?|tablets?|tabs?)?"
-    r"\s*(?:of\s+)?(?:some\s+|a\s+|an\s+)?",
-    re.IGNORECASE,
-)
-
-
-def _query(requested: str) -> str:
-    return _FILLER.sub("", requested).strip() or requested
-
-
 class parser:
     @staticmethod
     async def parse_prescription(image: bytes, mime: str) -> ParsedRx:
@@ -258,14 +243,19 @@ class parser:
 
     @staticmethod
     async def match_text(conn: Any, text: str) -> list[tuple[str, MatchResult]]:
-        return [(part, await _match(conn, _query(part))) for part in _split(text)]
+        # The real splitter, so typed requests split the same way in both modes.
+        out = []
+        for item in split_request(text):
+            query = " ".join(x for x in (item.drug, item.strength) if x)
+            out.append((item.requested_text, await _match(conn, query)))
+        return out
 
     @staticmethod
-    def list_samples() -> list[Sample]:
+    async def list_samples(conn: Any) -> list[Sample]:
         return TypeAdapter(list[Sample]).validate_python(_fixture("samples.json"))
 
     @staticmethod
-    def load_sample(sample_id: str) -> tuple[bytes, str, ParsedRx]:
+    async def load_sample(conn: Any, sample_id: str) -> tuple[bytes, str, ParsedRx]:
         if sample_id not in SAMPLE_LINES:
             raise KeyError(sample_id)
         return _render(sample_id), "image/png", _sample_rx(sample_id)
