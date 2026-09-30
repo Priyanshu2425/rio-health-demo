@@ -1,0 +1,18 @@
+# Docker Compose only picks up a dockerignore named "<dockerfile>.dockerignore"
+# when it sits next to the Dockerfile it applies to (here: deploy/Dockerfile),
+# so this file must be named deploy/Dockerfile.dockerignore rather than
+# deploy/.dockerignore.
+
+.git
+**/.venv
+**/__pycache__
+frontend/node_modules
+frontend/
+.env
+.env.*
+eval/
+docs/
+graft/
+.claude/
+data/raw/
+kaggle.json

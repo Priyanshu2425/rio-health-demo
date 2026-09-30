@@ -136,6 +136,11 @@ def _score(query: str, sku: SKU) -> float:
     salts = [s.name.split()[0] for s in sku.composition]
     per_salt = [max(fuzz.ratio(salt, w) for w in words) / 100 for salt in salts]
     by_salt = 0.9 * sum(per_salt) / len(per_salt) if per_salt else 0.0
+    # Strengths: a written number that matches a salt's strength helps, a mismatch hurts.
+    numbers = {w for w in re.findall(r"\d+(?:\.\d+)?", q)}
+    if numbers:
+        strengths = {n for s in sku.composition for n in re.findall(r"\d+(?:\.\d+)?", s.strength or "")}
+        by_salt += 0.05 if numbers & strengths else -0.1
     return round(min(1.0, max(by_brand, by_salt)), 3)
 
 
