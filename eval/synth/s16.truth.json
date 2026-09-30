@@ -1,0 +1,30 @@
+{
+  "lines": [
+    {
+      "drug": "Calpol",
+      "strength": "500",
+      "doses_per_day": 3,
+      "duration_days": 10,
+      "quantity": null,
+      "composition_key": "paracetamol 500mg",
+      "raw_text": "T. Calpol 500  1-1-1  x 10 days  (before food)"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 1,
+      "duration_days": 14,
+      "quantity": null,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "Tab. Thyronorm 50  HS  2/52"
+    }
+  ],
+  "meta": {
+    "layout": "minimal",
+    "hand_font": null,
+    "doctor": "Dr. Rajiv Malhotra",
+    "clinic": "Green Park Clinic",
+    "patient": "Karan Kapoor",
+    "date": "16/08/2026"
+  }
+}

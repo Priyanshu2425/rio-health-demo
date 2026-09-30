@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Amlong",
+      "strength": "5",
+      "doses_per_day": 2,
+      "duration_days": 15,
+      "quantity": null,
+      "composition_key": "amlodipine 5mg",
+      "raw_text": "Tab Amlong 5  1-0-1  x 15 days  (empty stomach)"
+    },
+    {
+      "drug": "Cetzine",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "cetirizine 10mg",
+      "raw_text": "Tab. Cetzine 10  0-0-1  5d  (B/F)"
+    },
+    {
+      "drug": "Azithral",
+      "strength": "500",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "T. Azithral 500  OD  x 7 days  (empty stomach)"
+    },
+    {
+      "drug": "Montair LC",
+      "strength": null,
+      "doses_per_day": 3,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab Montair LC  1-1-1  x 1 week  (B/F)"
+    }
+  ],
+  "meta": {
+    "layout": "letterhead",
+    "hand_font": null,
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "LifeCare Family Clinic",
+    "patient": "Anjali Gupta",
+    "date": "01/07/2026"
+  }
+}

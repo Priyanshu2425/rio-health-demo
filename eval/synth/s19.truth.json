@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Combiflam",
+      "strength": null,
+      "doses_per_day": null,
+      "duration_days": 3,
+      "quantity": null,
+      "composition_key": "ibuprofen 400mg + paracetamol 325mg",
+      "raw_text": "T. Combiflam  SOS  x 3 days"
+    },
+    {
+      "drug": "Taxim-O",
+      "strength": "200",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "quantity": null,
+      "composition_key": "cefixime 200mg",
+      "raw_text": "T. Taxim-O 200  0-0-1  3/7  (before food)"
+    },
+    {
+      "drug": "Azithral",
+      "strength": "500",
+      "doses_per_day": 2,
+      "duration_days": 10,
+      "quantity": null,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "Tab Azithral 500  1-0-1  x 10 days"
+    },
+    {
+      "drug": "Montair LC",
+      "strength": null,
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab Montair LC  1-0-0  x 5 days  (B/F)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "comic",
+    "doctor": "Dr. Neha Kulkarni",
+    "clinic": "Sanjeevani Medical Centre",
+    "patient": "Rahul Sharma",
+    "date": "28/01/2026"
+  }
+}

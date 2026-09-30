@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Pantocid",
+      "strength": "40",
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "pantoprazole 40mg",
+      "raw_text": "Tab Pantocid 40  OD  for 5 days  (before food)"
+    },
+    {
+      "drug": "Dolo",
+      "strength": "650",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "quantity": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "Tab Dolo 650  1-0-0  3/7"
+    },
+    {
+      "drug": "Thyronorm",
+      "strength": "50",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "quantity": null,
+      "composition_key": "thyroxine 50mcg",
+      "raw_text": "Tab. Thyronorm 50  BD  x 1 month  (B/F)"
+    },
+    {
+      "drug": "Metrogyl",
+      "strength": "400",
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "metronidazole 400mg",
+      "raw_text": "T. Metrogyl 400  0-0-1  for 5 days  (after food)"
+    }
+  ],
+  "meta": {
+    "layout": "letterhead",
+    "hand_font": null,
+    "doctor": "Dr. Anil Mehta",
+    "clinic": "Sunrise Clinic",
+    "patient": "Rahul Sharma",
+    "date": "26/02/2026"
+  }
+}

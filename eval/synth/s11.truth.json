@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Metrogyl",
+      "strength": "400",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "quantity": 15,
+      "composition_key": "metronidazole 400mg",
+      "raw_text": "Tab Metrogyl 400 #15  1-1-1  x 5 days  (A/F)"
+    },
+    {
+      "drug": "Montair LC",
+      "strength": null,
+      "doses_per_day": 3,
+      "duration_days": 10,
+      "quantity": null,
+      "composition_key": "levocetirizine 5mg + montelukast 10mg",
+      "raw_text": "Tab. Montair LC  TDS  x 10 days"
+    },
+    {
+      "drug": "Pan-D",
+      "strength": null,
+      "doses_per_day": 1,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "domperidone 30mg + pantoprazole 40mg",
+      "raw_text": "Cap. Pan-D  OD  5/7"
+    },
+    {
+      "drug": "Azithral",
+      "strength": "500",
+      "doses_per_day": 1,
+      "duration_days": 3,
+      "quantity": null,
+      "composition_key": "azithromycin 500mg",
+      "raw_text": "Tab Azithral 500  OD  3/7  (before food)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "marker",
+    "doctor": "Dr. Farah Siddiqui",
+    "clinic": "City Care Multispeciality Hospital",
+    "patient": "Ramesh Kumar",
+    "date": "14/03/2026"
+  }
+}

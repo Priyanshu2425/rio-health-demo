@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Omez",
+      "strength": "20",
+      "doses_per_day": 2,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "omeprazole 20mg",
+      "raw_text": "Cap. Omez 20  1-0-1  x 1 week  (B/F)"
+    },
+    {
+      "drug": "Rosuvas",
+      "strength": "10",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "quantity": null,
+      "composition_key": "rosuvastatin 10mg",
+      "raw_text": "Tab. Rosuvas 10  HS  x 1 month"
+    },
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "quantity": null,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "Tab. Atorva 10  BD  1/12  (after food)"
+    },
+    {
+      "drug": "Ecosprin",
+      "strength": "75",
+      "doses_per_day": 1,
+      "duration_days": 30,
+      "quantity": 30,
+      "composition_key": "aspirin 75mg",
+      "raw_text": "Tab. Ecosprin 75 #30  0-0-1  x 1 month  (A/F)"
+    }
+  ],
+  "meta": {
+    "layout": "opd_table",
+    "hand_font": null,
+    "doctor": "Dr. Neha Kulkarni",
+    "clinic": "Sanjeevani Medical Centre",
+    "patient": "Vikram Singh",
+    "date": "08/03/2026"
+  }
+}

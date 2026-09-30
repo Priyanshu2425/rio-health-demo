@@ -1,0 +1,50 @@
+{
+  "doctor_name": "Dr. Arjun Nair",
+  "clinic_name": "Sanjeevani Medical Centre",
+  "patient_name": "Ramesh Kumar",
+  "rx_date": "2026-03-06",
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_text": "T. Telma 40  0-0-1  x 1 month  (after food)",
+      "drug": "Telma",
+      "strength": "40",
+      "form": "tablet",
+      "frequency": "0-0-1",
+      "doses_per_day": 1.0,
+      "duration_days": 30,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 2,
+      "raw_text": "T. Glycomet 500  1-0-0  2/52",
+      "drug": "Glycomet",
+      "strength": "500",
+      "form": "tablet",
+      "frequency": "1-0-0",
+      "doses_per_day": 1.0,
+      "duration_days": 14,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 3,
+      "raw_text": "Tab Atorva 10  BD  2/52  (empty stomach)",
+      "drug": "Atorva",
+      "strength": "10",
+      "form": "tablet",
+      "frequency": "BD",
+      "doses_per_day": 2.0,
+      "duration_days": 14,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    }
+  ],
+  "model": "synthetic-truth",
+  "latency_ms": 0,
+  "cost_usd": null
+}

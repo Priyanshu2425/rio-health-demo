@@ -1,0 +1,48 @@
+{
+  "lines": [
+    {
+      "drug": "Dolo",
+      "strength": "650",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "T. Dolo 650  TDS  x 5 days"
+    },
+    {
+      "drug": "Ondem",
+      "strength": "4",
+      "doses_per_day": 2,
+      "duration_days": 5,
+      "quantity": null,
+      "composition_key": "ondansetron 4mg",
+      "raw_text": "Tab. Ondem 4  1-0-1  5d"
+    },
+    {
+      "drug": "Taxim-O",
+      "strength": "200",
+      "doses_per_day": 2,
+      "duration_days": 3,
+      "quantity": 6,
+      "composition_key": "cefixime 200mg",
+      "raw_text": "T. Taxim-O 200 #6  BD  x 3 days"
+    },
+    {
+      "drug": "Ciplox",
+      "strength": "500",
+      "doses_per_day": 3,
+      "duration_days": 5,
+      "quantity": 15,
+      "composition_key": "ciprofloxacin 500mg",
+      "raw_text": "Tab Ciplox 500 #15  TDS  5d  (empty stomach)"
+    }
+  ],
+  "meta": {
+    "layout": "opd_table",
+    "hand_font": null,
+    "doctor": "Dr. Farah Siddiqui",
+    "clinic": "Shree Sai Polyclinic",
+    "patient": "Deepak Joshi",
+    "date": "22/07/2026"
+  }
+}

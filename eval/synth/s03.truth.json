@@ -1,0 +1,30 @@
+{
+  "lines": [
+    {
+      "drug": "Dolo",
+      "strength": "650",
+      "doses_per_day": 3,
+      "duration_days": 7,
+      "quantity": null,
+      "composition_key": "paracetamol 650mg",
+      "raw_text": "Tab Dolo 650  1-1-1  x 1 week  (empty stomach)"
+    },
+    {
+      "drug": "Clavam",
+      "strength": "625",
+      "doses_per_day": 1,
+      "duration_days": 7,
+      "quantity": 7,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab. Clavam 625 #7  1-0-0  x 1 week  (before food)"
+    }
+  ],
+  "meta": {
+    "layout": "handwritten",
+    "hand_font": "bradley",
+    "doctor": "Dr. Neha Kulkarni",
+    "clinic": "Sanjeevani Medical Centre",
+    "patient": "Meera Pillai",
+    "date": "07/09/2026"
+  }
+}

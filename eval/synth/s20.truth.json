@@ -1,0 +1,39 @@
+{
+  "lines": [
+    {
+      "drug": "Calpol",
+      "strength": "500",
+      "doses_per_day": 2,
+      "duration_days": 10,
+      "quantity": null,
+      "composition_key": "paracetamol 500mg",
+      "raw_text": "Tab Calpol 500  1-0-1  x 10 days  (B/F)"
+    },
+    {
+      "drug": "Augmentin Duo",
+      "strength": "625",
+      "doses_per_day": 2,
+      "duration_days": 7,
+      "quantity": 14,
+      "composition_key": "amoxycillin 500mg + clavulanic acid 125mg",
+      "raw_text": "Tab. Augmentin 625 Duo #14  1-0-1  x 7 days"
+    },
+    {
+      "drug": "Atorva",
+      "strength": "10",
+      "doses_per_day": 2,
+      "duration_days": 30,
+      "quantity": null,
+      "composition_key": "atorvastatin 10mg",
+      "raw_text": "T. Atorva 10  BD  1/12  (before food)"
+    }
+  ],
+  "meta": {
+    "layout": "minimal",
+    "hand_font": null,
+    "doctor": "Dr. Pooja Bansal",
+    "clinic": "Arogya Health Centre",
+    "patient": "Mohd. Imran",
+    "date": "14/04/2026"
+  }
+}

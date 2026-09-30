@@ -1,0 +1,50 @@
+{
+  "doctor_name": "Dr. Anil Mehta",
+  "clinic_name": "Arogya Health Centre",
+  "patient_name": "Meera Pillai",
+  "rx_date": "2026-09-08",
+  "lines": [
+    {
+      "line_no": 1,
+      "raw_text": "T. Augmentin 625 Duo  1-0-1  5d  (A/F)",
+      "drug": "Augmentin Duo",
+      "strength": "625",
+      "form": "tablet",
+      "frequency": "1-0-1",
+      "doses_per_day": 2.0,
+      "duration_days": 5,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 2,
+      "raw_text": "Tab. Pan 40  TDS  x 5 days  (B/F)",
+      "drug": "Pan",
+      "strength": "40",
+      "form": "tablet",
+      "frequency": "TDS",
+      "doses_per_day": 3.0,
+      "duration_days": 5,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    },
+    {
+      "line_no": 3,
+      "raw_text": "Tab. Dolo 650  1-1-1  x 3 days",
+      "drug": "Dolo",
+      "strength": "650",
+      "form": "tablet",
+      "frequency": "1-1-1",
+      "doses_per_day": 3.0,
+      "duration_days": 3,
+      "quantity": null,
+      "illegible_fields": [],
+      "bbox": null
+    }
+  ],
+  "model": "synthetic-truth",
+  "latency_ms": 0,
+  "cost_usd": null
+}
