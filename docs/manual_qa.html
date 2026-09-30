@@ -233,8 +233,8 @@ uv run ruff check . && uv run ruff format --check . && uv run pytest -q     # 12
     <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a1d6e52e6258e2eeb
 git restore eval/results; git clean -fdq eval/results   # drops my 1-Rx smoke-test output; 3d reruns it
 git fetch origin && git rebase origin/main
-cd backend && uv sync && uv run ruff check . && uv run pytest -q   # 124 passed, 2 skipped (llm)</pre><button type="button">Copy</button></div>
-    <ul class="checks"><li><label><input type="checkbox" id="c-s3-1" data-stage="s3"><span>Rebase clean; tests pass with 2 skipped.</span></label></li></ul>
+cd backend && uv sync && uv run ruff check . && uv run pytest -q   # 230 passed, 2 skipped (llm); includes main's catalog tests</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s3-1" data-stage="s3"><span>Already rebased on main after #5 merged; the rebase is a no-op. Tests pass with 2 skipped.</span></label></li></ul>
   </div>
   <div class="step">
     <h3><span class="k">3b</span>Look at what the model will see</h3>
@@ -279,8 +279,8 @@ gh pr merge 4 --merge</pre><button type="button">Copy</button></div>
   <div class="step">
     <h3><span class="k">4a</span>Tests</h3>
     <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-aa32f6a27c087f297/backend
-uv run ruff check . && uv run pytest -q      # 188 passed</pre><button type="button">Copy</button></div>
-    <ul class="checks"><li><label><input type="checkbox" id="c-s4-1" data-stage="s4"><span>188 passed.</span></label></li></ul>
+uv run ruff check . && uv run pytest -q      # 296 passed (includes main's tests)</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s4-1" data-stage="s4"><span>296 passed.</span></label></li></ul>
   </div>
   <div class="step">
     <h3><span class="k">4b</span>Walk the flow with curl</h3>
