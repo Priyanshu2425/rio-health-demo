@@ -227,9 +227,25 @@ def map_form(label: str) -> Form | None:
     return None
 
 
-def parse_pack(raw: str | None) -> Pack | None:
-    """'strip of 10 tablets' -> tablet, 10; 'bottle of 100 ml Syrup' -> syrup, 1 bottle.
+# Forms dispensed whole: one bottle / tube / inhaler / sachet per pack (contracts-v2).
+_WHOLE_PACK_FORMS: set[str] = {
+    "syrup",
+    "suspension",
+    "drops",
+    "cream",
+    "ointment",
+    "gel",
+    "powder",
+    "inhaler",
+    "sachet",
+}
 
+
+def parse_pack(raw: str | None) -> Pack | None:
+    """Map a pack label to form, pack size (dispensable units) and label.
+
+    'strip of 10 tablets' -> tablet, 10. Volume, weight and inhaler packs are one unit
+    ('bottle of 100 ml Syrup' -> syrup, 1); injections count vials or ampoules.
     Returns None when the label can't be mapped; the ETL drops those rows.
     """
     if raw is None or isinstance(raw, float):
@@ -241,8 +257,7 @@ def parse_pack(raw: str | None) -> Pack | None:
         return None
     number = float(match.group("num"))
     first_word = (match.group("rest").split(" ", 1)[0] if match.group("rest") else "").strip()
-    if first_word in _MEASURE_UNITS or form in {"syrup", "suspension", "cream", "ointment", "gel", "drops"}:
-        # a volume or weight: the pack is one bottle / tube / sachet
+    if first_word in _MEASURE_UNITS or form in _WHOLE_PACK_FORMS:
         pack_size = 1
     else:
         if number < 1 or number != int(number):

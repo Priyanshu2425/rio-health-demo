@@ -85,6 +85,10 @@ def test_missing_strength_gives_name_only_key():
         ("tube of 20 gm Cream", "cream", 1),
         ("bottle of 10 ml Eye Drop", "drops", 1),
         ("packet of 200 MDI Inhaler", "inhaler", 1),
+        ("packet of 5 respules", "inhaler", 1),
+        ("box of 100 gm Powder", "powder", 1),
+        ("packet of 5 injections", "injection", 5),
+        ("bottle of 30 tablets", "tablet", 30),
         ("sachet of 21.8 g", "sachet", 1),
     ],
 )
