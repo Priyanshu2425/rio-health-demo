@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.api.guards import error
 from app.contracts import ForecastSummary, MatchCandidate, Order, QueueItem, ReviewRequest, SkuForecast
-from app.orders import service
+from app.orders import messages, service
 from app.orders.deps import get_conn, modules
 
 router = APIRouter()
@@ -39,7 +39,7 @@ async def forecast_summary(conn: Conn) -> ForecastSummary:
     try:
         return await modules().forecast.get_summary(conn)
     except LookupError as exc:
-        raise error(404, "no_forecast", "the forecast has not run yet") from exc
+        raise error(404, "no_forecast", messages.NO_FORECAST) from exc
 
 
 @router.get("/forecast/sku/{sku_id}", response_model=SkuForecast)
@@ -49,8 +49,8 @@ async def forecast_sku(sku_id: str, conn: Conn, area: str | None = None) -> SkuF
         try:
             area = (await fc.get_summary(conn)).areas[0]
         except (LookupError, IndexError) as exc:
-            raise error(404, "no_forecast", "the forecast has not run yet") from exc
+            raise error(404, "no_forecast", messages.NO_FORECAST) from exc
     found = await fc.get_sku_forecast(conn, sku_id, area)
     if found is None:
-        raise error(404, "not_found", f"no forecast for {sku_id} in {area}")
+        raise error(404, "not_found", messages.SKU_FORECAST_NOT_FOUND)
     return found

@@ -12,7 +12,7 @@ from app.api.guards import check_parse_rate, error, read_image
 from app.contracts import Order, Sample, SwapRequest, TextOrderRequest
 from app.core.config import get_settings
 from app.core.llm import LLMError
-from app.orders import service
+from app.orders import messages, service
 from app.orders.deps import get_conn, modules, orders
 from app.parser.extract import UnsupportedImage
 
@@ -25,10 +25,8 @@ PIPELINE_SLACK_S = 30.0
 
 def _parser_error(exc: BaseException) -> Exception:
     if isinstance(exc, TimeoutError) or isinstance(exc.__cause__, httpx.TimeoutException):
-        return error(
-            504, "parser_timeout", "the prescription reader took too long; try again or try a sample"
-        )
-    return error(502, "parser_failed", "could not read that prescription; try a clearer photo or a sample")
+        return error(504, "parser_timeout", messages.PARSER_TIMEOUT)
+    return error(502, "parser_failed", messages.PARSER_FAILED)
 
 
 @router.post("/orders/prescription", response_model=Order)
@@ -44,7 +42,7 @@ async def create_from_prescription(
             parsed = await mods.parser.parse_prescription(data, mime)
             return await service.create_rx_order(mods, conn, "prescription", parsed, data, mime)
     except UnsupportedImage as exc:
-        raise error(400, "unsupported_image", "that image could not be read; try another photo") from exc
+        raise error(400, "unsupported_image", messages.UNREADABLE_IMAGE) from exc
     except (LLMError, TimeoutError) as exc:
         raise _parser_error(exc) from exc
 
@@ -55,7 +53,7 @@ async def create_from_sample(sample_id: str, conn: Conn) -> Order:
     try:
         data, mime, parsed = await mods.parser.load_sample(conn, sample_id)
     except KeyError as exc:
-        raise error(404, "not_found", f"no sample {sample_id}") from exc
+        raise error(404, "not_found", messages.SAMPLE_NOT_FOUND) from exc
     try:
         return await service.create_rx_order(mods, conn, "sample", parsed, data, mime)
     except LLMError as exc:  # a re-rank call can still fail
@@ -79,7 +77,7 @@ async def get_order(order_id: str, conn: Conn) -> Order:
 async def get_order_image(order_id: str, conn: Conn) -> Response:
     found = await orders().get_image(conn, order_id)
     if found is None:
-        raise error(404, "not_found", f"no image for order {order_id}")
+        raise error(404, "not_found", messages.ORDER_IMAGE_NOT_FOUND)
     data, mime = found
     return Response(data, media_type=mime, headers={"Cache-Control": "private, max-age=3600"})
 
@@ -104,5 +102,5 @@ async def sample_image(sample_id: str, conn: Conn) -> Response:
     try:
         data, mime, _ = await modules().parser.load_sample(conn, sample_id)
     except KeyError as exc:
-        raise error(404, "not_found", f"no sample {sample_id}") from exc
+        raise error(404, "not_found", messages.SAMPLE_NOT_FOUND) from exc
     return Response(data, media_type=mime, headers={"Cache-Control": "public, max-age=86400"})

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI, Request
@@ -11,12 +12,13 @@ from starlette.exceptions import HTTPException
 from app.api import router
 from app.contracts import ApiError, ErrorResponse
 from app.core.config import get_settings
-from app.orders import startup
+from app.orders import messages, startup
 from app.orders.deps import uses_database
 from app.orders.rules import InvalidRequest, InvalidTransition
 from app.orders.service import NotFound
 
 log = logging.getLogger("rio")
+_CODE = re.compile(r"[a-z_]+")
 
 
 @asynccontextmanager
@@ -48,20 +50,27 @@ app.add_middleware(
 
 @app.exception_handler(HTTPException)
 async def http_error(_: Request, exc: HTTPException) -> JSONResponse:
-    """Every error leaves as ErrorResponse. Raise HTTPException(status, detail='code: message')."""
-    code, _, message = str(exc.detail).partition(": ")
-    body = ErrorResponse(error=ApiError(code=code, message=message or code))
-    return JSONResponse(body.model_dump(), status_code=exc.status_code)
+    """Every error leaves as ErrorResponse. Raise HTTPException(status, detail='code: message').
+
+    Framework errors (an unknown path, a wrong method) carry plain details like
+    'Not Found'; they get a contract code and a readable message instead.
+    """
+    code, sep, message = str(exc.detail).partition(": ")
+    if not (sep and _CODE.fullmatch(code)):
+        if exc.status_code == 404:
+            code, message = "not_found", messages.PAGE_NOT_FOUND
+        else:
+            code, message = "invalid_request", messages.REQUEST_FAILED
+    return _error(exc.status_code, code, message)
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+    """422 with a message about the first bad field, in words a person can act on."""
     first = exc.errors()[0] if exc.errors() else {}
-    where = ".".join(str(p) for p in first.get("loc", []))
-    body = ErrorResponse(
-        error=ApiError(code="invalid_request", message=f"{where}: {first.get('msg', 'invalid')}")
-    )
-    return JSONResponse(body.model_dump(), status_code=422)
+    fields = [str(p) for p in first.get("loc", []) if isinstance(p, str)]
+    message = next((messages.INVALID_FIELD[f] for f in reversed(fields) if f in messages.INVALID_FIELD), None)
+    return _error(422, "invalid_request", message or messages.INVALID_REQUEST)
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -89,7 +98,7 @@ async def invalid_request(_: Request, exc: InvalidRequest) -> JSONResponse:
 async def unexpected(request: Request, exc: Exception) -> JSONResponse:
     """Last resort: log it, never leak a stack trace to the client."""
     log.exception("unhandled error on %s %s", request.method, request.url.path)
-    return _error(500, "internal_error", "something went wrong on our side")
+    return _error(500, "internal_error", messages.INTERNAL_ERROR)
 
 
 @app.get("/api/health")

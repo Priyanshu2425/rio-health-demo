@@ -12,6 +12,7 @@ from fastapi import HTTPException, Request, UploadFile
 from PIL import Image, UnidentifiedImageError
 
 from app.core.config import get_settings
+from app.orders import messages
 
 
 def error(status: int, code: str, message: str) -> HTTPException:
@@ -41,7 +42,7 @@ def sniff_image(head: bytes) -> str | None:
 async def read_image(request: Request, image: UploadFile) -> tuple[bytes, str]:
     """(bytes, mime) or 400 unsupported_image / 413 image_too_large."""
     max_bytes = get_settings().max_upload_mb * 1024 * 1024
-    too_large = error(413, "image_too_large", f"images must be {get_settings().max_upload_mb} MB or smaller")
+    too_large = error(413, "image_too_large", messages.image_too_large(get_settings().max_upload_mb))
     declared_len = request.headers.get("content-length")
     # The multipart envelope adds a little; allow 64 KB of slack before refusing early.
     if declared_len and declared_len.isdigit() and int(declared_len) > max_bytes + 65536:
@@ -51,10 +52,10 @@ async def read_image(request: Request, image: UploadFile) -> tuple[bytes, str]:
         raise too_large
     declared = (image.content_type or "").lower()
     if declared not in DECLARED_OK:
-        raise error(400, "unsupported_image", f"{declared} is not supported; send a jpeg, png or webp photo")
+        raise error(400, "unsupported_image", messages.UNSUPPORTED_TYPE)
     mime = sniff_image(data[:16])
     if mime is None or not decodable(data):
-        raise error(400, "unsupported_image", "that file is not a readable jpeg, png or webp image")
+        raise error(400, "unsupported_image", messages.UNREADABLE_IMAGE)
     return data, mime
 
 
@@ -115,8 +116,4 @@ def check_parse_rate(request: Request) -> None:
     wait = parse_limiter.hit(client_ip(request), limit)
     if wait is not None:
         minutes = max(1, math.ceil(wait / 60))
-        raise error(
-            429,
-            "rate_limited",
-            f"{limit} prescription uploads per hour; try again in {minutes} min, or try a sample",
-        )
+        raise error(429, "rate_limited", messages.rate_limited(minutes))

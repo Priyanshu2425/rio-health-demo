@@ -173,13 +173,13 @@ exercises (parse, match, cart, store) did not change after it. Its cost: $0.0065
 edit itm_3: sku_dolo_650 -> sku_crocin_650
 == 7. placing before review is refused
 409 POST /api/orders/ord_561eb602783d/place
-{"error":{"code":"invalid_transition","message":"order is pending_review; cannot move to placed"}}
+{"error":{"code":"invalid_transition","message":"A pharmacist is still checking this order. You can place it once it's verified."}}
 == 8. review: approve, with one edit (itm_3 -> sku_crocin_650, 2 packs)
 200 POST /api/queue/ord_561eb602783d/review
 {"status":"verified","total_inr":444.42,"reviewed":true,"items":[{"item_id":"itm_1","sku":"Augmentin 625 Duo","packs":1,"line":223.42,"status":"approved"},{"item_id":"itm_2","sku":"Pan 40","packs":1,"line":155.0,"status":"approved"},{"item_id":"itm_3","sku":"Crocin 650","packs":2,"line":66.0,"status":"edited"}]}
 == 9. reviewing twice is refused
 409 POST /api/queue/ord_561eb602783d/review
-{"error":{"code":"invalid_transition","message":"order is verified; cannot move to verified"}}
+{"error":{"code":"invalid_transition","message":"This order was already reviewed, so it can't be changed now."}}
 == 10. order has left the queue
 200 GET /api/queue
 0
@@ -193,7 +193,7 @@ edit itm_3: sku_dolo_650 -> sku_crocin_650
 {"status":"needs_prescription","items":[{"requested_text":"augmentin","sku":"Augmentin 625 Duo","rx_only":true}]}
 == 13. a JPEG header on bytes Pillow cannot decode is refused before any vision call
 400 POST /api/orders/prescription
-{"error":{"code":"unsupported_image","message":"that file is not a readable jpeg, png or webp image"}}
+{"error":{"code":"unsupported_image","message":"We couldn't open that image. Please take a new photo of the prescription and try again."}}
 == 14. real photo upload: the typed_clinic_3 sample image as a prescription
 200 POST /api/orders/prescription (10 s)
 {"source":"prescription","status":"pending_review","has_image":true,"model":"google/gemini-3.8-flash","latency_ms":9438,"cost_usd":0.00651075,"items":[{"sku":"Augmentin 625 Duo","packs":1,"triage":"green"},{"sku":"Pan 40","packs":1,"triage":"green"},{"sku":"Dolo 650","packs":1,"triage":"green"}]}
@@ -217,7 +217,7 @@ with no vision call):
 hospital_opd_4 -> 200: Azithral 500 (green), Montair-LC (amber), Pan-D (amber), Calpol 500mg (green); ₹684.01
 handwritten_style_3 -> 200: Telma 40 (green), Glycomet 500 SR (green), Atorva × 2 (green); ₹498.28
 text "two strips of crocin, cetirizine" -> 200 confirmed_otc: Crocin 650 × 2, Wincet × 1
-text "flubberwort" -> 422 invalid_request
+text "flubberwort" -> 422 invalid_request: "We couldn't find “flubberwort” in our catalog. Try the brand name printed on the strip."
 ```
 
 ## Mock mode output (2026-09-30)
@@ -244,13 +244,13 @@ text "flubberwort" -> 422 invalid_request
 edit itm_3: sku_dolo_650 -> sku_pacimol_650
 == 7. placing before review is refused
 409 POST /api/orders/ord_7bd23abb7b9e/place
-{"error":{"code":"invalid_transition","message":"order is pending_review; cannot move to placed"}}
+{"error":{"code":"invalid_transition","message":"A pharmacist is still checking this order. You can place it once it's verified."}}
 == 8. review: approve, with one edit (itm_3 -> sku_pacimol_650, 2 packs)
 200 POST /api/queue/ord_7bd23abb7b9e/review
 {"status":"verified","total_inr":434.5,"reviewed":true,"items":[{"item_id":"itm_1","sku":"Augmentin 625 Duo","packs":1,"line":223.5,"status":"approved"},{"item_id":"itm_2","sku":"Pan 40","packs":1,"line":155.0,"status":"approved"},{"item_id":"itm_3","sku":"Pacimol 650","packs":2,"line":56.0,"status":"edited"}]}
 == 9. reviewing twice is refused
 409 POST /api/queue/ord_7bd23abb7b9e/review
-{"error":{"code":"invalid_transition","message":"order is verified; cannot move to verified"}}
+{"error":{"code":"invalid_transition","message":"This order was already reviewed, so it can't be changed now."}}
 == 10. order has left the queue
 200 GET /api/queue
 0
@@ -264,7 +264,7 @@ edit itm_3: sku_dolo_650 -> sku_pacimol_650
 {"status":"needs_prescription","items":[{"requested_text":"augmentin","sku":"Augmentin 625 Duo","rx_only":true}]}
 == 13. a JPEG header on bytes Pillow cannot decode is refused before any vision call
 400 POST /api/orders/prescription
-{"error":{"code":"unsupported_image","message":"that file is not a readable jpeg, png or webp image"}}
+{"error":{"code":"unsupported_image","message":"We couldn't open that image. Please take a new photo of the prescription and try again."}}
 ```
 
 ## Docker image
@@ -306,6 +306,11 @@ After the first deploy, run `API=https://rio-api.buildspacelabs.com bash verify.
 expect the real-mode statuses above.
 
 ## Notes for the frontend
+
+- **Error messages:** every `error.message` is one or two plain sentences meant for the
+  person on screen, and safe to show verbatim. The wording lives in
+  `backend/app/orders/messages.py`. Branch on `error.code`, never on the wording. The
+  only number in a 429 message is the retry time in minutes ("try again in 12 minutes").
 
 - **Swap:** after `POST /api/orders/{id}/swap` with `use_generic: true`, the item's `sku`
   and `generic_alternative` are the same generic SKU, and `savings_inr` is what the

@@ -17,7 +17,7 @@ from app.contracts import (
     ReviewRequest,
     SwapRequest,
 )
-from app.orders import rules
+from app.orders import messages, rules
 from app.orders.deps import Modules, orders
 from app.orders.repo import OrderRecord, StaleOrder
 
@@ -79,7 +79,7 @@ async def create_rx_order(
 async def create_text_order(mods: Modules, conn: Any, text: str) -> Order:
     items = await build_cart(mods, conn, text)
     if not any(i.sku is not None for i in items):
-        raise rules.InvalidRequest("could not find any of those medicines; try a brand name")
+        raise rules.InvalidRequest(messages.nothing_matched(i.requested_text or "" for i in items))
     status = rules.text_order_status(items)
     if status == "confirmed_otc":
         # Nothing to review: matched items are in, unmatched ones are dropped.
@@ -101,7 +101,7 @@ async def create_text_order(mods: Modules, conn: Any, text: str) -> Order:
 async def get_record(conn: Any, order_id: str) -> OrderRecord:
     record = await orders().get(conn, order_id)
     if record is None:
-        raise NotFound(f"no order {order_id}")
+        raise NotFound(messages.ORDER_NOT_FOUND)
     return record
 
 
@@ -109,7 +109,7 @@ async def _save(conn: Any, record: OrderRecord, expected: str) -> Order:
     try:
         await orders().save(conn, record, expected)  # type: ignore[arg-type]
     except StaleOrder as exc:
-        raise rules.InvalidTransition("order changed while you were looking at it; reload") from exc
+        raise rules.InvalidTransition(messages.STALE_ORDER) from exc
     return record.order
 
 

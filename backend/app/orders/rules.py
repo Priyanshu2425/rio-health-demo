@@ -24,6 +24,7 @@ from app.contracts import (
     SwapRequest,
     Triage,
 )
+from app.orders import messages
 from app.parser.split import split_request
 
 # ---------------------------------------------------------------------------
@@ -301,7 +302,7 @@ SWAPPABLE: frozenset[OrderStatus] = frozenset({"pending_review", "confirmed_otc"
 
 def check_transition(current: OrderStatus, target: OrderStatus) -> None:
     if target not in TRANSITIONS[current]:
-        raise InvalidTransition(f"order is {current}; cannot move to {target}")
+        raise InvalidTransition(messages.invalid_transition(current, target))
 
 
 def text_order_status(items: Iterable[CartItem]) -> OrderStatus:
@@ -326,7 +327,7 @@ def apply_swap(
     the swap can be undone; the updated map is returned alongside the order.
     """
     if order.status not in SWAPPABLE:
-        raise InvalidTransition(f"order is {order.status}; swaps are only allowed before review")
+        raise InvalidTransition(messages.swap_not_allowed(order.status))
     idx = _index(order, req.item_id)
     item = order.items[idx]
     originals = dict(swapped_from)
@@ -336,7 +337,7 @@ def apply_swap(
         if taken:
             return order, originals
         if item.sku is None or item.generic_alternative is None:
-            raise InvalidRequest(f"{item.item_id} has no generic alternative")
+            raise InvalidRequest(messages.no_generic(item))
         brand = item.sku
         new = priced(item.model_copy(update={"sku": item.generic_alternative}), brand)
         originals[item.item_id] = brand
@@ -378,9 +379,9 @@ def apply_review(
     known = {i.item_id for i in order.items}
     for d in req.items:
         if d.item_id not in known:
-            raise InvalidRequest(f"unknown item_id {d.item_id}")
+            raise InvalidRequest(messages.UNKNOWN_ITEM)
         if d.item_id in decisions:
-            raise InvalidRequest(f"{d.item_id} listed twice")
+            raise InvalidRequest(messages.DUPLICATE_ITEM)
         decisions[d.item_id] = d
 
     items = order.items
@@ -392,7 +393,7 @@ def apply_review(
         ]
         for item in items:
             if item.status != "removed" and item.sku is None:
-                raise InvalidRequest(f"{item.item_id} has no SKU; edit or remove it before approving")
+                raise InvalidRequest(messages.item_without_sku(item))
 
     return order.model_copy(
         update={
@@ -421,11 +422,11 @@ def _decide(
         update["quantity_packs"] = d.quantity_packs
     if d.action == "edit":
         if d.sku_id is None and d.quantity_packs is None:
-            raise InvalidRequest(f"edit on {d.item_id} needs sku_id or quantity_packs")
+            raise InvalidRequest(messages.edit_needs_change(item))
         if d.sku_id is not None and d.sku_id != (item.sku.sku_id if item.sku else None):
             sku = skus.get(d.sku_id)
             if sku is None:
-                raise InvalidRequest(f"unknown sku_id {d.sku_id}")
+                raise InvalidRequest(messages.UNKNOWN_SKU)
             generic = generics.get(d.sku_id)
             update["sku"] = sku
             update["generic_alternative"] = generic if generic and generic.mrp_inr < sku.mrp_inr else None
@@ -437,7 +438,7 @@ def _index(order: Order, item_id: str) -> int:
     for idx, item in enumerate(order.items):
         if item.item_id == item_id:
             return idx
-    raise InvalidRequest(f"unknown item_id {item_id}")
+    raise InvalidRequest(messages.UNKNOWN_ITEM)
 
 
 # ---------------------------------------------------------------------------
