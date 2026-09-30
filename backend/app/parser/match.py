@@ -39,6 +39,15 @@ class MatchOutcome:
     latency_ms: int = 0
 
 
+def readable_drug(drug: str | None) -> bool:
+    """A drug name the catalog can be searched for: it has at least one letter.
+
+    The vision model writes "?" or "—" for a name it cannot read; searching for that
+    only returns noise, so such a line gets no SKU and the reason "drug name unreadable".
+    """
+    return bool(drug) and any(ch.isalpha() for ch in drug)
+
+
 def search_query(line: ParsedLine) -> str:
     return " ".join(part for part in (line.drug, line.strength) if part)
 
@@ -201,7 +210,7 @@ async def typed_solid_pick(
 
 async def match_text_line_detailed(conn: AsyncConnection, line: ParsedLine) -> MatchOutcome:
     """Typed-request variant of match_line_detailed: a bare brand prefers its tablet."""
-    if not line.drug:
+    if not readable_drug(line.drug):
         return await match_line_detailed(conn, line)
     candidates = await _candidates(conn, line)
     pick = await typed_solid_pick(conn, line, candidates)
@@ -223,7 +232,7 @@ async def _candidates(conn: AsyncConnection, line: ParsedLine) -> list[MatchCand
 async def match_line_detailed(
     conn: AsyncConnection, line: ParsedLine, *, rerank_model: str | None = None
 ) -> MatchOutcome:
-    if not line.drug:
+    if not readable_drug(line.drug):
         return MatchOutcome(
             MatchResult(sku=None, score=0.0, candidates=[], reranked=False, reason="drug name unreadable")
         )

@@ -210,3 +210,19 @@ async def test_prescription_lines_keep_the_literal_match(monkeypatch, rerank_mod
     ranks(monkeypatch, {"dolo650": 1})
     result = await parser.match_line(None, line("Dolo", form=None))
     assert result.sku.sku_id == "dolo"
+
+
+@pytest.mark.parametrize("drug", ["?", "—", "??", " - "])
+async def test_letterless_drug_is_unreadable_without_a_search(monkeypatch, rerank_model, drug):
+    cat, fake = install(monkeypatch, {"? 400": [(PAN_40, 0.3)]})
+    result = await parser.match_line(None, line(drug, "400"))
+    assert result.sku is None
+    assert result.reason == "drug name unreadable"
+    assert cat.queries == [] and fake.calls == []
+    typed = await parser.match_text(None, "?")
+    assert all(r.sku is None for _, r in typed)
+
+
+def test_readable_drug():
+    assert match.readable_drug("Dolo") and match.readable_drug("B-12")
+    assert not match.readable_drug("?") and not match.readable_drug("") and not match.readable_drug(None)
