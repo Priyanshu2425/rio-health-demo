@@ -1,122 +1,83 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Suspense, lazy } from 'react'
+import { USE_MOCKS, resetMockState } from './api'
+import { navigate, useRoute, type Route } from './lib/router'
+import { ChatPage } from './pages/ChatPage'
+import { DemoPage } from './pages/DemoPage'
+import { PharmacistPage } from './pages/PharmacistPage'
+import './shell.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+// Recharts is only needed on the forecast tab; keep it out of the demo's first load.
+const ForecastPage = lazy(() => import('./pages/ForecastPage').then((m) => ({ default: m.ForecastPage })))
 
+const NAV: { to: Route; label: string }[] = [
+  { to: '/', label: 'Demo' },
+  { to: '/chat', label: 'Customer chat' },
+  { to: '/pharmacist', label: 'Pharmacist' },
+  { to: '/forecast', label: 'Forecast' },
+]
+
+export default function App() {
+  const route = useRoute()
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <div className={`shell shell-${route === '/' ? 'demo' : route.slice(1)}`}>
+      <header className="appbar">
+        <a
+          className="wordmark"
+          href="/"
+          onClick={(e) => {
+            e.preventDefault()
+            navigate('/')
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
+          <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="var(--accent)" />
+            <path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#fff" />
           </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <span>Rio</span>
+          <span className="wordmark-sub">prescription desk</span>
+        </a>
+        <nav className="appnav" aria-label="Views">
+          {NAV.map((n) => (
+            <a
+              key={n.to}
+              href={n.to}
+              aria-current={route === n.to ? 'page' : undefined}
+              onClick={(e) => {
+                e.preventDefault()
+                navigate(n.to)
+              }}
+            >
+              {n.label}
+            </a>
+          ))}
+        </nav>
+        {USE_MOCKS && (
+          <div className="mockflag">
+            <span className="pill" title="Running on the in-browser mock API">
+              Mock data
+            </span>
+            <button
+              className="btn btn-sm btn-quiet"
+              onClick={() => {
+                resetMockState()
+                window.location.reload()
+              }}
+            >
+              Reset demo
+            </button>
+          </div>
+        )}
+      </header>
+      <main className="stage">
+        {route === '/' && <DemoPage />}
+        {route === '/chat' && <ChatPage />}
+        {route === '/pharmacist' && <PharmacistPage />}
+        {route === '/forecast' && (
+          <Suspense fallback={null}>
+            <ForecastPage />
+          </Suspense>
+        )}
+      </main>
+    </div>
   )
 }
-
-export default App
