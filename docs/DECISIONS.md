@@ -47,3 +47,7 @@ Settled in the planning session on 2026-09-29. Change one only by editing this f
 14. **Process.** Four agents, one branch each, with disjoint directory ownership.
     Contracts are frozen on `main`. Each branch ships tests and a `VERIFY.md`, and the
     owner merges every PR.
+15. **Runtime reads only the database.** Seed CSVs, the Schedule H list and sample
+    images are ETL inputs loaded into Neon. No request path opens a file, so a deploy is
+    the code plus the database URL. Mock mode (`RIO_USE_MOCKS=1`) is the one exception
+    and is for development only.

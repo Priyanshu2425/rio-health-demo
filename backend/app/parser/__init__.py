@@ -30,11 +30,14 @@ async def match_text(conn: AsyncConnection, text: str) -> list[tuple[str, MatchR
     raise NotImplementedError
 
 
-def list_samples() -> list[Sample]:
-    """Demo prescriptions with cached parses, for the 'try a sample' fallback."""
+async def list_samples(conn: AsyncConnection) -> list[Sample]:
+    """Demo prescriptions from the `samples` table, in display order."""
     raise NotImplementedError
 
 
-def load_sample(sample_id: str) -> tuple[bytes, str, ParsedRx]:
-    """(image bytes, mime type, cached parse). Raises KeyError for an unknown id."""
+async def load_sample(conn: AsyncConnection, sample_id: str) -> tuple[bytes, str, ParsedRx]:
+    """(image bytes, mime type, cached parse) from the `samples` table.
+
+    Raises KeyError for an unknown id.
+    """
     raise NotImplementedError
