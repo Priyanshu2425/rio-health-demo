@@ -111,8 +111,9 @@ deploy.
    Or run the equivalent commands by hand on the box:
    ```
    cd /opt/rio/app
-   docker compose -f deploy/docker-compose.yml up -d --build
-   docker compose -f deploy/docker-compose.yml exec -T api python -m app.core.migrate
+   docker compose -f deploy/docker-compose.yml build
+   docker compose -f deploy/docker-compose.yml run --rm --no-deps api python -m app.core.migrate
+   docker compose -f deploy/docker-compose.yml up -d
    curl -fsS http://127.0.0.1:8000/api/health
    ```
 

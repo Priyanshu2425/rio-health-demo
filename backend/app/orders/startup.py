@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from contextlib import aclosing
 
 from app import forecast
 from app.core import db
@@ -35,19 +36,21 @@ async def close_database() -> None:
 async def ensure_forecast() -> None:
     """If forecast_runs is empty, compute the first run (about 17 s). Never raises."""
     try:
-        async for conn in db.get_conn():
-            cur = await conn.execute("SELECT EXISTS (SELECT 1 FROM forecast_runs) AS has_run")
-            row = await cur.fetchone()
-            await conn.commit()
-            if row["has_run"]:
-                return
-            log.info("forecast_runs is empty; running the first forecast in the background")
-            summary = await forecast.run(conn)
-            log.info("first forecast stored: %d reorder suggestions", len(summary.reorders))
+        # aclosing: the early return below must still hand the connection back to the pool.
+        async with aclosing(db.get_conn()) as conns:
+            async for conn in conns:
+                cur = await conn.execute("SELECT EXISTS (SELECT 1 FROM forecast_runs) AS has_run")
+                row = await cur.fetchone()
+                await conn.commit()
+                if row["has_run"]:
+                    return
+                log.info("forecast_runs is empty; running the first forecast in the background")
+                summary = await forecast.run(conn)
+                log.info("first forecast stored: %d reorder suggestions", len(summary.reorders))
     except asyncio.CancelledError:
         raise
     except Exception:
-        log.exception("startup forecast run failed; /api/forecast/* answers no_forecast until it runs")
+        log.exception("startup forecast run failed; /api/forecast/* answers no_forecast until restart")
 
 
 def start_forecast_task() -> asyncio.Task[None]:

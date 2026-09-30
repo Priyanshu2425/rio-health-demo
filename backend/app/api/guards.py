@@ -65,7 +65,7 @@ def decodable(data: bytes) -> bool:
     try:
         with Image.open(io.BytesIO(data)) as img:
             img.verify()
-    except (UnidentifiedImageError, OSError, SyntaxError, ValueError):
+    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, SyntaxError, ValueError):
         return False
     return True
 

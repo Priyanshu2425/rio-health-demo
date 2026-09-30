@@ -45,3 +45,18 @@ class _Req:
 )
 def test_client_ip(headers, expected):
     assert client_ip(_Req(headers)) == expected
+
+
+def test_decompression_bomb_is_refused_not_a_500():
+    import io
+
+    from PIL import Image
+
+    from app.api.guards import decodable
+
+    buf = io.BytesIO()
+    Image.new("L", (1, 1)).save(buf, format="PNG")
+    data = bytearray(buf.getvalue())
+    # Rewrite the IHDR width/height to 50000 x 50000 (2.5 gigapixels) without the pixels.
+    data[16:24] = (50000).to_bytes(4, "big") + (50000).to_bytes(4, "big")
+    assert decodable(bytes(data)) is False

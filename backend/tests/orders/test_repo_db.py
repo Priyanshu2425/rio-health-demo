@@ -33,7 +33,7 @@ async def conn():
         yield connection
     finally:
         await connection.rollback()
-        await connection.execute("DELETE FROM orders WHERE order_id LIKE %s", (f"{RUN}%",))
+        await connection.execute("DELETE FROM orders WHERE left(order_id, %s) = %s", (len(RUN), RUN))
         await connection.commit()
         await connection.close()
 
