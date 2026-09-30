@@ -8,13 +8,14 @@ import re
 from dataclasses import dataclass
 
 from psycopg import AsyncConnection
+from psycopg.rows import tuple_row
 
 from app import catalog
 from app.contracts import SKU, MatchCandidate, MatchResult, ParsedLine
 from app.core import llm
 from app.core.config import get_settings
 from app.parser.models import RerankChoice
-from app.parser.normalize import strength_numbers
+from app.parser.normalize import form_from_text, strength_numbers
 from app.parser.prompts import RERANK_SYSTEM
 
 log = logging.getLogger(__name__)
@@ -25,6 +26,10 @@ CONFIDENT_MARGIN = 0.1
 # A re-ranked pick whose strength and form agree with the line (checked in code) is
 # treated as confident, provided the trigram score shows it is the same name at all.
 AGREEMENT_FLOOR = 0.6
+# Typed requests only: how far below the top hit a same-brand tablet or capsule may score
+# and still be preferred when the customer typed neither a strength nor a form.
+TYPED_SOLID_MARGIN = 0.25
+SOLID_FORMS = {"tablet", "capsule"}
 
 
 @dataclass
@@ -145,6 +150,76 @@ async def rerank(
     return match, result.cost_usd, result.latency_ms
 
 
+async def popularity(conn: AsyncConnection, sku_ids: list[str]) -> dict[str, int]:
+    """popularity_rank (lower = better known) for the SKUs that have one."""
+    async with conn.cursor(row_factory=tuple_row) as cur:
+        await cur.execute(
+            "SELECT sku_id, popularity_rank FROM skus WHERE sku_id = ANY(%s) AND popularity_rank IS NOT NULL",
+            (sku_ids,),
+        )
+        return dict(await cur.fetchall())
+
+
+async def typed_solid_pick(
+    conn: AsyncConnection, line: ParsedLine, candidates: list[MatchCandidate]
+) -> MatchCandidate | None:
+    """A bare typed brand ('dolo') means its everyday tablet (Dolo 650), not whichever pack
+    is literally named 'Dolo' (a 15 ml suspension).
+
+    Applies only when the customer typed no strength and no form. Eligible: tablets and
+    capsules within TYPED_SOLID_MARGIN of the top score whose brand name adds nothing but
+    a strength to what was typed (so 'Allegra-M' never stands in for 'allegra'). Among
+    the eligible ones near the best of them, the best popularity_rank wins.
+    """
+    # 'dolo syrup' keeps the form word in the drug name; that customer chose a form
+    if line.strength or line.form or form_from_text(line.drug) or not candidates:
+        return None
+    top = candidates[0].score
+    solid = [
+        c
+        for c in candidates
+        if c.sku.form in SOLID_FORMS
+        and c.score >= top - TYPED_SOLID_MARGIN
+        and extra_tokens(line, c.sku) == 0
+    ]
+    if not solid:
+        return None
+    best = max(c.score for c in solid)
+    near = [c for c in solid if c.score >= best - CONFIDENT_MARGIN]
+    ranks = await popularity(conn, [c.sku.sku_id for c in near]) if len(near) > 1 else {}
+    order = {c.sku.sku_id: i for i, c in enumerate(near)}
+    return min(
+        near,
+        key=lambda c: (
+            c.sku.sku_id not in ranks,
+            ranks.get(c.sku.sku_id, 0),
+            -c.score,
+            order[c.sku.sku_id],
+        ),
+    )
+
+
+async def match_text_line_detailed(conn: AsyncConnection, line: ParsedLine) -> MatchOutcome:
+    """Typed-request variant of match_line_detailed: a bare brand prefers its tablet."""
+    if not line.drug:
+        return await match_line_detailed(conn, line)
+    candidates = await _candidates(conn, line)
+    pick = await typed_solid_pick(conn, line, candidates)
+    if pick is None:
+        return await _resolve(line, candidates)
+    reason = None
+    if pick is not candidates[0]:
+        reason = f"no strength or form typed; took the {pick.sku.form} of this brand"
+    return MatchOutcome(
+        MatchResult(sku=pick.sku, score=pick.score, candidates=candidates, reranked=False, reason=reason)
+    )
+
+
+async def _candidates(conn: AsyncConnection, line: ParsedLine) -> list[MatchCandidate]:
+    candidates = await catalog.search(conn, search_query(line), limit=TOP_K)
+    return sorted(candidates, key=lambda c: c.score, reverse=True)[:TOP_K]
+
+
 async def match_line_detailed(
     conn: AsyncConnection, line: ParsedLine, *, rerank_model: str | None = None
 ) -> MatchOutcome:
@@ -152,8 +227,12 @@ async def match_line_detailed(
         return MatchOutcome(
             MatchResult(sku=None, score=0.0, candidates=[], reranked=False, reason="drug name unreadable")
         )
-    candidates = await catalog.search(conn, search_query(line), limit=TOP_K)
-    candidates = sorted(candidates, key=lambda c: c.score, reverse=True)[:TOP_K]
+    return await _resolve(line, await _candidates(conn, line), rerank_model)
+
+
+async def _resolve(
+    line: ParsedLine, candidates: list[MatchCandidate], rerank_model: str | None = None
+) -> MatchOutcome:
     if not candidates:
         return MatchOutcome(
             MatchResult(sku=None, score=0.0, candidates=[], reranked=False, reason="no catalog match")
