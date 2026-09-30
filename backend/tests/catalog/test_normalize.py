@@ -12,7 +12,8 @@ from app.catalog.normalize import (
     parse_pack,
     schedule_for,
 )
-from app.contracts import Salt
+from app.catalog.query import pack_amount, same_whole_pack
+from app.contracts import SKU, Salt
 
 
 def test_parses_two_salt_string_into_sorted_salts():
@@ -142,3 +143,42 @@ def test_query_normalization():
     assert normalize_query("Amoxicillin Clavulanate 500/125") == "amoxycillin clavulanic acid 500 125"
     assert normalize_query("cefpodoxime proxetil 200") == "cefpodoxime proxetil 200"
     assert normalize_query("  Tab. PAN 40 ") == "tab. pan 40"
+
+
+@pytest.mark.parametrize(
+    ("label", "amount"),
+    [
+        ("bottle of 15 ml oral suspension", (15.0, "ml")),
+        ("packet of 15 ml oral suspension", (15.0, "ml")),
+        ("tube of 30 gm gel", (30.0, "gm")),
+        ("sachet of 21.8 g", (21.8, "gm")),
+        ("packet of 120 mdi inhaler", (120.0, "mdi")),
+        ("vial of 1 injection", None),
+    ],
+)
+def test_pack_amount(label, amount):
+    assert pack_amount(label) == amount
+
+
+def _bottle(label: str) -> SKU:
+    return SKU(
+        sku_id="x",
+        brand_name="x",
+        manufacturer="x",
+        form="suspension",
+        pack_size=1,
+        pack_label=label,
+        mrp_inr=10,
+        composition=[],
+        composition_key="k",
+        rx_only=False,
+    )
+
+
+def test_whole_pack_comparison_needs_equal_volume():
+    assert same_whole_pack(
+        _bottle("bottle of 15 ml oral suspension"), _bottle("packet of 15 ml oral suspension")
+    )
+    assert not same_whole_pack(_bottle("bottle of 60 ml oral suspension"), _bottle("bottle of 15 ml syrup"))
+    assert same_whole_pack(_bottle("vial of 1 injection"), _bottle("vial of 1 injection"))
+    assert not same_whole_pack(_bottle("vial of 1 injection"), _bottle("vial of 1 powder for injection"))

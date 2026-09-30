@@ -3,6 +3,7 @@
 import pytest
 
 from app.catalog import cheapest_generic, get_sku, search
+from app.catalog.query import pack_amount
 
 pytestmark = pytest.mark.db
 
@@ -74,3 +75,40 @@ async def test_rx_flags_for_known_salts(conn, query, key_part, rx_only, schedule
     assert match is not None, f"{query!r} did not find {key_part!r}"
     assert match.rx_only is rx_only
     assert match.schedule == schedule
+
+
+async def test_generic_respects_price_floor(conn):
+    # Oflocin at ₹1.14 a tablet sits far under the ₹7.98 median; it must not be offered
+    brand = await get_sku(conn, "sku_oflox_200")
+    generic = await cheapest_generic(conn, brand)
+    assert generic is not None
+    cur = await conn.execute(
+        "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY mrp_inr / pack_size) AS m "
+        "FROM skus WHERE composition_key = %s AND form = %s",
+        (brand.composition_key, brand.form),
+    )
+    median_unit = (await cur.fetchone())["m"]
+    assert generic.mrp_inr / generic.pack_size >= 0.2 * median_unit
+    assert generic.mrp_inr / generic.pack_size < brand.mrp_inr / brand.pack_size
+
+
+@pytest.mark.parametrize("sku_id", ["sku_dolo", "sku_dolo_250", "sku_augmentin_duo"])
+async def test_whole_pack_generic_has_the_same_volume(conn, sku_id):
+    brand = await get_sku(conn, sku_id)
+    assert brand.pack_size == 1
+    generic = await cheapest_generic(conn, brand)
+    if generic is not None:
+        assert pack_amount(generic.pack_label) == pack_amount(brand.pack_label)
+        assert generic.mrp_inr < brand.mrp_inr
+
+
+async def test_search_leaves_trigram_threshold_alone(conn):
+    await search(conn, "augmentin 625")
+    await search(conn, "augmantin")
+    cur = await conn.execute("SHOW pg_trgm.word_similarity_threshold")
+    assert (await cur.fetchone())["pg_trgm.word_similarity_threshold"] == "0.6"  # pg_trgm default
+
+
+async def test_typo_still_finds_brand(conn):
+    results = await search(conn, "augmantin")
+    assert results and results[0].sku.brand_name.lower().startswith("augmentin")
