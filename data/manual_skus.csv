@@ -1,0 +1,6 @@
+sku_id,brand_name,price,manufacturer_name,pack_size_label,composition
+sku_pan_40,Pan 40,155.00,Alkem Laboratories Ltd,strip of 15 tablets,Pantoprazole (40mg)
+sku_electral_21g,Electral Powder,22.00,FDC Ltd,sachet of 21.8 g,Oral Rehydration Salts (NA)
+sku_shelcal_500,Shelcal 500,125.00,Torrent Pharmaceuticals Ltd,strip of 15 tablets,Calcium Carbonate (1250mg) + Vitamin D3 (250IU)
+sku_limcee_500,Limcee 500,25.00,Abbott,strip of 15 chewable tablets,Vitamin C (500mg)
+sku_crocin_650,Crocin 650,33.00,GlaxoSmithKline Consumer Healthcare,strip of 15 tablets,Paracetamol (650mg)
