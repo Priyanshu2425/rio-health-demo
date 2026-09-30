@@ -44,10 +44,30 @@ def test_composition_key_is_order_independent():
         ("Potassium Clavulanate", "clavulanic acid"),
         ("Vitamin B6 (Pyridoxine)", "vitamin b6"),
         ("  Pantoprazole  ", "pantoprazole"),
+        ("Clinidipine", "cilnidipine"),
     ],
 )
 def test_salt_aliases(raw, name):
     assert normalize_salt_name(raw) == name
+
+
+@pytest.mark.parametrize(
+    ("a", "b"),
+    [
+        ("cefixime", "cefepime"),
+        ("clonazepam", "lorazepam"),
+        ("dexamethasone", "betamethasone"),
+        ("quinidine", "quinine"),
+        ("nizatidine", "tizanidine"),
+        ("enalaprilat", "enalapril"),
+        ("lactose", "lactulose"),
+        ("metoprolol succinate", "metoprolol tartrate"),
+    ],
+)
+def test_look_alike_salts_stay_distinct(a, b):
+    """Near-identical spellings that are different drugs must never be folded together."""
+    assert normalize_salt_name(a) != normalize_salt_name(b)
+    assert normalize_query(a) != normalize_query(b)
 
 
 @pytest.mark.parametrize(

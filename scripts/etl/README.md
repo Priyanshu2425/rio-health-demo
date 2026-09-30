@@ -8,9 +8,11 @@ PYTHONPATH=. uv run python ../scripts/etl/build_catalog.py --seed-only  # load c
 PYTHONPATH=. uv run python ../scripts/etl/build_catalog.py              # rebuild seed from data/raw, then load
 PYTHONPATH=. uv run python ../scripts/etl/gen_orders.py                 # synthetic orders + inventory, then a forecast run
 PYTHONPATH=. uv run python ../scripts/etl/sample_search.py              # row counts and sample searches
+PYTHONPATH=. uv run python ../scripts/etl/propose_aliases.py            # print salt-alias candidates to review
 ```
 
-Every load is idempotent: it replaces table contents inside one transaction.
+Every load is idempotent: it replaces table contents inside one transaction. The files in
+`data/` are ETL inputs only: the running app reads nothing but the database.
 
 ## Catalog source
 
@@ -56,7 +58,19 @@ mkdir -p data/raw && curl -sL -o data/raw/indian_medicine_data.csv \
    Electral Powder, Shelcal 500, Limcee 500, Crocin 650). They are real products with
    **approximate** MRPs. `data/sku_id_overrides.csv` pins the ids used in
    `contracts/fixtures/` (`sku_augmentin_625`, `sku_pan_40`, …).
-6. Validates every row against `app.contracts.SKU`, writes the seed, loads `skus`.
+6. Validates every row against `app.contracts.SKU` and writes the seed in popularity
+   order. Loading it sets `skus.popularity_rank` to the row number (0 = best known),
+   which search uses to break ties between equal scores.
+
+### Salt aliases are reviewed by hand
+
+`SALT_ALIASES` in `app/catalog/normalize.py` folds true spelling variants only
+(amoxicillin → amoxycillin, clinidipine → cilnidipine, …). `propose_aliases.py` prints
+rare salt names within Levenshtein distance 2 of a common one, for a person to review.
+**It never applies anything automatically**: most of its pairs are different drugs that
+are spelt alike (cefixime / cefepime, quinine / quinidine, lactose / lactulose), and a test
+guards a list of those look-alikes against being folded together. A true variant is added
+to `SALT_ALIASES` by hand, with a test.
 
 Limitation: the dataset keeps at most two salts per product, so a third ingredient (for
 example lactic acid bacillus in some amox-clav brands) is not part of the key.
