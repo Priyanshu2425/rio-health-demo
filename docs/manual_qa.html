@@ -164,7 +164,7 @@ command -v jq || brew install jq      # stage 4 uses it</pre><button type="butto
 <!-- 1 -->
 <section class="stage" id="s1">
   <div class="stage-head"><span class="num">1</span><h2>PR #2 · Contracts v2</h2><div class="tags"><span class="tag merge">merge first</span><span class="tag">no cost</span></div></div>
-  <p>Description-only contract changes plus an output-token cap on every OpenRouter call. Every other branch assumes these semantics, so it goes in first.</p>
+  <p>Merged. Then merge <b>PR #6 (contracts v3)</b> the same way: <code>gh pr merge 6 --merge</code>. It adds <code>skus.popularity_rank</code> and a <code>samples</code> table (already applied to Neon) so the running app reads only the database. PRs #5 and #4 are rebased on it.</p>
   <div class="step">
     <h3><span class="k">1a</span>Read the diff</h3>
     <div class="cmd"><pre>gh pr diff 2 -- backend/app/core/llm.py backend/app/contracts.py contracts/API.md</pre><button type="button">Copy</button></div>
@@ -193,8 +193,8 @@ cd ../frontend && npm run gen:contracts -- --check</pre><button type="button">Co
   <div class="step">
     <h3><span class="k">2a</span>Tests</h3>
     <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a38dc82c389a1fea2/backend
-uv run ruff check . && uv run ruff format --check . && uv run pytest -q     # 96 passed</pre><button type="button">Copy</button></div>
-    <ul class="checks"><li><label><input type="checkbox" id="c-s2-1" data-stage="s2"><span>96 passed (these include live queries against Neon), including rotacap, respule and MDI pack sizes.</span></label></li></ul>
+uv run ruff check . && uv run ruff format --check . && uv run pytest -q     # 120 passed</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s2-1" data-stage="s2"><span>120 passed (these include live queries against Neon): pack sizes, price floor, same-volume generics, look-alike guard, popularity tie-break.</span></label></li></ul>
   </div>
   <div class="step">
     <h3><span class="k">2b</span>Search the way a pharmacist would</h3>
@@ -233,7 +233,7 @@ uv run ruff check . && uv run ruff format --check . && uv run pytest -q     # 96
     <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a1d6e52e6258e2eeb
 git restore eval/results; git clean -fdq eval/results   # drops my 1-Rx smoke-test output; 3d reruns it
 git fetch origin && git rebase origin/main
-cd backend && uv sync && uv run ruff check . && uv run pytest -q   # passes, 2 skipped (llm)</pre><button type="button">Copy</button></div>
+cd backend && uv sync && uv run ruff check . && uv run pytest -q   # 124 passed, 2 skipped (llm)</pre><button type="button">Copy</button></div>
     <ul class="checks"><li><label><input type="checkbox" id="c-s3-1" data-stage="s3"><span>Rebase clean; tests pass with 2 skipped.</span></label></li></ul>
   </div>
   <div class="step">
