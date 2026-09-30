@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rio Prescription Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f5f7f6;
+  --panel: #ffffff;
+  --ink: #13201c;
+  --muted: #56655f;
+  --line: #d9e1dd;
+  --accent: #0a6b58;
+  --accent-soft: #e2f0ec;
+  --green: #1d7a45;  --green-bg: #e3f3e8;
+  --amber: #9a6200;  --amber-bg: #fbf0d9;
+  --red: #b3261e;    --red-bg: #fbe6e4;
+  --code-bg: #edf2f0;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0f1714; --panel: #16211d; --ink: #e4ece8; --muted: #9aaba4; --line: #2a3833;
+    --accent: #4cc2a4; --accent-soft: #173a31;
+    --green: #6fd08f; --green-bg: #173323; --amber: #f0b54a; --amber-bg: #3a2c10;
+    --red: #ff8a80; --red-bg: #3d1a17; --code-bg: #1c2a25;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0f1714; --panel: #16211d; --ink: #e4ece8; --muted: #9aaba4; --line: #2a3833;
+  --accent: #4cc2a4; --accent-soft: #173a31;
+  --green: #6fd08f; --green-bg: #173323; --amber: #f0b54a; --amber-bg: #3a2c10;
+  --red: #ff8a80; --red-bg: #3d1a17; --code-bg: #1c2a25;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 17px/1.6 var(--body);
+  padding: 0 20px;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 48px 96px; display: grid; gap: 64px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+section { display: grid; gap: 20px; }
+.eyebrow {
+  font: 600 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.lede { font-size: 1.2rem; color: var(--ink); }
+.muted { color: var(--muted); }
+
+/* header */
+header { display: grid; gap: 20px; }
+.rx-mark { font-family: var(--display); font-size: 3.4rem; line-height: 1; color: var(--accent); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 0.85rem/1.4 var(--mono); color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 600; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+nav.toc a {
+  font: 0.85rem/1 var(--body); text-decoration: none; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--panel);
+}
+nav.toc a:hover, nav.toc a:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+/* worked example */
+.walk { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.step { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 18px 20px; border-top: 1px solid var(--line); }
+.step:first-child { border-top: 0; }
+.step .who { font: 600 0.72rem/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.step .what { display: grid; gap: 8px; min-width: 0; }
+.handwrite { font-family: "Segoe Script", "Bradley Hand", "Comic Sans MS", cursive; font-size: 1.15rem; }
+.kv { display: flex; flex-wrap: wrap; gap: 6px; }
+.kv span { font: 0.8rem/1 var(--mono); background: var(--code-bg); border-radius: 4px; padding: 6px 8px; }
+.kv span i { font-style: normal; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 600 0.78rem/1 var(--mono); border-radius: 999px; padding: 5px 10px; width: fit-content; }
+.pill.g { color: var(--green); background: var(--green-bg); }
+.pill.a { color: var(--amber); background: var(--amber-bg); }
+.pill.r { color: var(--red); background: var(--red-bg); }
+.pill::before { font-size: 0.9em; }
+.pill.g::before { content: "✓"; }
+.pill.a::before { content: "!"; }
+.pill.r::before { content: "✕"; }
+
+/* tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font: 600 0.72rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--code-bg); }
+td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* architecture */
+.arch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: stretch; }
+.node { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 14px; display: grid; gap: 4px; align-content: start; position: relative; }
+.node h3 { font-size: 1rem; }
+.node .host { font: 0.72rem/1.35 var(--mono); color: var(--accent); word-break: break-all; }
+.node p { font-size: 0.9rem; color: var(--muted); }
+.node.side { grid-column: 3 / 5; }
+.arrow-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; font: 0.72rem/1.3 var(--mono); color: var(--muted); }
+.arrow-row span { text-align: center; }
+
+/* pipeline */
+.pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; counter-reset: stage; }
+.stage { border-top: 3px solid var(--accent); background: var(--panel); border-radius: 0 0 8px 8px; padding: 14px; display: grid; gap: 6px; align-content: start; counter-increment: stage; }
+.stage h3::before { content: counter(stage) ". "; color: var(--accent); }
+.stage p { font-size: 0.92rem; color: var(--muted); }
+.stage .tag { font: 0.72rem/1 var(--mono); color: var(--ink); }
+
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+.formula { font-family: var(--mono); font-size: 0.92rem; background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; white-space: pre; line-height: 1.7; }
+
+ul.clean { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; max-width: 66ch; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.two > div { display: grid; gap: 10px; align-content: start; }
+
+.timeline { display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 6px; }
+.tl { display: grid; grid-template-columns: 90px 1fr; gap: 12px; padding: 10px 0 10px 18px; position: relative; }
+.tl::before { content: ""; position: absolute; left: -7px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); }
+.tl.gate::before { background: var(--accent); }
+.tl .t { font: 600 0.8rem/1.6 var(--mono); color: var(--accent); }
+.tl p { font-size: 0.95rem; }
+
+.questions { display: grid; gap: 10px; }
+.q { border: 1px dashed var(--line); border-radius: 8px; padding: 12px 16px; background: var(--panel); }
+.q b { font-family: var(--display); }
+
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; }
+
+@media (max-width: 720px) {
+  body { font-size: 16px; padding: 0 16px; }
+  .step { grid-template-columns: 1fr; gap: 6px; }
+  .arch, .pipe, .arrow-row { grid-template-columns: 1fr 1fr; }
+  .node.side { grid-column: 1 / -1; }
+  .arrow-row { display: none; }
+  .two { grid-template-columns: 1fr; }
+}
+@media (max-width: 440px) {
+  .arch, .pipe { grid-template-columns: 1fr; }
+  .tl { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="rx-mark" aria-hidden="true">℞</div>
+  <div class="eyebrow">Project explainer · rio_health</div>
+  <h1>From a prescription photo to a pharmacist-verified cart</h1>
+  <p class="lede">A one-day demo for Rio's founders. A customer sends a photo of a prescription in a WhatsApp-style chat. Rio reads it, matches each line to a real Indian SKU, offers cheaper generics, and puts the order in front of a pharmacist who can approve it in seconds.</p>
+  <div class="meta">
+    <span><b>Build</b> 1 day, 4 agents</span>
+    <span><b>Status</b> scaffold on main (7b38ae7)</span>
+    <span><b>Live at</b> rio.buildspacelabs.com</span>
+    <span><b>Updated</b> 29 Sep 2026</span>
+  </div>
+  <nav class="toc" aria-label="Sections">
+    <a href="#example">Worked example</a>
+    <a href="#safety">Pharmacist rule</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#catalog">Catalog</a>
+    <a href="#eval">Eval</a>
+    <a href="#forecast">Forecast</a>
+    <a href="#arch">Architecture</a>
+    <a href="#build">Build plan</a>
+    <a href="#open">Open questions</a>
+  </nav>
+</header>
+
+<section id="goal">
+  <div class="eyebrow">Why it exists</div>
+  <h2>One flow, done properly</h2>
+  <p>The audience is Rio's founders or hiring team. After a 90-second Loom they should think: <em>this person understands regulated pharmacy ordering over WhatsApp, and ships end to end.</em> So one path gets nearly all the effort: photo, cart, pharmacist review, verified. The forecast tab is a bonus, and the first thing to go if time runs out.</p>
+</section>
+
+<section id="example">
+  <div class="eyebrow">Worked example</div>
+  <h2>One line, followed all the way through</h2>
+  <div class="walk">
+    <div class="step">
+      <div class="who">Customer sends</div>
+      <div class="what"><div class="handwrite">Tab. Augmentin 625 &nbsp;1-0-1 × 5 days</div><span class="muted">A phone photo of a clinic prescription with 3 lines.</span></div>
+    </div>
+    <div class="step">
+      <div class="who">Vision extract</div>
+      <div class="what">
+        <div class="kv"><span><i>drug</i> Augmentin</span><span><i>strength</i> 625</span><span><i>form</i> tablet</span><span><i>frequency</i> 1-0-1</span><span><i>duration</i> 5 days</span></div>
+        <span class="muted">The model transcribes what it sees and flags unreadable fields. It knows nothing about the catalog.</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="who">Code normalizes</div>
+      <div class="what"><div class="kv"><span>1-0-1 → 2 doses/day</span><span>2 × 5 = 10 tablets</span><span>strip of 10 → 1 pack</span></div></div>
+    </div>
+    <div class="step">
+      <div class="who">Catalog match</div>
+      <div class="what">
+        <div class="kv"><span>Augmentin 625 Duo · ₹223.50</span><span><i>score</i> 0.97</span><span><i>Rx</i> Schedule H</span></div>
+        <span class="muted">Clear winner, so no re-rank call. Same composition, cheaper: Moxclav 625 at ₹181.00, shown as "Save ₹42.50".</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="who">Triage</div>
+      <div class="what"><span class="pill g">green · approve as is</span><span class="muted">The other two lines come out amber (duration unreadable) and red (drug name unclear).</span></div>
+    </div>
+    <div class="step">
+      <div class="who">Pharmacist</div>
+      <div class="what"><span>Sees red first, fixes it with the SKU picker, approves all green lines with one tap, then approves the order.</span></div>
+    </div>
+    <div class="step">
+      <div class="who">Customer sees</div>
+      <div class="what"><span>"✅ Verified by pharmacist", the final cart, and a Place order button (a stub).</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="eyebrow">The compliance rule</div>
+  <h2>Every prescription order is reviewed</h2>
+  <p>Schedule H and H1 drugs legally need a pharmacist's check before they're dispensed, and a prescription photo almost always contains them. So confidence never decides <em>whether</em> a pharmacist sees an order. It decides <em>how fast</em> they can clear it.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Triage</th><th>When</th><th>Pharmacist action</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill r">red</span></td><td>No SKU, drug illegible, or match score below 0.6</td><td>Must edit or remove</td></tr>
+        <tr><td><span class="pill a">amber</span></td><td>Match score below 0.85, a missing field, or any field illegible</td><td>Check against the image</td></tr>
+        <tr><td><span class="pill g">green</span></td><td>Everything else</td><td>One-tap approve</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <b>Confidence is computed, never self-reported</b>
+    <p>It combines the catalog match score, field completeness and per-field legibility. An LLM's own "0.95" is uncalibrated, so it's never used. Typed orders that are all OTC (say, "dolo and ORS") skip the queue. Typed requests for Rx-only items get "please upload a prescription".</p>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="eyebrow">Parsing pipeline</div>
+  <h2>Two narrow LLM calls, with arithmetic in code</h2>
+  <div class="pipe">
+    <div class="stage"><h3>Vision extract</h3><p>One call per image, strict JSON output. Literal <code>raw_text</code> plus fields and an illegible flag per field.</p><span class="tag">VISION_MODEL</span></div>
+    <div class="stage"><h3>Candidates</h3><p>Postgres <code>pg_trgm</code> search on brand and composition. Top 5, deterministic, under 50 ms.</p><span class="tag">no LLM</span></div>
+    <div class="stage"><h3>Re-rank</h3><p>A cheap text-only call to pick one candidate or none, only when the top two are close.</p><span class="tag">RERANK_MODEL</span></div>
+    <div class="stage"><h3>Cart</h3><p>Quantity, generic alternative, confidence and triage, all as pure functions with table-driven tests.</p><span class="tag">no LLM</span></div>
+  </div>
+  <div class="formula">quantity_packs = ceil(doses_per_day × duration_days ÷ pack_size)
+# written quantity wins if present; 1 pack plus a reason if an input is missing</div>
+  <p class="muted">All LLM calls go through OpenRouter. The model IDs are environment variables chosen by the eval, not by guessing. If the vision call fails or times out, the chat offers "Try a sample", which uses a cached parse, so the Loom never depends on a live model call.</p>
+</section>
+
+<section id="catalog">
+  <div class="eyebrow">Catalog</div>
+  <h2>Real Indian SKUs, keyed by composition</h2>
+  <div class="two">
+    <div>
+      <h3>Source</h3>
+      <p>The Kaggle "A-Z Medicine Dataset of India" (about 250k rows), trimmed to 5–10k SKUs: the most common compositions, the cheapest brand of each, well-known brands, and a must-include list of about 150. The trimmed seed is committed, so the demo never depends on Kaggle.</p>
+    </div>
+    <div>
+      <h3>composition_key</h3>
+      <p><code>amoxycillin 500mg + clavulanic acid 125mg</code>. Salts are normalized and sorted. SKUs with equal keys can be substituted, which is where generic alternatives and "Save ₹X" come from.</p>
+    </div>
+    <div>
+      <h3>Rx-only flag</h3>
+      <p>About 150 Schedule H/H1/X salts curated by hand. An SKU is Rx-only if any of its salts is on that list. It's approximate, and the README says so.</p>
+    </div>
+    <div>
+      <h3>Search</h3>
+      <p>Trigram similarity on brand and composition, taking the better of the two, and tolerant of spelling variants (amoxicillin/amoxycillin).</p>
+    </div>
+  </div>
+</section>
+
+<section id="eval">
+  <div class="eyebrow">Eval</div>
+  <h2>Accuracy reported by set, not blended</h2>
+  <p>A model reads handwriting-style fonts far better than a real doctor's scrawl. Reporting one blended number would flatter the system, and anyone at Rio would notice.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Set</th><th class="num">Size</th><th>How it's made</th></tr></thead>
+      <tbody>
+        <tr><td>Synthetic</td><td class="num">20</td><td>Rendered clinic letterheads, 2–5 lines, real brands. Degraded to look like phone photos (rotation, blur, JPEG compression, shadows). Ground truth written at generation time.</td></tr>
+        <tr><td>Handwritten</td><td class="num">10</td><td>Written on paper by the owner in 2–3 different hands, photographed with a phone, and labelled by hand. No real patient data.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="clean">
+    <li><b>Headline metric:</b> SKU match accuracy, meaning the cart line has the right composition and strength.</li>
+    <li><b>Also reported:</b> line recall, per-field accuracy, % green (lines approved unedited), p50/p95 latency and ₹ per prescription.</li>
+    <li><b>Model comparison:</b> 3 vision candidates on OpenRouter, ending in a table in the README.</li>
+    <li><b>H4 gate:</b> SKU match ≥ 80% on the synthetic set.</li>
+  </ul>
+</section>
+
+<section id="forecast">
+  <div class="eyebrow">Bonus tab</div>
+  <h2>Forecast, deliberately small</h2>
+  <p>The order data is synthetic: about 50 SKUs × 3 areas, 90 days, hourly. It has an evening peak, a different mix per area, and a flu-style spike injected into the last 21 days. The page says it's synthetic.</p>
+  <div class="formula">forecast  = hour-of-week profile × 7-day EWMA level
+backtest  = last 14 days, MAPE vs naive "same hour last week"
+reorder   = max(0, ceil(next-24h forecast × 1.2 − on_hand))</div>
+  <p class="muted">One headline number, one actual-vs-forecast chart, and one reorder table with stockout rows highlighted. The story: the moving level catches the spike and the naive baseline doesn't.</p>
+</section>
+
+<section id="arch">
+  <div class="eyebrow">Architecture</div>
+  <h2>Three hosts, one tunnel</h2>
+  <div class="arch">
+    <div class="node"><h3>Browser</h3><span class="host">chat · pharmacist · forecast</span><p>Split-screen demo at <code>/</code>. Polls the order every 2 s.</p></div>
+    <div class="node"><h3>Cloudflare Pages</h3><span class="host">rio.buildspacelabs.com</span><p>Vite + React + TypeScript static build.</p></div>
+    <div class="node"><h3>Cloudflare Tunnel</h3><span class="host">rio-api.buildspacelabs.com</span><p>TLS at the edge. No open ports on the box.</p></div>
+    <div class="node"><h3>EC2 · FastAPI</h3><span class="host">localhost:8000 · Docker</span><p>API, parser, matcher, and forecast in the same process.</p></div>
+    <div class="node side"><h3>Neon Postgres</h3><span class="host">schema app_rio_health · pg_trgm</span><p>Catalog, orders (with images), synthetic orders, forecast runs. Its own role on the shared project; it can't read other apps' schemas.</p></div>
+    <div class="node side"><h3>OpenRouter</h3><span class="host">VISION_MODEL · RERANK_MODEL</span><p>Every LLM call. The key has a spend cap. 10 parses per IP per hour, 5 MB uploads.</p></div>
+  </div>
+  <p class="muted">The API hostname is one level deep because Cloudflare's free certificate covers only <code>*.buildspacelabs.com</code>, so <code>api.rio.…</code> would fail TLS.</p>
+</section>
+
+<section id="build">
+  <div class="eyebrow">How it gets built</div>
+  <h2>Four agents on four branches, and you merge</h2>
+  <p>Everything shared is frozen on <code>main</code>: the Pydantic contracts (with generated TypeScript types, JSON Schema and mock fixtures), the API spec, the database migration, module function signatures and Python dependencies. Each agent owns separate directories, so merges can't conflict. A contract change goes through a small <code>chore/contracts-vN</code> branch that you merge first.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Branch</th><th>Builds</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">feat/data-forecast</td><td>Catalog ETL, Schedule H list, trigram search, synthetic orders, forecast</td><td>Search tests pass; backtest beats naive</td></tr>
+        <tr><td class="mono">feat/parser-eval</td><td>Vision prompt, matcher, samples, 20 synthetic prescriptions, eval harness, model comparison</td><td>SKU match ≥ 80% on synthetic</td></tr>
+        <tr><td class="mono">feat/backend-api</td><td>Every route, order state machine, triage rules, rate limit, Docker + tunnel deploy</td><td>Curl walkthrough works live</td></tr>
+        <tr><td class="mono">feat/frontend</td><td>Split-screen chat and pharmacist console, forecast tab, mock API</td><td>Loom script clickable end to end</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="timeline">
+    <div class="tl"><span class="t">H0–H1</span><p>You: push main, provision Neon and pg_trgm, OpenRouter key, Kaggle CSV.</p></div>
+    <div class="tl"><span class="t">H1–H4</span><p>Wave 1: all four branches in parallel. Backend and frontend run on fixtures.</p></div>
+    <div class="tl gate"><span class="t">H4 gate</span><p>Merge data-forecast, then parser-eval (≥ 80% SKU match).</p></div>
+    <div class="tl"><span class="t">H4–H7</span><p>Wave 2: backend swaps mocks for real modules and deploys; frontend points at the live API.</p></div>
+    <div class="tl gate"><span class="t">H7 gate</span><p>Full flow works on the public URL. Merge backend-api, then frontend.</p></div>
+    <div class="tl"><span class="t">H7–H10</span><p>Fix the top 3 bugs, write the README, record the Loom, send the email.</p></div>
+  </div>
+  <div class="two">
+    <div><h3>Cut order when late</h3><ul class="clean"><li>The generic-swap chip in the chat</li><li>The reorder table</li><li>The whole forecast tab</li></ul></div>
+    <div><h3>Never cut</h3><p>Photo → cart → pharmacist review → verified.</p><h3>Out of scope</h3><p>The real WhatsApp API, auth, payments, delivery. Listed as "next" in the README.</p></div>
+  </div>
+</section>
+
+<section id="open">
+  <div class="eyebrow">Open questions</div>
+  <h2>What's still undecided</h2>
+  <div class="questions">
+    <div class="q"><b>Loom and email.</b> Who exactly receives it, and what's the ask: a role, a conversation, a pilot?</div>
+    <div class="q"><b>Rio's world.</b> Which city and neighbourhoods, what brand colours, and does Rio already use a pharmacist-in-the-loop flow we should mirror?</div>
+    <div class="q"><b>Handwritten set.</b> Who writes the 10 prescriptions, and are 10 enough to report a number without over-claiming?</div>
+    <div class="q"><b>Pharmacist UX.</b> Is one reviewer per order right, and what does "reject" mean for the customer?</div>
+    <div class="q"><b>Budget.</b> What spend cap on OpenRouter, and which EC2 size?</div>
+  </div>
+</section>
+
+<footer>
+  Sources: <code>docs/DECISIONS.md</code>, <code>docs/PLAN.md</code>, <code>contracts/API.md</code>, <code>docs/briefs/</code>. Prices and brands in the example are illustrative fixtures.
+</footer>
+
+</div>
+</body>
+</html>
