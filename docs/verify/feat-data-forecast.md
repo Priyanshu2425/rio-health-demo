@@ -105,10 +105,10 @@ cd backend && uv run ruff check . && uv run ruff format --check . && uv run pyte
 ```
 All checks passed!
 31 files already formatted
-81 passed
+96 passed
 ```
 
-Catalog tests (`tests/catalog/`): 38 pure parser tests; DB tests for `augmentin 625` top 1,
+Catalog tests (`tests/catalog/`): 51 pure parser tests (including rotacap, respule and MDI packs); DB tests for `augmentin 625` top 1,
 the amox-clav composition in the top 3, `pan 40` → pantoprazole 40mg, a cheaper generic
 with the same key and form, fixture ids resolving, and Rx/OTC flags for 10 salts.
 Forecast tests (`tests/forecast/`): generator structure and reproducibility, the model

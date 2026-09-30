@@ -228,24 +228,31 @@ def map_form(label: str) -> Form | None:
 
 
 # Forms dispensed whole: one bottle / tube / inhaler / sachet per pack (contracts-v2).
-_WHOLE_PACK_FORMS: set[str] = {
-    "syrup",
-    "suspension",
-    "drops",
-    "cream",
-    "ointment",
-    "gel",
-    "powder",
-    "inhaler",
-    "sachet",
-}
+# Forms whose packs are counted in units (contracts-v2: "countable units per pack").
+_COUNTED_FORMS: set[str] = {"tablet", "capsule", "injection"}
+# Other packs that hold countable units: inhalation capsules and single-dose ampoules,
+# and the countable "other" forms. Everything else (bottles, tubes, sachets, sprays,
+# lotions, metered-dose inhaler devices) is one unit per pack.
+_COUNTED_KEYWORDS = (
+    "rotacap",
+    "respicap",
+    "respule",
+    "transcap",
+    "suppositor",
+    "pessar",
+    "patch",
+    "lozenge",
+    "disintegrating strip",
+)
 
 
 def parse_pack(raw: str | None) -> Pack | None:
-    """Map a pack label to form, pack size (dispensable units) and label.
+    """Map a pack label to form, pack size (countable units) and label.
 
-    'strip of 10 tablets' -> tablet, 10. Volume, weight and inhaler packs are one unit
-    ('bottle of 100 ml Syrup' -> syrup, 1); injections count vials or ampoules.
+    Tablets, capsules, vials/ampoules, rotacaps, respicaps, respules, suppositories,
+    patches and lozenges count units ('strip of 30 rotacaps' -> 30). A volume, weight or
+    metered-dose count means one container ('bottle of 100 ml syrup' -> 1, 'packet of
+    200 mdi inhaler' -> 1), as do bottles, tubes, sachets and inhaler devices.
     Returns None when the label can't be mapped; the ETL drops those rows.
     """
     if raw is None or isinstance(raw, float):
@@ -257,7 +264,8 @@ def parse_pack(raw: str | None) -> Pack | None:
         return None
     number = float(match.group("num"))
     first_word = (match.group("rest").split(" ", 1)[0] if match.group("rest") else "").strip()
-    if first_word in _MEASURE_UNITS or form in _WHOLE_PACK_FORMS:
+    counted = form in _COUNTED_FORMS or any(k in label for k in _COUNTED_KEYWORDS)
+    if first_word in _MEASURE_UNITS or not counted:
         pack_size = 1
     else:
         if number < 1 or number != int(number):

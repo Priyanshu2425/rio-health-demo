@@ -40,7 +40,7 @@ mkdir -p data/raw && curl -sL -o data/raw/indian_medicine_data.csv \
    sorted by name, joined as `name strength + name strength`.
 2. Maps `pack_size_label` to a contract `form`, `pack_size` and `pack_label`. Counted
    packs keep their count (`strip of 10 tablets` → 10); measured packs (ml, gm, MDI
-   doses) are one unit (`bottle of 100 ml syrup` → 1). Unmappable packs (kits, soaps,
+   doses) are one unit (`bottle of 100 ml syrup` → 1). Inhalation capsules and ampoules count units (`packet of 30 rotacaps` → 30, `packet of 5 respules` → 5) while metered-dose inhalers are one device; suppositories, patches and lozenges count units too. Unmappable packs (kits, soaps,
    plain "solution") are dropped: 244,207 of 246,068 active rows survive.
 3. Cleans brand names by cutting the dosage-form tail (`Augmentin 625 Duo Tablet` →
    `Augmentin 625 Duo`) and keeps one row per brand × composition × form.
