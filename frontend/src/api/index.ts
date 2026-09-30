@@ -1,24 +1,38 @@
 import { createHttpApi } from './http'
-import { MockServer, localStore } from './mock/server'
 import type { RioApi } from './types'
 
 export * from './types'
 
+// Compared literally so Vite can constant-fold it: with VITE_MOCKS unset the mock branch,
+// its fixtures and the dynamic import below are dropped from the production bundle.
 export const USE_MOCKS = import.meta.env.VITE_MOCKS === '1' || import.meta.env.VITE_MOCKS === 'true'
 
-// Add ?fail=parser_failed | parser_timeout | rate_limited to the URL to rehearse the failure path on mocks.
-function failMode(): string | null {
+interface MockHandle extends RioApi {
+  reset(): void
+}
+
+function query(name: string): string | null {
   try {
-    return new URLSearchParams(window.location.search).get('fail')
+    return new URLSearchParams(window.location.search).get(name)
   } catch {
     return null
   }
 }
 
-const mock = USE_MOCKS ? new MockServer({ store: localStore('rio.mock.v1'), failMode }) : null
+async function loadMock(): Promise<MockHandle> {
+  const { MockServer, localStore } = await import('./mock/server')
+  // Rehearsal knobs on mocks: ?fail=<error code> fails the next upload; ?latency=<ms> sets parse time.
+  const latency = Number(query('latency'))
+  return new MockServer({
+    store: localStore('rio.mock.v1'),
+    failMode: () => query('fail'),
+    parseLatencyMs: Number.isFinite(latency) && latency > 0 ? latency : undefined,
+  })
+}
 
-export const api: RioApi =
-  mock ?? createHttpApi(import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000')
+const mock: MockHandle | null = USE_MOCKS ? await loadMock() : null
+
+export const api: RioApi = mock ?? createHttpApi(import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000')
 
 /** Mock only: wipe orders back to the seeded queue, for a clean Loom take. */
 export function resetMockState() {

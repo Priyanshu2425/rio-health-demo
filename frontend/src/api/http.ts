@@ -1,14 +1,29 @@
 import type { ErrorResponse } from '../contracts.gen'
-import { ApiRequestError, type RioApi } from './types'
+import { ApiRequestError, PARSE_TIMEOUT_MS, timeoutError, type RioApi } from './types'
+
+// Used when an error body isn't our JSON (e.g. a proxy's HTML 413 or 502 page).
+const FALLBACK_MESSAGES: Record<number, string> = {
+  413: 'That photo is over 5 MB. Try a smaller one.',
+  429: 'Too many prescriptions this hour. Try again later, or try a sample.',
+  502: 'We couldn’t read that prescription. Try a clearer photo, or try a sample.',
+  503: 'Rio is restarting. Try again in a minute.',
+  504: 'Reading the prescription took too long. Try again, or try a sample.',
+}
 
 export function createHttpApi(baseUrl: string): RioApi {
   const base = baseUrl.replace(/\/+$/, '')
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
-    const res = await fetch(base + path, init)
+    let res: Response
+    try {
+      res = await fetch(base + path, init)
+    } catch (err) {
+      if (err instanceof DOMException && (err.name === 'TimeoutError' || err.name === 'AbortError')) throw timeoutError()
+      throw err
+    }
     if (!res.ok) {
       let code = 'http_' + res.status
-      let message = `Request failed (${res.status}).`
+      let message = FALLBACK_MESSAGES[res.status] ?? `Request failed (${res.status}).`
       try {
         const body = (await res.json()) as ErrorResponse
         if (body?.error?.message) {
@@ -35,9 +50,14 @@ export function createHttpApi(baseUrl: string): RioApi {
     createPrescriptionOrder(image) {
       const form = new FormData()
       form.append('image', image, 'prescription.jpg')
-      return request('/api/orders/prescription', { method: 'POST', body: form })
+      return request('/api/orders/prescription', {
+        method: 'POST',
+        body: form,
+        signal: AbortSignal.timeout(PARSE_TIMEOUT_MS),
+      })
     },
-    createSampleOrder: (id) => request(`/api/orders/sample/${enc(id)}`, json('POST')),
+    createSampleOrder: (id) =>
+      request(`/api/orders/sample/${enc(id)}`, { ...json('POST'), signal: AbortSignal.timeout(PARSE_TIMEOUT_MS) }),
     createTextOrder: (text) => request('/api/orders/text', json('POST', { text })),
     getOrder: (id) => request(`/api/orders/${enc(id)}`),
     orderImageUrl: (id) => `${base}/api/orders/${enc(id)}/image`,
