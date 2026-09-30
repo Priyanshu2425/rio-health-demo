@@ -73,10 +73,17 @@ def quantity_packs(
     quantity: int | None,
     pack_size: int | None,
 ) -> tuple[int, str | None]:
-    """(packs, reason). The written quantity wins; otherwise ceil(doses x days / pack);
-    otherwise 1 pack, with a reason for the pharmacist."""
+    """(packs, reason) for a prescription line.
+
+    `quantity` is in dispensable units, the same unit as `pack_size` (tablets for solid
+    forms; bottles, tubes, sachets for the rest, which have pack_size 1). The written
+    quantity wins: ceil(quantity / pack); otherwise ceil(doses x days / pack); otherwise
+    1 pack, with a reason for the pharmacist.
+    """
     if quantity:
-        return quantity, None
+        if not pack_size:
+            return 1, "no pack size; assumed 1 pack"
+        return math.ceil(quantity / pack_size), None
     if doses_per_day is None and duration_days is None:
         return 1, "no dose count or duration; assumed 1 pack"
     if doses_per_day is None:

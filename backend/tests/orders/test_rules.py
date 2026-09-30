@@ -75,8 +75,13 @@ def match(s: SKU | None = BRAND, score=0.95) -> MatchResult:
         (1, 30, None, 15, 2, False),  # 30 tabs, strip of 15
         (0.5, 10, None, 10, 1, False),  # half a tab a day
         (0, 5, None, 10, 1, False),  # never fewer than 1 pack
-        (2, 5, 3, 10, 3, False),  # written quantity wins
-        (None, None, 4, 10, 4, False),  # written quantity even without inputs
+        (2, 5, 30, 10, 3, False),  # written quantity (units) wins over doses x days
+        (2, 5, 10, 10, 1, False),  # exactly one strip
+        (None, None, 21, 10, 3, False),  # written quantity even without inputs: ceil(21/10)
+        (None, None, 1, 15, 1, False),  # a single tablet still needs a pack
+        (None, None, 2, 1, 2, False),  # 2 bottles, pack_size 1
+        (None, None, 5, None, 1, True),  # quantity but no pack size (no SKU)
+        (2, 5, 0, 10, 1, False),  # quantity 0 means "not written"
         (None, 5, None, 10, 1, True),  # SOS: no dose count
         (2, None, None, 10, 1, True),  # no duration
         (None, None, None, 10, 1, True),  # neither
@@ -201,6 +206,13 @@ def test_make_item_quantity_reason_lands_on_item():
     item = rules.make_item("itm_1", match(BRAND), None, line=line(doses_per_day=None, frequency="SOS"))
     assert item.quantity_packs == 1
     assert any("assumed 1 pack" in r for r in item.confidence.reasons)
+
+
+def test_make_item_written_quantity_is_units():
+    # "Tab X 500, #15": 15 tablets from strips of 10 -> 2 strips
+    item = rules.make_item("itm_1", match(BRAND), None, line=line(quantity=15))
+    assert item.quantity_packs == 2
+    assert item.line_total_inr == 400.0
 
 
 def test_make_text_item():
