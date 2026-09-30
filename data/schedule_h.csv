@@ -1,0 +1,309 @@
+salt,schedule,class
+amoxycillin,H,antibiotic
+ampicillin,H,antibiotic
+cloxacillin,H,antibiotic
+dicloxacillin,H,antibiotic
+clavulanic acid,H,antibiotic
+sulbactam,H,antibiotic
+tazobactam,H,antibiotic
+piperacillin,H,antibiotic
+azithromycin,H,antibiotic
+clarithromycin,H,antibiotic
+erythromycin,H,antibiotic
+roxithromycin,H,antibiotic
+doxycycline,H,antibiotic
+minocycline,H,antibiotic
+ciprofloxacin,H,antibiotic
+ofloxacin,H,antibiotic
+norfloxacin,H,antibiotic
+gatifloxacin,H,antibiotic
+levofloxacin,H1,antibiotic
+moxifloxacin,H1,antibiotic
+sparfloxacin,H1,antibiotic
+gemifloxacin,H1,antibiotic
+prulifloxacin,H1,antibiotic
+balofloxacin,H1,antibiotic
+cefalexin,H,antibiotic
+cefadroxil,H,antibiotic
+cefaclor,H,antibiotic
+cefuroxime,H,antibiotic
+cefixime,H1,antibiotic
+cefpodoxime proxetil,H1,antibiotic
+cefdinir,H1,antibiotic
+cefditoren,H1,antibiotic
+cefoperazone,H1,antibiotic
+cefotaxime,H1,antibiotic
+ceftriaxone,H1,antibiotic
+ceftazidime,H1,antibiotic
+cefepime,H1,antibiotic
+faropenem,H1,antibiotic
+meropenem,H1,antibiotic
+imipenem,H1,antibiotic
+ertapenem,H1,antibiotic
+doripenem,H1,antibiotic
+linezolid,H,antibiotic
+clindamycin,H,antibiotic
+vancomycin,H,antibiotic
+teicoplanin,H,antibiotic
+amikacin,H,antibiotic
+gentamicin,H,antibiotic
+tobramycin,H,antibiotic
+netilmicin,H,antibiotic
+colistimethate sodium,H,antibiotic
+sulfamethoxazole,H,antibiotic
+trimethoprim,H,antibiotic
+nitrofurantoin,H,antibiotic
+metronidazole,H,antibacterial/antiprotozoal
+tinidazole,H,antibacterial/antiprotozoal
+ornidazole,H,antibacterial/antiprotozoal
+rifaximin,H,antibiotic
+isoniazid,H1,antitubercular
+rifampicin,H1,antitubercular
+pyrazinamide,H1,antitubercular
+ethambutol,H1,antitubercular
+fluconazole,H,antifungal
+itraconazole,H,antifungal
+voriconazole,H,antifungal
+terbinafine,H,antifungal
+griseofulvin,H,antifungal
+acyclovir,H,antiviral
+valacyclovir,H,antiviral
+oseltamivir,H,antiviral
+favipiravir,H,antiviral
+tenofovir disoproxil fumarate,H,antiviral
+lamivudine,H,antiviral
+hydroxychloroquine,H,antimalarial
+chloroquine,H,antimalarial
+artesunate,H,antimalarial
+artemether,H,antimalarial
+lumefantrine,H,antimalarial
+omeprazole,H,ppi
+pantoprazole,H,ppi
+rabeprazole,H,ppi
+esomeprazole,H,ppi
+lansoprazole,H,ppi
+ilaprazole,H,ppi
+domperidone,H,antiemetic/prokinetic
+ondansetron,H,antiemetic
+levosulpiride,H,prokinetic
+itopride,H,prokinetic
+metoclopramide,H,antiemetic
+amlodipine,H,antihypertensive
+s-amlodipine,H,antihypertensive
+cilnidipine,H,antihypertensive
+nifedipine,H,antihypertensive
+telmisartan,H,antihypertensive
+losartan,H,antihypertensive
+olmesartan medoxomil,H,antihypertensive
+valsartan,H,antihypertensive
+azilsartan medoxomil,H,antihypertensive
+ramipril,H,antihypertensive
+enalapril,H,antihypertensive
+lisinopril,H,antihypertensive
+atenolol,H,beta blocker
+metoprolol,H,beta blocker
+bisoprolol,H,beta blocker
+nebivolol,H,beta blocker
+carvedilol,H,beta blocker
+propranolol,H,beta blocker
+hydrochlorothiazide,H,diuretic
+chlorthalidone,H,diuretic
+torasemide,H,diuretic
+furosemide,H,diuretic
+spironolactone,H,diuretic
+clopidogrel,H,antiplatelet
+rivaroxaban,H,anticoagulant
+dabigatran etexilate,H,anticoagulant
+enoxaparin,H,anticoagulant
+heparin,H,anticoagulant
+isosorbide mononitrate,H,antianginal
+nicorandil,H,antianginal
+ivabradine,H,antianginal
+ranolazine,H,antianginal
+trimetazidine,H,antianginal
+atorvastatin,H,statin
+rosuvastatin,H,statin
+simvastatin,H,statin
+fenofibrate,H,lipid lowering
+ezetimibe,H,lipid lowering
+metformin,H,antidiabetic
+glimepiride,H,antidiabetic
+gliclazide,H,antidiabetic
+glipizide,H,antidiabetic
+glibenclamide,H,antidiabetic
+pioglitazone,H,antidiabetic
+voglibose,H,antidiabetic
+acarbose,H,antidiabetic
+sitagliptin,H,antidiabetic
+vildagliptin,H,antidiabetic
+teneligliptin,H,antidiabetic
+dapagliflozin,H,antidiabetic
+empagliflozin,H,antidiabetic
+insulin,H,antidiabetic
+thyroxine,H,thyroid
+prednisolone,H,corticosteroid
+methylprednisolone,H,corticosteroid
+dexamethasone,H,corticosteroid
+deflazacort,H,corticosteroid
+betamethasone,H,corticosteroid
+hydrocortisone,H,corticosteroid
+budesonide,H,corticosteroid
+fluticasone,H,corticosteroid
+mometasone,H,corticosteroid
+clobetasol,H,corticosteroid
+beclometasone,H,corticosteroid
+triamcinolone,H,corticosteroid
+alprazolam,H1,psychotropic
+clonazepam,H,psychotropic
+lorazepam,H,psychotropic
+diazepam,H1,psychotropic
+chlordiazepoxide,H1,psychotropic
+nitrazepam,H1,psychotropic
+etizolam,H,psychotropic
+clobazam,H,psychotropic
+zolpidem,H1,psychotropic
+escitalopram,H,antidepressant
+sertraline,H,antidepressant
+fluoxetine,H,antidepressant
+paroxetine,H,antidepressant
+duloxetine,H,antidepressant
+venlafaxine,H,antidepressant
+desvenlafaxine,H,antidepressant
+mirtazapine,H,antidepressant
+amitriptyline,H,antidepressant
+nortriptyline,H,antidepressant
+imipramine,H,antidepressant
+olanzapine,H,antipsychotic
+risperidone,H,antipsychotic
+quetiapine,H,antipsychotic
+aripiprazole,H,antipsychotic
+haloperidol,H,antipsychotic
+amisulpride,H,antipsychotic
+clozapine,H,antipsychotic
+lithium carbonate,H,mood stabiliser
+divalproex,H,anticonvulsant
+sodium valproate,H,anticonvulsant
+valproic acid,H,anticonvulsant
+levetiracetam,H,anticonvulsant
+carbamazepine,H,anticonvulsant
+oxcarbazepine,H,anticonvulsant
+phenytoin,H,anticonvulsant
+lamotrigine,H,anticonvulsant
+topiramate,H,anticonvulsant
+phenobarbitone,H,anticonvulsant
+pregabalin,H,neuropathic pain
+gabapentin,H,neuropathic pain
+tramadol,H1,opioid analgesic
+tapentadol,H1,opioid analgesic
+codeine,H1,opioid
+buprenorphine,H1,opioid
+pentazocine,H1,opioid
+methylphenidate,X,stimulant
+modafinil,H,stimulant
+methotrexate,H,immunosuppressant
+tacrolimus,H,immunosuppressant
+ciclosporin,H,immunosuppressant
+mycophenolate mofetil,H,immunosuppressant
+isotretinoin,H,retinoid
+sildenafil,H,pde5 inhibitor
+tadalafil,H,pde5 inhibitor
+tamsulosin,H,urology
+silodosin,H,urology
+dutasteride,H,urology
+finasteride,H,urology
+letrozole,H,hormone
+clomiphene,H,hormone
+progesterone,H,hormone
+norethisterone,H,hormone
+estradiol,H,hormone
+misoprostol,H,hormone
+mifepristone,H,hormone
+tranexamic acid,H,haemostatic
+diclofenac,H,nsaid
+aceclofenac,H,nsaid
+etoricoxib,H,nsaid
+nimesulide,H,nsaid
+mefenamic acid,H,nsaid
+ketorolac,H,nsaid
+lornoxicam,H,nsaid
+thiocolchicoside,H,muscle relaxant
+tizanidine,H,muscle relaxant
+febuxostat,H,antigout
+allopurinol,H,antigout
+montelukast,H,antiasthmatic
+levocetirizine,H,antihistamine
+hydroxyzine,H,antihistamine
+granisetron,H,antiemetic
+colistin sulphate,H,antibiotic
+nadifloxacin,H,antibiotic
+mupirocin,H,antibiotic
+fusidic acid,H,antibiotic
+chloramphenicol,H,antibiotic
+neomycin,H,antibiotic
+framycetin,H,antibiotic
+nitazoxanide,H,antiprotozoal
+ivermectin,H,anthelmintic
+ketoconazole,H,antifungal
+tretinoin,H,retinoid
+adapalene,H,retinoid
+halobetasol,H,corticosteroid
+fluocinolone acetonide,H,corticosteroid
+loteprednol etabonate,H,corticosteroid
+fluorometholone,H,corticosteroid
+baclofen,H,muscle relaxant
+tolperisone,H,muscle relaxant
+chlorzoxazone,H,muscle relaxant
+indomethacin,H,nsaid
+etodolac,H,nsaid
+piroxicam,H,nsaid
+naproxen,H,nsaid
+flurbiprofen,H,nsaid
+celecoxib,H,nsaid
+diltiazem,H,antihypertensive
+isoxsuprine,H,vasodilator
+quinine,H,antimalarial
+drotaverine,H,antispasmodic
+cyproheptadine,H,antihistamine
+betahistine,H,antivertigo
+cinnarizine,H,antivertigo
+flunarizine,H,antimigraine
+piracetam,H,nootropic
+citicoline,H,nootropic
+ursodeoxycholic acid,H,hepatobiliary
+acebrophylline,H,bronchodilator
+doxofylline,H,bronchodilator
+theophylline,H,bronchodilator
+salbutamol,H,bronchodilator
+levosalbutamol,H,bronchodilator
+terbutaline,H,bronchodilator
+formoterol,H,bronchodilator
+salmeterol,H,bronchodilator
+tiotropium,H,bronchodilator
+ipratropium,H,bronchodilator
+ranitidine,H,h2 blocker
+famotidine,H,h2 blocker
+sucralfate,H,antiulcer
+mesalazine,H,ibd
+ethamsylate,H,haemostatic
+hydroxyprogesterone,H,hormone
+medroxyprogesterone acetate,H,hormone
+dydrogesterone,H,hormone
+dienogest,H,hormone
+cabergoline,H,hormone
+tamoxifen,H,oncology
+anastrozole,H,oncology
+paclitaxel,H,oncology
+docetaxel,H,oncology
+gemcitabine,H,oncology
+methylergometrine,H,obstetric
+clomipramine,H,antidepressant
+dosulepin,H,antidepressant
+trihexyphenidyl,H,antiparkinson
+flupenthixol,H,antipsychotic
+melitracen,H,antidepressant
+trifluoperazine,H,antipsychotic
+chlorpromazine,H,antipsychotic
+prochlorperazine,H,antiemetic
+donepezil,H,antidementia
+memantine,H,antidementia
+dapoxetine,H,urology

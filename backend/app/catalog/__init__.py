@@ -6,6 +6,7 @@ change the signatures without a contracts branch.
 
 from psycopg import AsyncConnection
 
+from app.catalog import query as _query
 from app.contracts import SKU, MatchCandidate
 
 
@@ -15,13 +16,13 @@ async def search(conn: AsyncConnection, query: str, limit: int = 5) -> list[Matc
     Must find 'Augmentin 625' by brand and 'amoxicillin clavulanate 500/125' by
     composition, tolerating spelling variants such as amoxicillin/amoxycillin.
     """
-    raise NotImplementedError
+    return await _query.search(conn, query, limit)
 
 
 async def get_sku(conn: AsyncConnection, sku_id: str) -> SKU | None:
-    raise NotImplementedError
+    return await _query.get_sku(conn, sku_id)
 
 
 async def cheapest_generic(conn: AsyncConnection, sku: SKU) -> SKU | None:
     """Cheapest other SKU with the same `composition_key` and form, if it costs less."""
-    raise NotImplementedError
+    return await _query.cheapest_generic(conn, sku)

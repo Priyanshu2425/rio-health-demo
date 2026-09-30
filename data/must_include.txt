@@ -1,0 +1,230 @@
+# Brands the catalog always keeps, matched case-insensitively against the cleaned brand name.
+# Fixture brands plus common Indian brands a prescription would name. One per line.
+Augmentin 625 Duo
+Moxclav 625
+Dolo 650
+Crocin Advance
+Crocin 650
+Calpol 500mg
+Calpol 650mg
+Pacimol 650
+Pan 40
+Pan-D
+Pantocid
+Pantocid DSR
+Pantop 40
+Rablet 20
+Razo 20
+Razo-D
+Rabekind 20
+Omez
+Nexpro 40
+Nexpro RD 40
+Azithral 500
+Azee 500
+Azithral 250mg DT
+Zithrox 500
+Mox 500mg
+Novamox 500
+Taxim-O 200
+Zifi 200
+Cefix 200
+Monocef-O 200
+Cepodem 200
+Ciplox 500
+Oflox 200
+Zenflox 200
+Levoflox 500
+Norflox 400
+Metrogyl 400
+Flagyl 400
+O2
+Doxy-1 L-DR Forte
+Fluka 150
+Forcan 150
+Glycomet 500 SR
+Glycomet-GP 1
+Glycomet-GP 2
+Gluconorm-G 1
+Janumet 50mg/500mg
+Galvus Met 50mg/500mg
+Istamet 50mg/500mg
+Amaryl 1mg
+Amaryl 2mg
+Glimisave M 1
+Zoryl-M 1
+Jalra-M 50mg/500mg
+Forxiga 10mg
+Telma 40
+Telma 80
+Telma 80-H
+Telma-AM
+Telmikind 40
+Amlong
+Amlokind 5
+Amlodac 5
+Stamlo 5
+Losar 50
+Losar-H
+Cilacar 10
+Olmezest 20
+Met XL 50
+Met XL 25
+Metolar XR 50
+Concor 5
+Tenormin 50
+Aten 50
+Nebicard 5
+Atorva 5
+Atorva 20
+Rozavel 10
+Rosuvas 10
+Rosuvas 20
+Storvas 10
+Ecosprin 75
+Ecosprin-AV 75
+Clopitab
+Deplatt
+Thyronorm 25mcg
+Thyronorm 50mcg
+Thyronorm 75mcg
+Eltroxin 50mcg
+Thyrox 50
+Montair-LC
+Montair 10
+Montek LC
+Levocet
+Levocet M
+Okacet
+Cetzine
+Alerid
+Allegra 120mg
+Allegra 180mg
+Avil 25
+Ascoril LS
+Ascoril D Plus
+Benadryl
+Grilinctus
+Chericof
+Sinarest
+Cheston Cold
+Wikoryl
+Deriphyllin Retard 150
+Asthalin 100mcg
+Budecort 0.5mg
+Duolin
+Foracort 200
+Seroflo 250
+Combiflam
+Brufen 400
+Zerodol-P
+Zerodol-SP
+Hifenac-P
+Voveran SR 75
+Voveran SR 100
+Ultracet
+Meftal-Spas
+Meftal 500
+Cyclopam
+Drotin
+Buscopan 10mg
+Nise
+Nimulid
+Etoshine 90
+Ondem 4
+Emeset 4
+Vomikind
+Domstal
+Perinorm
+Ganaton
+Rantac 150
+Aciloc 150
+Sucral
+Udiliv 300
+Cremaffin Plus
+Duphalac
+Econorm
+Norflox-TZ RF
+Imodium
+Folvite 5mg
+Neurobion RF Forte
+Methycobal
+Nurokind OD
+Limcee 500
+Shelcal 500
+Calcirol 600000IU
+Uprise-D3 60K
+Orofer S
+Prolomet XL 50
+Pregabid 75
+Pregalin 75
+Gabapin NT
+Lyrica 75mg
+Nexito 10
+Stalopam 10
+Rexipra 10
+Serta 50
+Fludac
+Sizodon 1
+Oleanz 5
+Qutipin 25
+Clonotril 0.5
+Rivotril 0.5mg
+Restyl 0.25mg
+Alprax 0.25
+Zolfresh 10mg
+Valparin 200
+Levipil 500
+Eptoin
+Tegretol 100mg
+Wysolone 10
+Omnacortil 10
+Medrol 4mg
+Defcort 6
+Dexona
+Betnesol
+Candid
+Candid-B
+Betnovate-C
+Betnovate-N
+Soframycin 1% Skin
+Quadriderm RF
+Volini 100mg
+Otrivin Saline
+Refresh Tears
+Tobrex
+Ciplox D
+Chymoral Forte
+Duphaston 10mg
+Susten 200
+Meprate 10mg
+Cabgolin 0.5
+Siphene
+Letroz
+Tamflo 0.4
+Urimax 0.4
+Dutas
+Febutaz 40
+Zyloric
+Hetrazan 100
+HCQS 200
+Lariago
+Zentel
+Bandy-Plus
+Vermox 500mg
+Ivermectol 6
+Permite 5 %
+Lulifin
+Canditral 200
+Terbicip
+Acivir 400 DT
+Valcivir 500
+Fabiflu 400
+Ketorol-DT
+Paracip 500
+Sumo
+Mucaine
+Cyra 20mg
+Veloz 20
+Rabeloc 20
+Electral Powder
