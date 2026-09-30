@@ -1,8 +1,8 @@
 {
-  "model": "oracle",
+  "model": "google/gemini-3.8-flash",
   "rerank_model": "openai/gpt-6-luna",
   "catalog": "app.catalog.search (9303 SKUs)",
-  "generated_at": "2026-09-30T11:25:15.439243+00:00",
+  "generated_at": "2026-09-30T11:35:07.662795+00:00",
   "sets": {
     "synth": {
       "prescriptions": 20,
@@ -16,14 +16,15 @@
         "duration_days": 1.0,
         "quantity": 1.0
       },
-      "p50_latency_ms": 3972.647916059941,
-      "p95_latency_ms": 7029.059912485536,
-      "mean_cost_usd": 0.000101695,
+      "p50_latency_ms": 13997.999229002744,
+      "p95_latency_ms": 23123.518444155343,
+      "mean_cost_usd": 0.007370079999999999,
+      "sku_scored_prescriptions": 20,
       "sku_match_accuracy": 1.0,
-      "pct_green": 0.7662337662337663,
+      "pct_green": 0.7142857142857143,
       "triage_counts": {
-        "green": 59,
-        "amber": 18,
+        "green": 55,
+        "amber": 22,
         "red": 0
       },
       "green_but_wrong": 0,
@@ -35,18 +36,18 @@
       {
         "rx_id": "s01",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Suresh Iyer",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Rahul Sharma",
+          "rx_date": "2026-01-12",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Crocin 650  BD  x 3 days  (after food)",
+              "raw_text": "1. T. Crocin 650 BD x 3 days (after food)",
               "drug": "Crocin",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 3,
               "quantity": null,
@@ -55,11 +56,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab Taxim-O 200  0-0-1  for 5 days  (empty stomach)",
+              "raw_text": "2. Tab Taxim-O 200 0-0-1 for 5 days (empty stomach)",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -68,11 +69,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab Amlong 5  BD  x 15 days  (A/F)",
+              "raw_text": "3. Tab Amlong 5 BD x 15 days (A/F)",
               "drug": "Amlong",
               "strength": "5",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 15,
               "quantity": null,
@@ -81,11 +82,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab. Montair LC  1-1-1  3/7",
+              "raw_text": "4. Tab. Montair LC 1-1-1 3/7",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 3,
               "quantity": null,
@@ -93,9 +94,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9472,
+          "cost_usd": 0.00635925
         },
         "matches": [
           {
@@ -431,7 +432,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Amlong 5 mg tablet matches the brand, strength, and dosage form."
+            "reason": "Amlong 5 mg tablet matches the prescribed brand, strength, and dosage form."
           },
           {
             "sku": {
@@ -584,9 +585,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 3235.9321659896523,
-        "parse_latency_ms": 0,
-        "cost_usd": 6.66e-05,
+        "latency_ms": 11756.699833087623,
+        "parse_latency_ms": 9472,
+        "cost_usd": 0.0064262500000000005,
         "score": {
           "rx_id": "s01",
           "truth_lines": 4,
@@ -614,18 +615,18 @@
       {
         "rx_id": "s02",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Rajiv Malhotra",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Anjali Gupta",
+          "rx_date": "2026-03-12",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab. Azithral 500  TDS  3/7  (B/F)",
+              "raw_text": "Tab. Azithral 500 1 tab TDS 3/7",
               "drug": "Azithral",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 3,
               "quantity": null,
@@ -634,11 +635,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Calpol 500  SOS  (before food)",
+              "raw_text": "Tab. Calpol 500 1 tab SOS -",
               "drug": "Calpol",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "SOS",
               "doses_per_day": null,
               "duration_days": null,
               "quantity": null,
@@ -647,11 +648,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Cap. Pan-D  1-0-0  x 1 week",
+              "raw_text": "Cap. Pan-D 1 cap 1-0-0 1 week",
               "drug": "Pan-D",
               "strength": null,
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 7,
               "quantity": null,
@@ -660,11 +661,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Cap Omez 20  BD  x 5 days  (empty stomach)",
+              "raw_text": "Cap Omez 20 1 cap BD 5 days",
               "drug": "Omez",
               "strength": "20",
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 5,
               "quantity": null,
@@ -673,11 +674,11 @@
             },
             {
               "line_no": 5,
-              "raw_text": "Tab Augmentin 625 Duo  OD  for 5 days  (B/F)",
+              "raw_text": "Tab Augmentin 625 Duo 1 tab OD for 5 days",
               "drug": "Augmentin Duo",
               "strength": "625",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -685,9 +686,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 11970,
+          "cost_usd": 0.008208
         },
         "matches": [
           {
@@ -952,7 +953,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Calpol 500 mg tablet matches the prescribed brand, strength, and form."
+            "reason": "Calpol 500mg matches the prescribed brand, 500mg strength, and tablet form."
           },
           {
             "sku": {
@@ -1232,7 +1233,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Omez 20 mg capsule matches the prescribed brand, strength, and dosage form."
+            "reason": "Omez capsule with omeprazole 20 mg matches the prescribed strength and form."
           },
           {
             "sku": {
@@ -1389,9 +1390,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 5244.590000016615,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.000132,
+        "latency_ms": 16425.976790953428,
+        "parse_latency_ms": 11970,
+        "cost_usd": 0.0083415,
         "score": {
           "rx_id": "s02",
           "truth_lines": 5,
@@ -1420,18 +1421,18 @@
       {
         "rx_id": "s03",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Neha Kulkarni",
+          "clinic_name": "Sanjeevani Medical Centre",
+          "patient_name": "Meera Pillai",
+          "rx_date": "2026-09-07",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Dolo 650  1-1-1  x 1 week  (empty stomach)",
+              "raw_text": "1) Tab Dolo 650 1-1-1 x 1 week (empty stomach)",
               "drug": "Dolo",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 7,
               "quantity": null,
@@ -1440,11 +1441,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Clavam 625 #7  1-0-0  x 1 week  (before food)",
+              "raw_text": "2) Tab. Clavam 625 #7 1-0-0 x 1 week (before food)",
               "drug": "Clavam",
               "strength": "625",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 7,
               "quantity": 7,
@@ -1452,9 +1453,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 17826,
+          "cost_usd": 0.0047805
         },
         "matches": [
           {
@@ -1746,9 +1747,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 828.4361669793725,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0,
+        "latency_ms": 18043.665291043,
+        "parse_latency_ms": 17826,
+        "cost_usd": 0.0047805,
         "score": {
           "rx_id": "s03",
           "truth_lines": 2,
@@ -1774,18 +1775,18 @@
       {
         "rx_id": "s04",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Suresh Iyer",
+          "clinic_name": "CITY CARE MULTISPECIALITY HOSPITAL",
+          "patient_name": "Ramesh Kumar",
+          "rx_date": "2026-04-03",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab. Meftal Spas  SOS  (A/F)",
+              "raw_text": "1) Tab. Meftal Spas SOS (A/F)",
               "drug": "Meftal Spas",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "SOS",
               "doses_per_day": null,
               "duration_days": null,
               "quantity": null,
@@ -1794,11 +1795,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab Calpol 500  1-0-1  x 10 days",
+              "raw_text": "2) Tab Calpol 500 1-0-1 x 10 days",
               "drug": "Calpol",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 10,
               "quantity": null,
@@ -1807,11 +1808,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Augmentin 625 Duo  BD  x 3 days  (empty stomach)",
+              "raw_text": "3) Tab. Augmentin 625 Duo BD x 3 days (empty stomach)",
               "drug": "Augmentin Duo",
               "strength": "625",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 3,
               "quantity": null,
@@ -1820,11 +1821,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Taxim-O 200 #6  1-0-1  x 3 days  (A/F)",
+              "raw_text": "4) Tab Taxim-O 200 #6 1-0-1 x 3 days (A/F)",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 3,
               "quantity": 6,
@@ -1833,11 +1834,11 @@
             },
             {
               "line_no": 5,
-              "raw_text": "Tab Allegra 120 #5  OD  5/7  (empty stomach)",
+              "raw_text": "5) Tab Allegra 120 #5 OD 5/7 (empty stomach)",
               "drug": "Allegra",
               "strength": "120",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": 5,
@@ -1845,9 +1846,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 13989,
+          "cost_usd": 0.007833
         },
         "matches": [
           {
@@ -1994,7 +1995,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Meftal-Spas tablet matches the prescribed brand and form; the DS tablet is a distinct higher-strength variant."
+            "reason": "Meftal-Spas tablet matches the prescribed brand and dosage form; the DS tablet is a different strength."
           },
           {
             "sku": {
@@ -2128,7 +2129,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Calpol 500mg tablet matches the prescribed brand, strength, and form."
+            "reason": "Calpol 500 mg tablet matches the prescribed brand, strength, and form."
           },
           {
             "sku": {
@@ -2553,9 +2554,9 @@
             "reason": "Allegra 120 mg tablet matches the prescribed brand, strength, and dosage form."
           }
         ],
-        "latency_ms": 7561.62349996157,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00020610000000000002,
+        "latency_ms": 21007.8739579767,
+        "parse_latency_ms": 13989,
+        "cost_usd": 0.0080565,
         "score": {
           "rx_id": "s04",
           "truth_lines": 5,
@@ -2584,18 +2585,18 @@
       {
         "rx_id": "s05",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Rajiv Malhotra",
+          "clinic_name": "Sanjeevani Medical Centre",
+          "patient_name": "Sneha Patil",
+          "rx_date": "2026-03-17",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Taxim-O 200  OD  5/7  (A/F)",
+              "raw_text": "1. Tab Taxim-O 200 OD 5/7 (A/F)",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -2604,11 +2605,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Atorva 10  0-0-1  x 1 month",
+              "raw_text": "2. Tab. Atorva 10 0-0-1 x 1 month",
               "drug": "Atorva",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -2617,11 +2618,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Allegra 120 #10  1-0-0  x 10 days  (after food)",
+              "raw_text": "3. Tab. Allegra 120 #10 1-0-0 x 10 days (after food)",
               "drug": "Allegra",
               "strength": "120",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 10,
               "quantity": 10,
@@ -2629,9 +2630,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9660,
+          "cost_usd": 0.0064155
         },
         "matches": [
           {
@@ -2896,7 +2897,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Atorva 10 mg tablet matches the prescribed brand, strength, and form."
+            "reason": "Atorva 10 mg tablet matches the brand, strength, and dosage form."
           },
           {
             "sku": {
@@ -3033,9 +3034,9 @@
             "reason": "Allegra 120 mg tablet matches the prescribed brand, strength, and dosage form."
           }
         ],
-        "latency_ms": 3883.2436660304666,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00013299999999999998,
+        "latency_ms": 13478.613999905065,
+        "parse_latency_ms": 9660,
+        "cost_usd": 0.0065484,
         "score": {
           "rx_id": "s05",
           "truth_lines": 3,
@@ -3062,18 +3063,18 @@
       {
         "rx_id": "s06",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Farah Siddiqui",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Deepak Joshi",
+          "rx_date": "2026-07-22",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Dolo 650  TDS  x 5 days",
+              "raw_text": "T. Dolo 650 1 tab TDS 5 days",
               "drug": "Dolo",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 5,
               "quantity": null,
@@ -3082,11 +3083,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Ondem 4  1-0-1  5d",
+              "raw_text": "Tab. Ondem 4 1 tab 1-0-1 5d",
               "drug": "Ondem",
               "strength": "4",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 5,
               "quantity": null,
@@ -3095,11 +3096,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "T. Taxim-O 200 #6  BD  x 3 days",
+              "raw_text": "T. Taxim-O 200 #6 1 tab BD 3 days",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 3,
               "quantity": 6,
@@ -3108,11 +3109,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Ciplox 500 #15  TDS  5d  (empty stomach)",
+              "raw_text": "Tab Ciplox 500 #15 1 tab TDS 5d Instructions: 4: empty stomach",
               "drug": "Ciplox",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 5,
               "quantity": 15,
@@ -3120,9 +3121,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 16743,
+          "cost_usd": 0.00918675
         },
         "matches": [
           {
@@ -3666,9 +3667,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 619.8220830410719,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0,
+        "latency_ms": 17575.612124986947,
+        "parse_latency_ms": 16743,
+        "cost_usd": 0.00918675,
         "score": {
           "rx_id": "s06",
           "truth_lines": 4,
@@ -3696,18 +3697,18 @@
       {
         "rx_id": "s07",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Kavita Rao",
+          "clinic_name": "LifeCare Family Clinic",
+          "patient_name": "Priya Verma",
+          "rx_date": "2026-08-10",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Ondem 4  TDS  5/7  (A/F)",
+              "raw_text": "1) Tab Ondem 4 TDS 5/7 (A/F)",
               "drug": "Ondem",
               "strength": "4",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 5,
               "quantity": null,
@@ -3716,11 +3717,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Thyronorm 50  1-0-0  1/12  (A/F)",
+              "raw_text": "2) Tab. Thyronorm 50 1-0-0 1/12 (A/F)",
               "drug": "Thyronorm",
               "strength": "50",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -3729,11 +3730,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Amlong 5 #60  1-0-1  x 1 month",
+              "raw_text": "3) Tab. Amlong 5 #60 1-0-1 x 1 month",
               "drug": "Amlong",
               "strength": "5",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 30,
               "quantity": 60,
@@ -3742,11 +3743,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Cap Pan-D #21  TDS  x 7 days  (A/F)",
+              "raw_text": "4) Cap Pan-D #21 TDS x 7 days (A/F)",
               "drug": "Pan-D",
               "strength": null,
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 7,
               "quantity": 21,
@@ -3755,11 +3756,11 @@
             },
             {
               "line_no": 5,
-              "raw_text": "Tab Combiflam  OD  x 3 days  (B/F)",
+              "raw_text": "5) Tab Combiflam OD x 3 days (B/F)",
               "drug": "Combiflam",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -3767,9 +3768,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 11805,
+          "cost_usd": 0.00797175
         },
         "matches": [
           {
@@ -4030,7 +4031,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Thyronorm 50mcg tablet matches the prescribed brand, strength, and form."
+            "reason": "Thyronorm 50 mcg tablet matches the prescribed brand, strength, and form."
           },
           {
             "sku": {
@@ -4164,7 +4165,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Amlong 5 mg tablet matches the prescribed brand, strength, and dosage form."
+            "reason": "Amlong 5 is a tablet containing amlodipine 5 mg, matching the prescribed brand, strength, and form."
           },
           {
             "sku": {
@@ -4439,12 +4440,12 @@
               }
             ],
             "reranked": true,
-            "reason": "Combiflam tablet matches the prescribed brand and dosage form; it is the common adult-strength tablet."
+            "reason": "Same Combiflam brand and tablet form; this is the matching adult tablet candidate."
           }
         ],
-        "latency_ms": 6387.4563339632,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00020250000000000002,
+        "latency_ms": 19329.698957968503,
+        "parse_latency_ms": 11805,
+        "cost_usd": 0.008199549999999998,
         "score": {
           "rx_id": "s07",
           "truth_lines": 5,
@@ -4473,18 +4474,18 @@
       {
         "rx_id": "s08",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Farah Siddiqui",
+          "clinic_name": "APEX HEART & DIABETES CLINIC",
+          "patient_name": "Sneha Patil",
+          "rx_date": "2026-07-01",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab. Glycomet 500  OD  x 30 days  (B/F)",
+              "raw_text": "1) Tab. Glycomet 500  OD  x 30 days  (B/F)",
               "drug": "Glycomet",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -4493,11 +4494,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "T. Crocin 650  1-0-0  x 3 days  (B/F)",
+              "raw_text": "2) T. Crocin 650  1-0-0  x 3 days  (B/F)",
               "drug": "Crocin",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -4506,11 +4507,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab Pantocid 40 #15  1-1-1  5d",
+              "raw_text": "3) Tab Pantocid 40 #15  1-1-1  5d",
               "drug": "Pantocid",
               "strength": "40",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 5,
               "quantity": 15,
@@ -4519,11 +4520,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab. Meftal Spas  0-0-1  x 5 days  (after food)",
+              "raw_text": "4) Tab. Meftal Spas  0-0-1  x 5 days  (after food)",
               "drug": "Meftal Spas",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -4531,9 +4532,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9865,
+          "cost_usd": 0.0075495
         },
         "matches": [
           {
@@ -5031,12 +5032,12 @@
               }
             ],
             "reranked": true,
-            "reason": "Meftal-Spas tablet matches the prescribed brand and dosage form."
+            "reason": "Meftal-Spas tablet matches the prescribed brand and dosage form; the standard tablet is dicyclomine 10 mg with mefenamic acid 250 mg."
           }
         ],
-        "latency_ms": 4062.0521660894156,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00013759999999999998,
+        "latency_ms": 14517.384458100423,
+        "parse_latency_ms": 9865,
+        "cost_usd": 0.007698,
         "score": {
           "rx_id": "s08",
           "truth_lines": 4,
@@ -5064,18 +5065,18 @@
       {
         "rx_id": "s09",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Pooja Bansal",
+          "clinic_name": "LifeCare Family Clinic",
+          "patient_name": "Anjali Gupta",
+          "rx_date": "2026-07-01",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Amlong 5  1-0-1  x 15 days  (empty stomach)",
+              "raw_text": "1. Tab Amlong 5 1-0-1 x 15 days (empty stomach)",
               "drug": "Amlong",
               "strength": "5",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 15,
               "quantity": null,
@@ -5084,11 +5085,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Cetzine 10  0-0-1  5d  (B/F)",
+              "raw_text": "2. Tab. Cetzine 10 0-0-1 5d (B/F)",
               "drug": "Cetzine",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -5097,11 +5098,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "T. Azithral 500  OD  x 7 days  (empty stomach)",
+              "raw_text": "3. T. Azithral 500 OD x 7 days (empty stomach)",
               "drug": "Azithral",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 7,
               "quantity": null,
@@ -5110,11 +5111,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Montair LC  1-1-1  x 1 week  (B/F)",
+              "raw_text": "4. Tab Montair LC 1-1-1 x 1 week (B/F)",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 7,
               "quantity": null,
@@ -5122,9 +5123,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 10096,
+          "cost_usd": 0.006702
         },
         "matches": [
           {
@@ -5259,7 +5260,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Amlong 5 tablet matches the prescribed brand, 5 mg strength, and tablet form."
+            "reason": "Amlong 5 mg tablet matches the prescribed brand, strength, and form."
           },
           {
             "sku": {
@@ -5672,9 +5673,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 4497.5842498242855,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00013769999999999999,
+        "latency_ms": 15659.057250013575,
+        "parse_latency_ms": 10096,
+        "cost_usd": 0.0068379999999999995,
         "score": {
           "rx_id": "s09",
           "truth_lines": 4,
@@ -5702,18 +5703,18 @@
       {
         "rx_id": "s10",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Neha Kulkarni",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Vikram Singh",
+          "rx_date": "2026-03-08",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Cap. Omez 20  1-0-1  x 1 week  (B/F)",
+              "raw_text": "Cap. Omez 20 1 cap 1-0-1 1 week",
               "drug": "Omez",
               "strength": "20",
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 7,
               "quantity": null,
@@ -5722,11 +5723,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Rosuvas 10  HS  x 1 month",
+              "raw_text": "Tab. Rosuvas 10 1 tab HS 1 month",
               "drug": "Rosuvas",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "HS",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -5735,11 +5736,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Atorva 10  BD  1/12  (after food)",
+              "raw_text": "Tab. Atorva 10 1 tab BD 1/12",
               "drug": "Atorva",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 30,
               "quantity": null,
@@ -5748,11 +5749,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab. Ecosprin 75 #30  0-0-1  x 1 month  (A/F)",
+              "raw_text": "Tab. Ecosprin 75 #30 1 tab 0-0-1 1 month",
               "drug": "Ecosprin",
               "strength": "75",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": 30,
@@ -5760,9 +5761,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 18584,
+          "cost_usd": 0.01089825
         },
         "matches": [
           {
@@ -6165,7 +6166,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Atorva 10 mg tablet matches the prescribed brand, strength, and dosage form."
+            "reason": "Atorva 10 is the matching brand, tablet form, and 10 mg strength."
           },
           {
             "sku": {
@@ -6314,9 +6315,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 4493.56291606091,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.00013220000000000001,
+        "latency_ms": 23068.337792064995,
+        "parse_latency_ms": 18584,
+        "cost_usd": 0.01103025,
         "score": {
           "rx_id": "s10",
           "truth_lines": 4,
@@ -6344,18 +6345,18 @@
       {
         "rx_id": "s11",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Farah Siddiqui",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Ramesh Kumar",
+          "rx_date": "2026-03-14",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Metrogyl 400 #15  1-1-1  x 5 days  (A/F)",
+              "raw_text": "1) Tab Metrogyl 400 #15 1-1-1 x 5 days (A/F)",
               "drug": "Metrogyl",
               "strength": "400",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 5,
               "quantity": 15,
@@ -6364,11 +6365,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Montair LC  TDS  x 10 days",
+              "raw_text": "2) Tab. Montair LC TDS x 10 days",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "TDS",
               "doses_per_day": 3.0,
               "duration_days": 10,
               "quantity": null,
@@ -6377,11 +6378,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Cap. Pan-D  OD  5/7",
+              "raw_text": "3) Cap. Pan-D OD 5/7",
               "drug": "Pan-D",
               "strength": null,
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -6390,11 +6391,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Azithral 500  OD  3/7  (before food)",
+              "raw_text": "4) Tab Azithral 500 OD 3/7 (before food)",
               "drug": "Azithral",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -6402,9 +6403,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 14571,
+          "cost_usd": 0.009537
         },
         "matches": [
           {
@@ -6976,9 +6977,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 415.51062487997115,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0,
+        "latency_ms": 15017.36137503758,
+        "parse_latency_ms": 14571,
+        "cost_usd": 0.009537,
         "score": {
           "rx_id": "s11",
           "truth_lines": 4,
@@ -7006,18 +7007,18 @@
       {
         "rx_id": "s12",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Anil Mehta",
+          "clinic_name": "SUNRISE CLINIC",
+          "patient_name": "Mohd. Imran",
+          "rx_date": "2026-09-14",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Taxim-O 200  OD  3/7  (before food)",
+              "raw_text": "1) T. Taxim-O 200   OD   3/7   (before food)",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -7026,11 +7027,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "T. Dolo 650  SOS  x 3 days  (empty stomach)",
+              "raw_text": "2) T. Dolo 650   SOS   x 3 days   (empty stomach)",
               "drug": "Dolo",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "SOS",
               "doses_per_day": null,
               "duration_days": 3,
               "quantity": null,
@@ -7039,11 +7040,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Telma 40  OD  x 1 month",
+              "raw_text": "3) Tab. Telma 40   OD   x 1 month",
               "drug": "Telma",
               "strength": "40",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -7052,11 +7053,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "T. Amlong 5  OD  2/52",
+              "raw_text": "4) T. Amlong 5   OD   2/52",
               "drug": "Amlong",
               "strength": "5",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 14,
               "quantity": null,
@@ -7064,9 +7065,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 8719,
+          "cost_usd": 0.00577575
         },
         "matches": [
           {
@@ -7615,12 +7616,12 @@
               }
             ],
             "reranked": true,
-            "reason": "Amlong 5 mg tablet matches the prescribed brand, strength, and form."
+            "reason": "Amlong tablet containing amlodipine 5 mg matches the prescribed brand, strength, and form."
           }
         ],
-        "latency_ms": 2462.781958980486,
-        "parse_latency_ms": 0,
-        "cost_usd": 6.63e-05,
+        "latency_ms": 10842.12820790708,
+        "parse_latency_ms": 8719,
+        "cost_usd": 0.005844749999999999,
         "score": {
           "rx_id": "s12",
           "truth_lines": 4,
@@ -7648,18 +7649,18 @@
       {
         "rx_id": "s13",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Kavita Rao",
+          "clinic_name": "Apex Heart & Diabetes Clinic",
+          "patient_name": "Sneha Patil",
+          "rx_date": "2026-01-08",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab. Combiflam  BD  x 5 days  (B/F)",
+              "raw_text": "1. Tab. Combiflam BD x 5 days (B/F)",
               "drug": "Combiflam",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 5,
               "quantity": null,
@@ -7668,11 +7669,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Cetzine 10  1-1-1  x 7 days  (B/F)",
+              "raw_text": "2. Tab. Cetzine 10 1-1-1 x 7 days (B/F)",
               "drug": "Cetzine",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 7,
               "quantity": null,
@@ -7681,11 +7682,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Glycomet 500 #14  1-0-0  2/52  (before food)",
+              "raw_text": "3. Tab. Glycomet 500 #14 1-0-0 2/52 (before food)",
               "drug": "Glycomet",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 14,
               "quantity": 14,
@@ -7694,11 +7695,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "T. Ecosprin 75  1-0-0  x 1 month  (before food)",
+              "raw_text": "4. T. Ecosprin 75 1-0-0 x 1 month (before food)",
               "drug": "Ecosprin",
               "strength": "75",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -7707,11 +7708,11 @@
             },
             {
               "line_no": 5,
-              "raw_text": "Tab. Thyronorm 50 #30  0-0-1  x 1 month  (after food)",
+              "raw_text": "5. Tab. Thyronorm 50 #30 0-0-1 x 1 month (after food)",
               "drug": "Thyronorm",
               "strength": "50",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": 30,
@@ -7719,9 +7720,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 16496,
+          "cost_usd": 0.00938325
         },
         "matches": [
           {
@@ -7851,7 +7852,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Combiflam tablet matches the prescribed brand and dosage form; its 400 mg ibuprofen/325 mg paracetamol strength is the standard adult tablet."
+            "reason": "Combiflam tablet matches the prescribed brand and dosage form; its 400 mg ibuprofen/325 mg paracetamol strength is the common adult tablet."
           },
           {
             "sku": {
@@ -8402,9 +8403,9 @@
             "reason": "Thyronorm 50 mcg tablet matches the prescribed brand, strength, and dosage form."
           }
         ],
-        "latency_ms": 6722.54449990578,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0002105,
+        "latency_ms": 24171.95083387196,
+        "parse_latency_ms": 16496,
+        "cost_usd": 0.00959345,
         "score": {
           "rx_id": "s13",
           "truth_lines": 5,
@@ -8433,18 +8434,18 @@
       {
         "rx_id": "s14",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Neha Kulkarni",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Fatima Shaikh",
+          "rx_date": "2026-07-26",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Cap Pan-D  OD  for 5 days",
+              "raw_text": "1 Cap Pan-D 1 cap OD for 5 days",
               "drug": "Pan-D",
               "strength": null,
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -8453,11 +8454,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "T. Dolo 650  SOS  x 3 days  (before food)",
+              "raw_text": "2 T. Dolo 650 1 tab SOS 3 days (Instructions: 2: before food)",
               "drug": "Dolo",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "SOS",
               "doses_per_day": null,
               "duration_days": 3,
               "quantity": null,
@@ -8466,11 +8467,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab Montair LC  1-0-1  x 3 days  (empty stomach)",
+              "raw_text": "3 Tab Montair LC 1 tab 1-0-1 3 days (Instructions: 3: empty stomach)",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 3,
               "quantity": null,
@@ -8479,11 +8480,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "T. Telma 40  BD  x 1 month  (A/F)",
+              "raw_text": "4 T. Telma 40 1 tab BD 1 month (Instructions: 4: A/F)",
               "drug": "Telma",
               "strength": "40",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 30,
               "quantity": null,
@@ -8491,9 +8492,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9750,
+          "cost_usd": 0.0069945
         },
         "matches": [
           {
@@ -9073,9 +9074,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 424.5101250708103,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0,
+        "latency_ms": 10209.310624981299,
+        "parse_latency_ms": 9750,
+        "cost_usd": 0.0069945,
         "score": {
           "rx_id": "s14",
           "truth_lines": 4,
@@ -9103,18 +9104,18 @@
       {
         "rx_id": "s15",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Suresh Iyer",
+          "clinic_name": "Green Park Clinic",
+          "patient_name": "Karan Kapoor",
+          "rx_date": "2026-04-17",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Augmentin 625 Duo  1-1-1  x 3 days  (after food)",
+              "raw_text": "1) T. Augmentin 625 Duo 1-1-1 x 3 days (after food)",
               "drug": "Augmentin Duo",
               "strength": "625",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 3,
               "quantity": null,
@@ -9123,11 +9124,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Pan 40  0-0-1  5d  (after food)",
+              "raw_text": "2) Tab. Pan 40 0-0-1 5d (after food)",
               "drug": "Pan",
               "strength": "40",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -9136,11 +9137,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "T. Allegra 120  OD  x 10 days  (before food)",
+              "raw_text": "3) T. Allegra 120 OD x 10 days (before food)",
               "drug": "Allegra",
               "strength": "120",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 10,
               "quantity": null,
@@ -9148,9 +9149,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9639,
+          "cost_usd": 0.00634575
         },
         "matches": [
           {
@@ -9580,9 +9581,9 @@
             "reason": "Allegra 120 mg tablet matches the prescribed brand, strength, and dosage form."
           }
         ],
-        "latency_ms": 2118.216749979183,
-        "parse_latency_ms": 0,
-        "cost_usd": 6.72e-05,
+        "latency_ms": 11943.337083095685,
+        "parse_latency_ms": 9639,
+        "cost_usd": 0.0064128499999999995,
         "score": {
           "rx_id": "s15",
           "truth_lines": 3,
@@ -9609,18 +9610,18 @@
       {
         "rx_id": "s16",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Rajiv Malhotra",
+          "clinic_name": "GREEN PARK CLINIC",
+          "patient_name": "Karan Kapoor",
+          "rx_date": "2026-08-16",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Calpol 500  1-1-1  x 10 days  (before food)",
+              "raw_text": "1) T. Calpol 500 1-1-1 x 10 days (before food)",
               "drug": "Calpol",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 10,
               "quantity": null,
@@ -9629,11 +9630,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Thyronorm 50  HS  2/52",
+              "raw_text": "2) Tab. Thyronorm 50 HS 2/52",
               "drug": "Thyronorm",
               "strength": "50",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "HS",
               "doses_per_day": 1.0,
               "duration_days": 14,
               "quantity": null,
@@ -9641,9 +9642,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 8542,
+          "cost_usd": 0.00519675
         },
         "matches": [
           {
@@ -9665,7 +9666,7 @@
               "rx_only": false,
               "schedule": null
             },
-            "score": 0.85,
+            "score": 0.8117,
             "candidates": [
               {
                 "sku": {
@@ -9777,8 +9778,8 @@
                 "score": 0.4773
               }
             ],
-            "reranked": true,
-            "reason": "Calpol 500mg tablet matches the prescribed brand, strength, and dosage form."
+            "reranked": false,
+            "reason": "ambiguous match, re-rank failed; took the best trigram match"
           },
           {
             "sku": {
@@ -9799,7 +9800,7 @@
               "rx_only": true,
               "schedule": "H"
             },
-            "score": 0.85,
+            "score": 0.8145,
             "candidates": [
               {
                 "sku": {
@@ -9907,13 +9908,13 @@
                 "score": 0.6346
               }
             ],
-            "reranked": true,
-            "reason": "Thyronorm 50 mcg tablet matches the brand, strength, and dosage form."
+            "reranked": false,
+            "reason": "ambiguous match, re-rank failed; took the best trigram match"
           }
         ],
-        "latency_ms": 7001.030249986798,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0001358,
+        "latency_ms": 9049.979290924966,
+        "parse_latency_ms": 8542,
+        "cost_usd": 0.00519675,
         "score": {
           "rx_id": "s16",
           "truth_lines": 2,
@@ -9929,8 +9930,8 @@
           "sku_evaluated": true,
           "sku_correct": 2,
           "triage": [
-            "green",
-            "green"
+            "amber",
+            "amber"
           ],
           "green_wrong": 0,
           "failures": []
@@ -9939,18 +9940,18 @@
       {
         "rx_id": "s17",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Anil Mehta",
+          "clinic_name": "Sunrise Clinic",
+          "patient_name": "Rahul Sharma",
+          "rx_date": "2026-02-26",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Pantocid 40  OD  for 5 days  (before food)",
+              "raw_text": "1. Tab Pantocid 40 OD for 5 days (before food)",
               "drug": "Pantocid",
               "strength": "40",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -9959,11 +9960,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab Dolo 650  1-0-0  3/7",
+              "raw_text": "2. Tab Dolo 650 1-0-0 3/7",
               "drug": "Dolo",
               "strength": "650",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -9972,11 +9973,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab. Thyronorm 50  BD  x 1 month  (B/F)",
+              "raw_text": "3. Tab. Thyronorm 50 BD x 1 month (B/F)",
               "drug": "Thyronorm",
               "strength": "50",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 30,
               "quantity": null,
@@ -9985,11 +9986,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "T. Metrogyl 400  0-0-1  for 5 days  (after food)",
+              "raw_text": "4. T. Metrogyl 400 0-0-1 for 5 days (after food)",
               "drug": "Metrogyl",
               "strength": "400",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -9997,9 +9998,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9135,
+          "cost_usd": 0.006492
         },
         "matches": [
           {
@@ -10021,7 +10022,7 @@
               "rx_only": true,
               "schedule": "H"
             },
-            "score": 0.85,
+            "score": 0.75,
             "candidates": [
               {
                 "sku": {
@@ -10141,8 +10142,8 @@
                 "score": 0.675
               }
             ],
-            "reranked": true,
-            "reason": "Pantocid 40 mg tablet matches the prescribed brand, strength, and dosage form."
+            "reranked": false,
+            "reason": "ambiguous match, re-rank failed; took the best trigram match"
           },
           {
             "sku": {
@@ -10297,7 +10298,7 @@
               "rx_only": true,
               "schedule": "H"
             },
-            "score": 0.85,
+            "score": 0.8145,
             "candidates": [
               {
                 "sku": {
@@ -10405,8 +10406,8 @@
                 "score": 0.6346
               }
             ],
-            "reranked": true,
-            "reason": "Thyronorm 50 mcg tablet matches the prescribed brand, strength, and form."
+            "reranked": false,
+            "reason": "ambiguous match, re-rank failed; took the best trigram match"
           },
           {
             "sku": {
@@ -10551,9 +10552,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 5854.738499969244,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0001373,
+        "latency_ms": 10056.595625123009,
+        "parse_latency_ms": 9135,
+        "cost_usd": 0.006492,
         "score": {
           "rx_id": "s17",
           "truth_lines": 4,
@@ -10569,9 +10570,9 @@
           "sku_evaluated": true,
           "sku_correct": 4,
           "triage": [
+            "amber",
             "green",
-            "green",
-            "green",
+            "amber",
             "green"
           ],
           "green_wrong": 0,
@@ -10581,18 +10582,18 @@
       {
         "rx_id": "s18",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Suresh Iyer",
+          "clinic_name": "City Care Multispeciality Hospital",
+          "patient_name": "Anjali Gupta",
+          "rx_date": "2026-01-19",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Cap. Pan-D #3  OD  x 3 days  (empty stomach)",
+              "raw_text": "Cap. Pan-D #3 1 cap OD 3 days",
               "drug": "Pan-D",
               "strength": null,
               "form": "capsule",
-              "frequency": "as truth",
+              "frequency": "OD",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": 3,
@@ -10601,11 +10602,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab Meftal Spas  1-0-0  3/7",
+              "raw_text": "Tab Meftal Spas 1 tab 1-0-0 3/7",
               "drug": "Meftal Spas",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -10614,11 +10615,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "T. Rosuvas 10  1-0-0  1/12",
+              "raw_text": "T. Rosuvas 10 1 tab 1-0-0 1/12",
               "drug": "Rosuvas",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 30,
               "quantity": null,
@@ -10627,11 +10628,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Montair LC  1-1-1  x 3 days",
+              "raw_text": "Tab Montair LC 1 tab 1-1-1 3 days",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-1-1",
               "doses_per_day": 3.0,
               "duration_days": 3,
               "quantity": null,
@@ -10639,9 +10640,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 11238,
+          "cost_usd": 0.00669675
         },
         "matches": [
           {
@@ -10933,8 +10934,8 @@
                 "score": 0.5417
               }
             ],
-            "reranked": true,
-            "reason": "Meftal-Spas tablet matches the prescribed brand and dosage form; the DS tablet is a distinct higher-strength product."
+            "reranked": false,
+            "reason": "ambiguous match, re-rank failed; took the best trigram match"
           },
           {
             "sku": {
@@ -11225,9 +11226,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 2607.529459055513,
-        "parse_latency_ms": 0,
-        "cost_usd": 7.34e-05,
+        "latency_ms": 11862.533415900543,
+        "parse_latency_ms": 11238,
+        "cost_usd": 0.00669675,
         "score": {
           "rx_id": "s18",
           "truth_lines": 4,
@@ -11255,18 +11256,18 @@
       {
         "rx_id": "s19",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Neha Kulkarni",
+          "clinic_name": "Sanjeevani Medical Centre",
+          "patient_name": "Rahul Sharma",
+          "rx_date": "2026-01-28",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "T. Combiflam  SOS  x 3 days",
+              "raw_text": "1) T. Combiflam SOS x 3 days",
               "drug": "Combiflam",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "SOS",
               "doses_per_day": null,
               "duration_days": 3,
               "quantity": null,
@@ -11275,11 +11276,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "T. Taxim-O 200  0-0-1  3/7  (before food)",
+              "raw_text": "2) T. Taxim-O 200 0-0-1 3/7 (before food)",
               "drug": "Taxim-O",
               "strength": "200",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "0-0-1",
               "doses_per_day": 1.0,
               "duration_days": 3,
               "quantity": null,
@@ -11288,11 +11289,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "Tab Azithral 500  1-0-1  x 10 days",
+              "raw_text": "3) Tab Azithral 500 1-0-1 x 10 days",
               "drug": "Azithral",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 10,
               "quantity": null,
@@ -11301,11 +11302,11 @@
             },
             {
               "line_no": 4,
-              "raw_text": "Tab Montair LC  1-0-0  x 5 days  (B/F)",
+              "raw_text": "4) Tab Montair LC 1-0-0 x 5 days (B/F)",
               "drug": "Montair LC",
               "strength": null,
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-0",
               "doses_per_day": 1.0,
               "duration_days": 5,
               "quantity": null,
@@ -11313,9 +11314,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 9400,
+          "cost_usd": 0.0071205
         },
         "matches": [
           {
@@ -11445,7 +11446,7 @@
               }
             ],
             "reranked": true,
-            "reason": "Combiflam tablet matches the prescribed brand and dosage form; strength is unspecified."
+            "reason": "Combiflam tablet matches the prescribed brand and dosage form; its 400 mg ibuprofen/325 mg paracetamol strength is the common adult tablet strength."
           },
           {
             "sku": {
@@ -11862,9 +11863,9 @@
             "reason": null
           }
         ],
-        "latency_ms": 2425.1983750145882,
-        "parse_latency_ms": 0,
-        "cost_usd": 6.34e-05,
+        "latency_ms": 11722.362624946982,
+        "parse_latency_ms": 9400,
+        "cost_usd": 0.0071919,
         "score": {
           "rx_id": "s19",
           "truth_lines": 4,
@@ -11892,18 +11893,18 @@
       {
         "rx_id": "s20",
         "parsed": {
-          "doctor_name": null,
-          "clinic_name": null,
-          "patient_name": null,
-          "rx_date": null,
+          "doctor_name": "Dr. Pooja Bansal",
+          "clinic_name": "AROGYA HEALTH CENTRE",
+          "patient_name": "Mohd. Imran",
+          "rx_date": "2026-04-14",
           "lines": [
             {
               "line_no": 1,
-              "raw_text": "Tab Calpol 500  1-0-1  x 10 days  (B/F)",
+              "raw_text": "1) Tab Calpol 500  1-0-1  x 10 days  (B/F)",
               "drug": "Calpol",
               "strength": "500",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 10,
               "quantity": null,
@@ -11912,11 +11913,11 @@
             },
             {
               "line_no": 2,
-              "raw_text": "Tab. Augmentin 625 Duo #14  1-0-1  x 7 days",
+              "raw_text": "2) Tab. Augmentin 625 Duo #14  1-0-1  x 7 days",
               "drug": "Augmentin Duo",
               "strength": "625",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "1-0-1",
               "doses_per_day": 2.0,
               "duration_days": 7,
               "quantity": 14,
@@ -11925,11 +11926,11 @@
             },
             {
               "line_no": 3,
-              "raw_text": "T. Atorva 10  BD  1/12  (before food)",
+              "raw_text": "3) T. Atorva 10  BD  1/12  (before food)",
               "drug": "Atorva",
               "strength": "10",
               "form": "tablet",
-              "frequency": "as truth",
+              "frequency": "BD",
               "doses_per_day": 2.0,
               "duration_days": 30,
               "quantity": null,
@@ -11937,9 +11938,9 @@
               "bbox": null
             }
           ],
-          "model": "oracle",
-          "latency_ms": 0,
-          "cost_usd": 0.0
+          "model": "google/gemini-3.8-flash",
+          "latency_ms": 8961,
+          "cost_usd": 0.00620325
         },
         "matches": [
           {
@@ -12361,9 +12362,9 @@
             "reason": "Atorva 10 mg tablet matches the prescribed brand, strength, and form."
           }
         ],
-        "latency_ms": 5044.479666976258,
-        "parse_latency_ms": 0,
-        "cost_usd": 0.0001323,
+        "latency_ms": 12280.423250049353,
+        "parse_latency_ms": 8961,
+        "cost_usd": 0.00633595,
         "score": {
           "rx_id": "s20",
           "truth_lines": 3,
