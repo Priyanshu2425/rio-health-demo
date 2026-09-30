@@ -56,14 +56,26 @@ search 'pan 40'
   1.00  sku_pan_40               Pan 40               pantoprazole 40mg  ₹155.0 Rx H
   0.55  sku_pantop_40            Pantop 40            pantoprazole 40mg  ₹155.0 Rx H
   0.51  sku_pan_d                Pan-D                domperidone 30mg + pantoprazole 40mg  ₹199.0 Rx H
-  generic for top hit: Pantoride 40 ₹15.0 / strip of 10 tablets
+  generic for top hit: Pantakind ₹63.76 / strip of 15 tablets
 ```
 
 Typos work too: `augmantin` returns the Augmentin family (score 0.48). Wall-clock time per
 search is 85 to 150 ms from a laptop, which is almost all network round trip to Neon
 (`SELECT 1` alone takes about 80 ms). Server-side `EXPLAIN ANALYZE` execution time: brand
-queries under 1 ms, `amoxycillin clavulanic acid 500 125` 8 ms, `paracetamol 650` (400+
-candidate SKUs) about 42 ms.
+queries about 1 ms, `amoxycillin clavulanic acid 500 125` 5 ms, `paracetamol 650` (400+
+candidate SKUs) about 41 ms. Search uses pg_trgm's default thresholds and never changes a
+connection setting (`SHOW pg_trgm.word_similarity_threshold` stays `0.6`).
+
+Generic suggestions (`cheapest_generic`) compare price per unit within the same
+composition and form, skip listings under a fifth of that group's median unit price
+(data errors), and for one-unit packs (bottles, tubes, sachets, inhalers) only offer the
+same volume. Examples: `Oflox 200` (₹88.57 / 10) → Zenflox 200 ₹69.90 / 10, where it
+used to offer Oflocin at ₹1.14 a tablet against a ₹7.98 median; `Dolo` drops (15 ml,
+₹30.07) → Babygesic 15 ml ₹22.09; `Dolo 250` (60 ml) only considers 60 ml bottles.
+
+Search ranks ties by brand popularity, read from the seed file. The backend can call
+`app.catalog.popularity.warm()` at startup; otherwise the first search loads it in a
+worker thread.
 
 ## 3. Synthetic orders, inventory and a forecast run
 
@@ -96,6 +108,10 @@ The model beats naive on 134 of 150 series.
 Row counts after both scripts: `skus` 9,303; `synthetic_orders` 156,194; `inventory` 150;
 `forecast_runs` at most 5 (older runs are pruned); `forecast_series` 150 per run.
 
+`app.forecast.run(conn)` **commits the connection it is given** (the new run has to be
+visible to other connections) and **prunes `forecast_runs` to the latest 5 runs**, whose
+`forecast_series` rows cascade.
+
 ## 4. Checks
 
 ```bash
@@ -104,13 +120,16 @@ cd backend && uv run ruff check . && uv run ruff format --check . && uv run pyte
 
 ```
 All checks passed!
-31 files already formatted
-96 passed
+All files formatted
+109 passed
 ```
 
-Catalog tests (`tests/catalog/`): 51 pure parser tests (including rotacap, respule and MDI packs); DB tests for `augmentin 625` top 1,
-the amox-clav composition in the top 3, `pan 40` → pantoprazole 40mg, a cheaper generic
-with the same key and form, fixture ids resolving, and Rx/OTC flags for 10 salts.
+Catalog tests (`tests/catalog/`): pure parser and pack tests (including rotacap, respule and MDI packs and
+pack-volume comparison); DB tests for `augmentin 625` top 1, the amox-clav composition in
+the top 3, `pan 40` → pantoprazole 40mg, a cheaper generic with the same key and form,
+the generic price floor (Oflox 200), same-volume generics for bottles, search leaving
+the trigram threshold at its default, a typo query, fixture ids resolving, and Rx/OTC
+flags for 10 salts.
 Forecast tests (`tests/forecast/`): generator structure and reproducibility, the model
 recovering a known seasonal pattern, backtest beating naive (overall and on the outbreak
 SKUs), reorder rule cases, `reorder_qty >= 0`, at least one stockout risk, contract
