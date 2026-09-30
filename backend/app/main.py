@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -9,8 +10,8 @@ from starlette.exceptions import HTTPException
 
 from app.api import router
 from app.contracts import ApiError, ErrorResponse
-from app.core import db
 from app.core.config import get_settings
+from app.orders import startup
 from app.orders.deps import uses_database
 from app.orders.rules import InvalidRequest, InvalidTransition
 from app.orders.service import NotFound
@@ -21,11 +22,19 @@ log = logging.getLogger("rio")
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     settings = get_settings()
-    # Mock mode never touches the database: orders live in memory.
-    if settings.database_url and not settings.use_mocks:
-        await db.open_pool()
-    yield
-    await db.close_pool()
+    if settings.use_mocks:
+        # Development only: fixtures and in-memory orders, never the database.
+        yield
+        return
+    await startup.open_database(settings)
+    forecast_task = startup.start_forecast_task()
+    try:
+        yield
+    finally:
+        forecast_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await forecast_task
+        await startup.close_database()
 
 
 app = FastAPI(title="Rio", lifespan=lifespan)

@@ -1,7 +1,8 @@
 """Order storage behind one small interface.
 
-`MemoryOrders` is used in mock mode or when there is no database; `PostgresOrders`
-reads and writes the `orders` table from 001_init.sql. Both take the connection per
+`PostgresOrders` reads and writes the `orders` table from 001_init.sql and is the only
+store in real mode. `MemoryOrders` is for mock mode (RIO_USE_MOCKS=1, development) only;
+real mode never falls back to it. Both take the connection per
 call (MemoryOrders ignores it). An order is read and written whole.
 
 Customer generic swaps are remembered as `swapped_from` (item_id -> brand SKU) so a

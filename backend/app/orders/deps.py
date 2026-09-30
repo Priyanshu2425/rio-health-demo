@@ -1,8 +1,11 @@
 """Which catalog / parser / forecast / storage the API talks to.
 
-Mock mode (RIO_USE_MOCKS=1) routes every cross-module call to app.orders.mocks and
-keeps orders in memory. Otherwise the real modules are called through the signatures in
-their __init__.py, and orders go to Postgres when a pool is open.
+Real mode (RIO_USE_MOCKS=0) calls the real modules through the signatures in their
+__init__.py and stores orders in Postgres. It needs the database: app startup fails if
+RIO_HEALTH_DATABASE_URL is missing or the pool cannot open, and there is no fallback.
+
+Mock mode (RIO_USE_MOCKS=1) is for development only: every cross-module call goes to
+app.orders.mocks and orders live in memory.
 """
 
 from __future__ import annotations
@@ -31,8 +34,15 @@ MOCK = Modules(catalog=mocks.catalog, parser=mocks.parser, forecast=mocks.foreca
 REAL = Modules(catalog=real_catalog, parser=real_parser, forecast=real_forecast)
 
 
+class _State:
+    database = False  # set by the app lifespan once the pool is open
+
+
+state = _State()
+
+
 def uses_database() -> bool:
-    return not get_settings().use_mocks and db._pool is not None
+    return state.database
 
 
 def modules() -> Modules:
@@ -40,12 +50,16 @@ def modules() -> Modules:
 
 
 def orders() -> OrderRepo:
-    return postgres_orders if uses_database() else memory_orders
+    if get_settings().use_mocks:
+        return memory_orders
+    if not state.database:
+        raise RuntimeError("real mode needs the database, but the pool is not open")
+    return postgres_orders
 
 
 async def get_conn() -> AsyncIterator[Any]:
-    """FastAPI dependency: a pooled connection, or None in mock / no-database mode."""
-    if not uses_database():
+    """FastAPI dependency: a pooled connection, or None in mock mode."""
+    if get_settings().use_mocks:
         yield None
         return
     async for conn in db.get_conn():
