@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, errorMessage, type CartItem, type MatchCandidate, type SKU } from '../api'
 import { Dots, Money } from '../components/bits'
+import { sameScore } from './review'
 
 function initialQuery(item: CartItem): string {
   const p = item.parsed
@@ -64,8 +65,12 @@ export function SkuPicker({
         {!error && results?.length === 0 && q.trim().length >= 2 && (
           <p className="picker-empty">No SKU matches “{q.trim()}”. Try the salt name.</p>
         )}
-        {results?.map((c) => {
+        {results && results.length > 1 && (
+          <p className="picker-hint">Best match first; equal matches are ranked by how often they sell.</p>
+        )}
+        {results?.map((c, idx) => {
           const on = picked?.sku_id === c.sku.sku_id
+          const tiedWithPrev = idx > 0 && sameScore(results[idx - 1].score, c.score)
           return (
             <button
               key={c.sku.sku_id}
@@ -86,7 +91,9 @@ export function SkuPicker({
               </span>
               <span className="picker-side">
                 <Money value={c.sku.mrp_inr} />
-                <span className="picker-score num">{Math.round(c.score * 100)}% match</span>
+                <span className="picker-score num">
+                  #{idx + 1} · {tiedWithPrev ? 'same match' : `${Math.round(c.score * 100)}% match`}
+                </span>
               </span>
             </button>
           )

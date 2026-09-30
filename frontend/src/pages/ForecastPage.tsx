@@ -13,6 +13,7 @@ import {
 import type { ForecastSummary, SkuForecast, ForecastPoint } from '../contracts.gen'
 import { api, errorMessage, ApiRequestError } from '../api'
 import { TriageBadge, Dots } from '../components/bits'
+import { pickDefault, type Selection } from '../lib/forecastDefault'
 import './forecast.css'
 
 const IST_FORMATTER = new Intl.DateTimeFormat('en-GB', {
@@ -41,19 +42,6 @@ function formatHours(h: number | null): string {
   return `${Math.round(h * 10) / 10} h`
 }
 
-interface Selection {
-  skuId: string
-  area: string
-}
-
-function pickDefault(summary: ForecastSummary): Selection {
-  const risky = summary.reorders.find((r) => r.stockout_risk)
-  if (risky) return { skuId: risky.sku_id, area: risky.area }
-  const first = summary.reorders[0]
-  if (first) return { skuId: first.sku_id, area: first.area }
-  return { skuId: summary.skus[0]?.sku_id ?? '', area: summary.areas[0] ?? '' }
-}
-
 type ChartRow = { ts: string; actual: number | null; forecast: number | null }
 
 export function ForecastPage() {
@@ -66,6 +54,7 @@ export function ForecastPage() {
   const [series, setSeries] = useState<SkuForecast | null>(null)
   const [seriesError, setSeriesError] = useState<unknown>(null)
   const [seriesLoading, setSeriesLoading] = useState(false)
+  const [showAll, setShowAll] = useState(false)
 
   const loadSummary = useCallback(() => {
     setSummaryLoading(true)
@@ -166,6 +155,11 @@ export function ForecastPage() {
     )
   }
 
+  const riskCount = summary.reorders.filter((r) => r.stockout_risk).length
+  const tableRows =
+    showAll || riskCount === 0
+      ? summary.reorders.slice(0, showAll ? undefined : 12)
+      : summary.reorders.filter((r) => r.stockout_risk || (selection?.skuId === r.sku_id && selection.area === r.area))
   const backtest = summary.backtest
   const modelPct = formatPct(backtest.model_mape)
   const naivePct = formatPct(backtest.naive_mape)
@@ -321,7 +315,14 @@ export function ForecastPage() {
       </section>
 
       <section className="forecast-panel forecast-table-panel">
-        <h2>Reorder suggestions</h2>
+        <div className="forecast-table-head">
+          <h2>Reorder suggestions</h2>
+          {riskCount > 0 && riskCount < summary.reorders.length && (
+            <button type="button" className="btn btn-sm" onClick={() => setShowAll((v) => !v)}>
+              {showAll ? `Show only the ${riskCount} at risk` : `Show all ${summary.reorders.length}`}
+            </button>
+          )}
+        </div>
         <div className="forecast-table-scroll">
           <table className="forecast-table">
             <thead>
@@ -329,14 +330,14 @@ export function ForecastPage() {
                 <th>SKU</th>
                 <th>Area</th>
                 <th className="num">On hand</th>
-                <th className="num">Forecast (next 12 h)</th>
+                <th className="num">Demand over lead time</th>
                 <th className="num">Runs out in</th>
                 <th className="num">Reorder</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {summary.reorders.map((row) => {
+              {tableRows.map((row) => {
                 const isSelected =
                   selection?.skuId === row.sku_id && selection?.area === row.area
                 const rowClass = [

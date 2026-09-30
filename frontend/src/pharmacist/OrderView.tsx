@@ -111,10 +111,12 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
               <dt>Rx date</dt>
               <dd className="num">{rx.rx_date ?? '—'}</dd>
             </div>
-            <div>
-              <dt>Read in</dt>
-              <dd className="num">{(rx.latency_ms / 1000).toFixed(1)} s</dd>
-            </div>
+            {rx.latency_ms > 0 && (
+              <div>
+                <dt>Read in</dt>
+                <dd className="num">{(rx.latency_ms / 1000).toFixed(1)} s</dd>
+              </div>
+            )}
           </dl>
         )}
       </header>

@@ -748,3 +748,9 @@
 .ov-title h2 {
   overflow-wrap: anywhere;
 }
+
+.picker-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 2px;
+}

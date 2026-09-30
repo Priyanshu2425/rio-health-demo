@@ -191,3 +191,11 @@
     grid-template-columns: 70px 1fr 48px;
   }
 }
+
+.forecast-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}

@@ -47,3 +47,8 @@ export function toReviewRequest(decisions: Decisions, note: string): ReviewReque
   )
   return { decision: 'approve', items, note: note.trim() || null }
 }
+
+/** Scores that round to the same percent are a tie; the backend then ranks by popularity. */
+export function sameScore(a: number, b: number): boolean {
+  return Math.round(a * 100) === Math.round(b * 100)
+}
