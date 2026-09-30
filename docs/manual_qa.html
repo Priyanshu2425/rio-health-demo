@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rio QA Runbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f5f7f6; --panel: #ffffff; --ink: #13201c; --muted: #56655f; --line: #d9e1dd;
+  --accent: #0a6b58; --accent-soft: #e2f0ec; --code-bg: #edf2f0;
+  --green: #1d7a45; --green-bg: #e3f3e8; --amber: #9a6200; --amber-bg: #fbf0d9; --red: #b3261e; --red-bg: #fbe6e4;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0f1714; --panel: #16211d; --ink: #e4ece8; --muted: #9aaba4; --line: #2a3833;
+    --accent: #4cc2a4; --accent-soft: #173a31; --code-bg: #1c2a25;
+    --green: #6fd08f; --green-bg: #173323; --amber: #f0b54a; --amber-bg: #3a2c10; --red: #ff8a80; --red-bg: #3d1a17;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0f1714; --panel: #16211d; --ink: #e4ece8; --muted: #9aaba4; --line: #2a3833;
+  --accent: #4cc2a4; --accent-soft: #173a31; --code-bg: #1c2a25;
+  --green: #6fd08f; --green-bg: #173323; --amber: #f0b54a; --amber-bg: #3a2c10; --red: #ff8a80; --red-bg: #3d1a17;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16.5px/1.6 var(--body); padding: 0 20px; }
+.wrap { max-width: 900px; margin: 0 auto; padding-block: 40px 96px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5.5vw, 3rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 68ch; }
+code { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+a { color: var(--accent); }
+.eyebrow { font: 600 0.72rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--muted); }
+header { display: grid; gap: 14px; }
+
+/* sticky progress */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+}
+.bar .track { flex: 1 1 200px; height: 8px; background: var(--code-bg); border-radius: 99px; overflow: hidden; min-width: 120px; }
+.bar .fill { height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+.bar .count { font: 600 0.85rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+.bar button { font: 600 0.8rem/1 var(--body); background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+.bar button:hover, .bar button:focus-visible { color: var(--ink); border-color: var(--ink); outline: none; }
+
+/* order strip */
+.order { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.order a { text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 4px; }
+.order a:hover, .order a:focus-visible { border-color: var(--accent); outline: none; }
+.order .n { font: 600 0.72rem/1 var(--mono); color: var(--accent); }
+.order .t { font-weight: 600; font-size: 0.92rem; line-height: 1.25; }
+.order .v { font: 0.72rem/1.3 var(--mono); color: var(--muted); }
+.order a.done { border-color: var(--green); }
+.order a.done .n::after { content: " ✓"; color: var(--green); }
+
+/* tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; min-width: 600px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font: 600 0.7rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--code-bg); }
+td.mono { font-family: var(--mono); font-size: 0.8rem; word-break: break-all; }
+
+/* stage */
+.stage { display: grid; gap: 18px; border-top: 2px solid var(--ink); padding-top: 18px; }
+.stage-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; }
+.stage-head .num { font: 700 2rem/1 var(--display); color: var(--accent); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font: 600 0.72rem/1 var(--mono); border-radius: 99px; padding: 5px 9px; background: var(--code-bg); color: var(--muted); }
+.tag.merge { background: var(--green-bg); color: var(--green); }
+.tag.hold { background: var(--amber-bg); color: var(--amber); }
+.tag.cost { background: var(--red-bg); color: var(--red); }
+.step { display: grid; gap: 8px; }
+.step h3 { display: flex; gap: 8px; align-items: baseline; }
+.step h3 .k { font: 600 0.75rem/1 var(--mono); color: var(--muted); }
+
+.cmd { position: relative; }
+.cmd pre { margin: 0; background: var(--code-bg); border-radius: 8px; padding: 12px 14px; padding-right: 64px; overflow-x: auto; font: 0.82rem/1.6 var(--mono); }
+.cmd button { position: absolute; top: 8px; right: 8px; font: 600 0.72rem/1 var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 5px; padding: 6px 8px; cursor: pointer; }
+.cmd button:hover, .cmd button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+ul.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.checks label { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; cursor: pointer; padding: 6px 8px; border-radius: 6px; }
+ul.checks label:hover { background: var(--accent-soft); }
+ul.checks input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--accent); }
+ul.checks input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+ul.checks input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+
+.note { border-left: 3px solid var(--amber); background: var(--amber-bg); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.note.ok { border-color: var(--accent); background: var(--accent-soft); }
+.gate { display: grid; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.gate b { font-family: var(--display); }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 18px; }
+
+@media (max-width: 760px) {
+  body { padding: 0 16px; font-size: 16px; }
+  .order { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 420px) { .order { grid-template-columns: repeat(2, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Rio · manual QA · 30 Sep 2026</div>
+  <h1>Test and merge in this order</h1>
+  <p>Five open PRs. Merge the contracts first, then the two branches that only add modules, then keep backend and frontend as drafts until Wave 2 wires them to the real modules. Each stage lists the commands, what you should see, and when to merge. Ticks are saved in this browser only.</p>
+</header>
+
+<div class="bar" role="region" aria-label="Progress">
+  <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
+  <span class="count" id="count">0 / 0 checks</span>
+  <button type="button" id="reset">Clear ticks</button>
+</div>
+
+<nav class="order" aria-label="Stages">
+  <a href="#s0" data-stage="s0"><span class="n">0</span><span class="t">Setup</span><span class="v">2 min</span></a>
+  <a href="#s1" data-stage="s1"><span class="n">1 · PR #2</span><span class="t">Contracts v2</span><span class="v">5 min · merge</span></a>
+  <a href="#s2" data-stage="s2"><span class="n">2 · PR #5</span><span class="t">Catalog + forecast</span><span class="v">15 min · merge</span></a>
+  <a href="#s3" data-stage="s3"><span class="n">3 · PR #4</span><span class="t">Parser + eval</span><span class="v">20 min · merge</span></a>
+  <a href="#s4" data-stage="s4"><span class="n">4 · PR #1</span><span class="t">Backend API</span><span class="v">15 min · hold</span></a>
+  <a href="#s5" data-stage="s5"><span class="n">5 · PR #3</span><span class="t">Frontend</span><span class="v">20 min · hold</span></a>
+</nav>
+
+<!-- 0 -->
+<section class="stage" id="s0">
+  <div class="stage-head"><span class="num">0</span><h2>Where each branch lives</h2></div>
+  <p>Every feature branch is already checked out in its own worktree with <code>.env</code> linked, so you test each one in place. Git won't let you <code>git switch</code> to these branches in the main checkout while the worktrees exist; use the paths below.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>PR</th><th>Branch</th><th>Directory (under rio_health/)</th></tr></thead>
+      <tbody>
+        <tr><td>#2</td><td>chore/contracts-v2</td><td class="mono">no worktree; review the diff on GitHub</td></tr>
+        <tr><td>#5</td><td>feat/data-forecast</td><td class="mono">.claude/worktrees/agent-a38dc82c389a1fea2</td></tr>
+        <tr><td>#4</td><td>feat/parser-eval</td><td class="mono">.claude/worktrees/agent-a1d6e52e6258e2eeb</td></tr>
+        <tr><td>#1</td><td>feat/backend-api</td><td class="mono">.claude/worktrees/agent-aa32f6a27c087f297</td></tr>
+        <tr><td>#3</td><td>feat/frontend</td><td class="mono">.claude/worktrees/agent-a99316dc00a16d452</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health
+git fetch origin && gh pr list
+command -v jq || brew install jq      # stage 4 uses it</pre><button type="button">Copy</button></div>
+  <ul class="checks">
+    <li><label><input type="checkbox" id="c-s0-1" data-stage="s0"><span>Five PRs listed: #1 and #3 drafts, #2, #4, #5 ready.</span></label></li>
+    <li><label><input type="checkbox" id="c-s0-2" data-stage="s0"><span><code>jq</code> available.</span></label></li>
+  </ul>
+</section>
+
+<!-- 1 -->
+<section class="stage" id="s1">
+  <div class="stage-head"><span class="num">1</span><h2>PR #2 · Contracts v2</h2><div class="tags"><span class="tag merge">merge first</span><span class="tag">no cost</span></div></div>
+  <p>Description-only contract changes plus an output-token cap on every OpenRouter call. Every other branch assumes these semantics, so it goes in first.</p>
+  <div class="step">
+    <h3><span class="k">1a</span>Read the diff</h3>
+    <div class="cmd"><pre>gh pr diff 2 -- backend/app/core/llm.py backend/app/contracts.py contracts/API.md</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s1-1" data-stage="s1"><span><code>ParsedLine.quantity</code> and <code>SKU.pack_size</code> now say the same unit: tablets/capsules, or 1 bottle/tube/sachet.</span></label></li>
+      <li><label><input type="checkbox" id="c-s1-2" data-stage="s1"><span>API.md: packs = ceil(quantity ÷ pack_size); swap and 422 rules written down.</span></label></li>
+      <li><label><input type="checkbox" id="c-s1-3" data-stage="s1"><span><code>llm.py</code> sends <code>"max_tokens": max_tokens</code> (default 8000). No field was added, removed or retyped anywhere.</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">1b</span>Merge and check main</h3>
+    <div class="cmd"><pre>gh pr merge 2 --merge
+git pull
+cd backend && uv run pytest -q          # 13 passed
+cd ../frontend && npm run gen:contracts -- --check</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s1-4" data-stage="s1"><span>Merged. On main: 13 tests pass and <code>contracts.gen.ts is current</code>.</span></label></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="stage" id="s2">
+  <div class="stage-head"><span class="num">2</span><h2>PR #5 · Catalog + forecast</h2><div class="tags"><span class="tag merge">merge</span><span class="tag">no cost</span></div></div>
+  <p>9,303 real SKUs in Neon, trigram search, generics, Schedule H flags, synthetic orders and the forecast. The tables are already loaded; the scripts are idempotent if you re-run them.</p>
+  <div class="step">
+    <h3><span class="k">2a</span>Tests</h3>
+    <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a38dc82c389a1fea2/backend
+uv run ruff check . && uv run ruff format --check . && uv run pytest -q     # 81 passed</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s2-1" data-stage="s2"><span>81 passed (these include live queries against Neon).</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">2b</span>Search the way a pharmacist would</h3>
+    <p class="muted">Add a few brands you know from real prescriptions. That is the real test of this branch.</p>
+    <div class="cmd"><pre>PYTHONPATH=. uv run python ../scripts/etl/sample_search.py \
+  "augmentin 625" "augmantin" "pan 40" "dolo 650" "azithral 500" "montair lc" "telma 40" "shelcal"</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s2-2" data-stage="s2"><span>"augmentin 625" → Augmentin 625 Duo on top (≈0.89); the typo "augmantin" still finds the Augmentin family.</span></label></li>
+      <li><label><input type="checkbox" id="c-s2-3" data-stage="s2"><span>"pan 40" → Pan 40 (pantoprazole 40mg) at 1.00, with a cheaper generic line under it.</span></label></li>
+      <li><label><input type="checkbox" id="c-s2-4" data-stage="s2"><span>Rx flags look right: antibiotics, PPIs and antihypertensives say <code>Rx H</code>; Dolo/Shelcal don't.</span></label></li>
+      <li><label><input type="checkbox" id="c-s2-5" data-stage="s2"><span>Generic suggestions are the same salt and strength, not just the same salt, and not absurdly cheap.</span></label></li>
+      <li><label><input type="checkbox" id="c-s2-6" data-stage="s2"><span>Prices look like real MRPs. (Pan 40, Electral, Shelcal, Limcee, Crocin 650 were hand-added in <code>data/manual_skus.csv</code>.)</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">2c</span>Forecast</h3>
+    <div class="cmd"><pre>PYTHONPATH=. uv run python ../scripts/etl/gen_orders.py     # ~20 s, rewrites synthetic data</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s2-7" data-stage="s2"><span>Prints model MAPE 22.9% vs naive 28.5%, 14 stockout risks, and a list led by items like Telma 40 in Area C.</span></label></li>
+      <li><label><input type="checkbox" id="c-s2-8" data-stage="s2"><span><code>scripts/etl/README.md</code> says plainly that the orders are synthetic, and names the dataset source (GitHub mirror, MIT).</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">2d</span>Merge</h3>
+    <div class="cmd"><pre>gh pr merge 5 --merge</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s2-9" data-stage="s2"><span>Merged. (It only touches catalog/, forecast/, scripts/etl/, data/ and its tests, so it can't conflict with #2.)</span></label></li></ul>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="stage" id="s3">
+  <div class="stage-head"><span class="num">3</span><h2>PR #4 · Parser + eval</h2><div class="tags"><span class="tag merge">merge after the gate</span><span class="tag cost">~$0.12 OpenRouter</span></div></div>
+  <p>Vision extract, matcher, typed-text splitter, 3 demo samples, 20 synthetic prescriptions and the eval harness. First rebase it onto main so it uses the real catalog search from #5 instead of its temporary adapter.</p>
+  <div class="step">
+    <h3><span class="k">3a</span>Rebase on main, then tests</h3>
+    <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a1d6e52e6258e2eeb
+git restore eval/results; git clean -fdq eval/results   # drops my 1-Rx smoke-test output; 3d reruns it
+git fetch origin && git rebase origin/main
+cd backend && uv sync && uv run ruff check . && uv run pytest -q   # passes, 2 skipped (llm)</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s3-1" data-stage="s3"><span>Rebase clean; tests pass with 2 skipped.</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">3b</span>Look at what the model will see</h3>
+    <div class="cmd"><pre>open ../eval/synth/s01.jpg ../eval/synth/s07.jpg ../eval/synth/s14.jpg</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s3-2" data-stage="s3"><span>They look like phone photos of real Indian prescriptions (letterhead, Tab./Syp., 1-0-1, x 5 days), not clean PDFs.</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">3c</span>Free: matcher on the real catalog</h3>
+    <div class="cmd"><pre>uv run python ../eval/run.py --model oracle --set synth --catalog app</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s3-3" data-stage="s3"><span>SKU match ≈100%, 0 red, 0 green-but-wrong, now through <code>app.catalog.search</code>.</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">3d</span>Paid: the H4 gate on Gemini 3.8 Flash</h3>
+    <p class="muted">20 prescriptions × about $0.006. Re-rank uses gpt-6-luna only on ambiguous lines.</p>
+    <div class="cmd"><pre>uv run python ../eval/run.py --model google/gemini-3.8-flash --rerank-model openai/gpt-6-luna --set synth --catalog app
+tail -5 ../eval/results/summary.md</pre><button type="button">Copy</button></div>
+    <div class="gate"><b>Gate</b><span>SKU match ≥ 80% on synth, green-but-wrong = 0 (a green line that's wrong is the one failure a pharmacist wouldn't catch), no parse errors.</span></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s3-4" data-stage="s3"><span>SKU match ≥ 80%.</span></label></li>
+      <li><label><input type="checkbox" id="c-s3-5" data-stage="s3"><span>Green-but-wrong is 0.</span></label></li>
+      <li><label><input type="checkbox" id="c-s3-6" data-stage="s3"><span>Mean cost ≈ $0.006 per Rx, p95 latency under ~20 s.</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">3e</span>Make the demo samples real, commit, merge</h3>
+    <div class="cmd"><pre>uv run python ../eval/refresh_samples.py      # 3 more calls, ~$0.02
+cd .. && git add eval/results backend/app/parser/samples && git commit -m "eval: gemini-3.8-flash synth results, refreshed samples"
+git push --force-with-lease
+gh pr merge 4 --merge</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s3-7" data-stage="s3"><span>Sample parses now say <code>"model": "google/gemini-3.8-flash"</code>, not <code>synthetic-truth</code>.</span></label></li>
+      <li><label><input type="checkbox" id="c-s3-8" data-stage="s3"><span>Merged.</span></label></li>
+    </ul>
+  </div>
+  <div class="note">Handwritten set is still empty. Photos go in <code>eval/handwritten/</code> (see its README); that run and its numbers come later and don't block the merge.</div>
+</section>
+
+<!-- 4 -->
+<section class="stage" id="s4">
+  <div class="stage-head"><span class="num">4</span><h2>PR #1 · Backend API (Wave 1)</h2><div class="tags"><span class="tag hold">keep as draft</span><span class="tag">no cost, mock mode</span></div></div>
+  <p>You are checking the rules and the HTTP surface on fixtures. It gets wired to the real catalog and parser in Wave 2, after which you test it again in stage 6.</p>
+  <div class="step">
+    <h3><span class="k">4a</span>Tests</h3>
+    <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-aa32f6a27c087f297/backend
+uv run ruff check . && uv run pytest -q      # 188 passed</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s4-1" data-stage="s4"><span>188 passed.</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">4b</span>Walk the flow with curl</h3>
+    <div class="cmd"><pre># terminal 1
+RIO_USE_MOCKS=1 uv run uvicorn app.main:app --port 8000
+
+# terminal 2: pull the script out of the verify doc and run it
+cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-aa32f6a27c087f297
+awk '/^```bash$/{f=1;next} /^```$/{f=0} f' docs/verify/feat-backend-api.md > /tmp/rio-verify.sh
+API=http://localhost:8000 bash /tmp/rio-verify.sh</pre><button type="button">Copy</button></div>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s4-2" data-stage="s4"><span>Statuses in order: 200 200 200 200 200 <b>409</b> 200 <b>409</b> 200 200 200 200 200 <b>400</b>.</span></label></li>
+      <li><label><input type="checkbox" id="c-s4-3" data-stage="s4"><span>Sample order: Augmentin green, Pan 40 amber, Dolo red, ₹412.10; after the edit the order is <code>verified</code>, then <code>placed</code>.</span></label></li>
+      <li><label><input type="checkbox" id="c-s4-4" data-stage="s4"><span>"dolo and ORS" → <code>confirmed_otc</code>; "augmentin" → <code>needs_prescription</code>; a fake PNG → 400.</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">4c</span>Poke at it yourself</h3>
+    <p>Open <a href="http://localhost:8000/docs">localhost:8000/docs</a> (FastAPI's built-in UI) and try the edges.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s4-5" data-stage="s4"><span>Upload a 6 MB photo to <code>/api/orders/prescription</code> → 413 <code>image_too_large</code>.</span></label></li>
+      <li><label><input type="checkbox" id="c-s4-6" data-stage="s4"><span>Upload 11 times in a row → the 11th is 429 <code>rate_limited</code> with a retry time.</span></label></li>
+      <li><label><input type="checkbox" id="c-s4-7" data-stage="s4"><span>Every error body is <code>{"error": {"code", "message"}}</code>, never a stack trace.</span></label></li>
+    </ul>
+  </div>
+  <div class="note ok">Don't merge yet. Stop the server (Ctrl-C) before stage 5 only if you want the frontend on its in-browser mock; it doesn't need the API.</div>
+</section>
+
+<!-- 5 -->
+<section class="stage" id="s5">
+  <div class="stage-head"><span class="num">5</span><h2>PR #3 · Frontend (Wave 1)</h2><div class="tags"><span class="tag hold">keep as draft</span><span class="tag">no cost, in-browser mock</span></div></div>
+  <p>This is also your Loom rehearsal. Test at a desktop size first, then a phone width.</p>
+  <div class="step">
+    <h3><span class="k">5a</span>Checks and run</h3>
+    <div class="cmd"><pre>cd ~/Desktop/buildspace/rio_health/.claude/worktrees/agent-a99316dc00a16d452/frontend
+npm test && npm run build && npm run gen:contracts -- --check     # 54 tests
+VITE_MOCKS=1 npm run dev                                          # http://localhost:5173</pre><button type="button">Copy</button></div>
+    <ul class="checks"><li><label><input type="checkbox" id="c-s5-1" data-stage="s5"><span>54 tests pass, build succeeds, contracts current.</span></label></li></ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">5b</span>The Loom path on <code>/</code> (1440 px wide or more)</h3>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s5-2" data-stage="s5"><span><b>Reset demo</b> (top right) → phone shows the greeting and three quick replies; the queue already has two orders.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-3" data-stage="s5"><span><b>Try a sample → Typed clinic Rx</b>: typing dots ~2 s, then the cart: Augmentin, Pan 40, Dolo 650, ₹412.10.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-4" data-stage="s5"><span>Tap <b>Save ₹42.50 — switch to generic</b>: Augmentin becomes Moxclav 625, total ₹369.60; undo works.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-5" data-stage="s5"><span>Right pane: the new order opens marked <b>New</b>, lines grouped Fix (red ✕) → Check (amber !) → Clear (green ✓), image zooms.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-6" data-stage="s5"><span><b>Approve order</b> stays disabled until the red Dolo line is decided. Edit it with the SKU picker, then Approve all green, then Approve order.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-7" data-stage="s5"><span>Within 2 s the phone shows the <b>Verified by pharmacist</b> stamp, the edited line struck through, and Place order.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-8" data-stage="s5"><span><b>Forecast</b> tab: Dolo 650 · Area A spikes before "now", the reorder table's first row is a red stockout risk. (This spike is mock data until Wave 2.)</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">5c</span>Other paths</h3>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s5-9" data-stage="s5"><span>Type <code>dolo, ORS</code> → OTC cart with Place order straight away. Type <code>augmentin</code> → "needs a prescription. Upload one?"</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-10" data-stage="s5"><span>Open <code>/?fail=parser_failed</code>, upload any photo → friendly error and a Try a sample button. Same for <code>parser_timeout</code>, <code>rate_limited</code>.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-11" data-stage="s5"><span>Reject with note requires a note, and the chat shows it.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-12" data-stage="s5"><span>Upload a real photo from your phone gallery: it resizes and uploads. (In mocks it always reads as the Sunrise Clinic Rx; that's expected.)</span></label></li>
+    </ul>
+  </div>
+  <div class="step">
+    <h3><span class="k">5d</span>Phone width</h3>
+    <p class="muted">Browser dev tools → responsive mode → 390 × 844.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" id="c-s5-13" data-stage="s5"><span><code>/chat</code> fills the screen with no sideways scroll; cart prices stay aligned.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-14" data-stage="s5"><span><code>/</code> becomes Customer / Pharmacist tabs; the whole flow still works.</span></label></li>
+      <li><label><input type="checkbox" id="c-s5-15" data-stage="s5"><span>Dark mode (system setting) is readable everywhere, including triage badges.</span></label></li>
+    </ul>
+  </div>
+  <div class="note ok">Don't merge yet. Note anything you'd change in the copy or design; I'll give it to the frontend agent with Wave 2.</div>
+</section>
+
+<!-- 6 -->
+<section class="stage" id="s6">
+  <div class="stage-head"><span class="num">6</span><h2>After Wave 2: together, then live</h2><div class="tags"><span class="tag">later</span></div></div>
+  <p>Once #2, #5 and #4 are merged, I start Wave 2: the backend swaps mocks for the real modules on Neon and the frontend points at it. You then repeat stages 4b and 5b with real data, then on the public URLs.</p>
+  <ul class="checks">
+    <li><label><input type="checkbox" id="c-s6-1" data-stage="s6"><span>Local: API with <code>RIO_USE_MOCKS=0</code> + frontend without <code>VITE_MOCKS</code>: sample order → queue → edit → verified, all real SKUs.</span></label></li>
+    <li><label><input type="checkbox" id="c-s6-2" data-stage="s6"><span>Local: photograph a prescription you wrote, upload it, and check the cart against the paper.</span></label></li>
+    <li><label><input type="checkbox" id="c-s6-3" data-stage="s6"><span>Your setup: EC2 up, <code>cloudflared tunnel login</code> done, Pages project on <code>rio.buildspacelabs.com</code>.</span></label></li>
+    <li><label><input type="checkbox" id="c-s6-4" data-stage="s6"><span>Live: <code>curl https://rio-api.buildspacelabs.com/api/health</code> → <code>"mocks": false, "database": true</code>.</span></label></li>
+    <li><label><input type="checkbox" id="c-s6-5" data-stage="s6"><span>Live: the full Loom path on <code>rio.buildspacelabs.com</code>, on your laptop and on your phone.</span></label></li>
+    <li><label><input type="checkbox" id="c-s6-6" data-stage="s6"><span>Merge #1, then #3.</span></label></li>
+  </ul>
+</section>
+
+<footer>Sources: each branch's <code>docs/verify/*.md</code>, <code>contracts/API.md</code>, <code>docs/PLAN.md</code>. Counts and prices are from the agents' runs on 30 Sep 2026.</footer>
+</div>
+
+<script>
+(function () {
+  var KEY = "rio.qa.v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type="checkbox"]'));
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+  boxes.forEach(function (b) { b.checked = !!saved[b.id]; });
+
+  function update() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    document.getElementById("count").textContent = done + " / " + boxes.length + " checks";
+    document.getElementById("fill").style.width = (100 * done / boxes.length) + "%";
+    document.querySelectorAll(".order a").forEach(function (a) {
+      var mine = boxes.filter(function (b) { return b.dataset.stage === a.dataset.stage; });
+      a.classList.toggle("done", mine.length > 0 && mine.every(function (b) { return b.checked; }));
+    });
+  }
+  function save() {
+    var state = {};
+    boxes.forEach(function (b) { if (b.checked) state[b.id] = true; });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", function () { save(); update(); }); });
+  document.getElementById("reset").addEventListener("click", function () {
+    boxes.forEach(function (b) { b.checked = false; }); save(); update();
+  });
+
+  document.querySelectorAll(".cmd button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.parentNode.querySelector("pre");
+      var text = pre.textContent;
+      function done(ok) {
+        btn.textContent = ok ? "Copied" : "Selected";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1400);
+      }
+      function select() {
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); done(false);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, select);
+      } else { select(); }
+    });
+  });
+  update();
+})();
+</script>
+</body>
+</html>
