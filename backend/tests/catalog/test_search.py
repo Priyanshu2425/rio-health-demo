@@ -1,0 +1,76 @@
+"""Catalog search against the real `skus` table (loaded by scripts/etl/build_catalog.py)."""
+
+import pytest
+
+from app.catalog import cheapest_generic, get_sku, search
+
+pytestmark = pytest.mark.db
+
+AMOX_CLAV = "amoxycillin 500mg + clavulanic acid 125mg"
+
+
+async def test_brand_search_augmentin_625(conn):
+    results = await search(conn, "augmentin 625")
+    assert results[0].sku.composition_key == AMOX_CLAV
+    assert results[0].sku.form == "tablet"
+    assert all(0 <= r.score <= 1 for r in results)
+    assert results == sorted(results, key=lambda r: -r.score)
+
+
+async def test_composition_search_with_spelling_variant(conn):
+    results = await search(conn, "amoxicillin clavulanic 500 125", limit=3)
+    assert any(r.sku.composition_key == AMOX_CLAV for r in results)
+
+
+async def test_composition_search_with_slash_strengths(conn):
+    results = await search(conn, "amoxicillin clavulanate 500/125", limit=3)
+    assert results[0].sku.composition_key == AMOX_CLAV
+
+
+async def test_pan_40_is_pantoprazole_40(conn):
+    results = await search(conn, "pan 40")
+    assert results[0].sku.composition_key == "pantoprazole 40mg"
+
+
+async def test_fixture_ids_exist(conn):
+    for sku_id in ["sku_augmentin_625", "sku_moxclav_625", "sku_pan_40", "sku_dolo_650", "sku_electral_21g"]:
+        sku = await get_sku(conn, sku_id)
+        assert sku is not None, sku_id
+    assert await get_sku(conn, "sku_does_not_exist") is None
+
+
+async def test_generic_is_cheaper_with_same_key(conn):
+    brand = await get_sku(conn, "sku_augmentin_625")
+    generic = await cheapest_generic(conn, brand)
+    assert generic is not None
+    assert generic.sku_id != brand.sku_id
+    assert generic.composition_key == brand.composition_key
+    assert generic.form == brand.form
+    assert generic.mrp_inr / generic.pack_size < brand.mrp_inr / brand.pack_size
+
+
+async def test_empty_query(conn):
+    assert await search(conn, "   ") == []
+
+
+@pytest.mark.parametrize(
+    ("query", "key_part", "rx_only", "schedule"),
+    [
+        ("azithromycin 500", "azithromycin 500mg", True, "H"),
+        ("pantoprazole 40", "pantoprazole 40mg", True, "H"),
+        ("metformin 500", "metformin 500mg", True, "H"),
+        ("telmisartan 40", "telmisartan 40mg", True, "H"),
+        ("cefixime 200", "cefixime 200mg", True, "H1"),
+        ("alprazolam 0.25", "alprazolam 0.25mg", True, "H1"),
+        ("paracetamol 650", "paracetamol 650mg", False, None),
+        ("cetirizine 10", "cetirizine 10mg", False, None),
+        ("electral", "oral rehydration salts", False, None),
+        ("limcee", "vitamin c 500mg", False, None),
+    ],
+)
+async def test_rx_flags_for_known_salts(conn, query, key_part, rx_only, schedule):
+    results = await search(conn, query, limit=10)
+    match = next((r.sku for r in results if r.sku.composition_key == key_part), None)
+    assert match is not None, f"{query!r} did not find {key_part!r}"
+    assert match.rx_only is rx_only
+    assert match.schedule == schedule
