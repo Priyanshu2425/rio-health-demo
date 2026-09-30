@@ -21,7 +21,7 @@ _COLUMNS = (
 # Trigram candidates come from the GIN indexes via `<%` (word similarity above the
 # threshold); the score is then the better of brand and composition, each the mean of
 # similarity() and word_similarity(), so both lie in 0..1.
-_WORD_SIM_THRESHOLD = 0.4
+_WORD_SIM_THRESHOLD = 0.5
 _SEARCH_SQL = """
 SELECT set_config('pg_trgm.word_similarity_threshold', {threshold}, false);
 WITH cand AS (
