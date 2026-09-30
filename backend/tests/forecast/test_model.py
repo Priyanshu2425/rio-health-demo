@@ -7,7 +7,8 @@ import pandas as pd
 import pytest
 
 from app.contracts import ForecastSummary, SkuForecast
-from app.forecast import compute, model
+from app.forecast import model
+from app.forecast.store import compute
 from app.forecast.synthetic import IST, PLAN, SPIKE_SKUS, generate, hour_of_week_curve
 
 END = datetime(2026, 9, 30, 14, 30, tzinfo=IST)
