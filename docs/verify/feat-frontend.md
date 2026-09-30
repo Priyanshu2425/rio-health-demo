@@ -1,4 +1,4 @@
-# Verify: `feat/frontend` (Wave 1, mock API)
+# Verify: `feat/frontend`
 
 ## Run it
 
@@ -6,7 +6,7 @@
 cd frontend
 npm install
 VITE_MOCKS=1 npm run dev          # http://localhost:5173, in-browser mock API
-npm test                          # vitest: 54 tests (mock state machine, money, review helpers, resize)
+npm test                          # vitest: 74 tests (mock state machine, money, review helpers, resize, edge cases, HTTP client)
 npm run build                     # tsc + vite build
 npm run gen:contracts -- --check  # contracts.gen.ts is current
 ```
@@ -20,8 +20,10 @@ About the mock:
   (409 on invalid transitions).
 - State lives in `localStorage` (`rio.mock.v1`), so `/chat` and `/pharmacist` in two tabs share orders.
   **Reset demo** (top right) clears it back to the seeded queue, so each Loom take starts clean.
-- To rehearse failures, add `?fail=parser_failed`, `?fail=parser_timeout` or `?fail=rate_limited` to
-  the URL. The next photo upload then fails with 502, 504 or 429 and the chat offers "Try a sample".
+- To rehearse failures, add `?fail=` to the URL with `unsupported_image` (400), `image_too_large` (413),
+  `rate_limited` (429), `parser_failed` (502) or `parser_timeout` (504). The next photo upload then fails
+  with that code and the chat offers "Try a sample".
+- To rehearse a slow parse, add `?latency=20000`: the parse then takes 20 s.
 - In mocks, any uploaded photo parses as the 3-line Sunrise Clinic prescription. The console
   shows the photo you uploaded.
 
@@ -82,6 +84,34 @@ Captured with Playwright against `VITE_MOCKS=1` (script walks the path above).
   "Clear", amber triangle ! "Check", red square ✕ "Fix".
 - Prices use tabular numerals and `formatINR` (`₹1,234.50`, Indian grouping, always two decimals).
 - The only flourish is the pharmacist's stamp.
+
+## Wave 2, part A: real-data edge cases (still on mocks)
+
+| Case | Where to see it | Behaviour |
+|---|---|---|
+| Long brand name | **Try a sample** → **Messy Rx, 4 lines (edge cases)** | "Augmentin 625 Duo Tablet (Dispersible)" wraps cleanly in the cart, console and picker |
+| `sku: null` line | same sample, line 2 | Always red. Chat: "We couldn't identify this line; the pharmacist will check." Console: "No SKU matched", Approve is disabled, and the pharmacist must edit or remove the line |
+| `generic_alternative: null` | same sample (Thyronorm, Telma) | No swap chip |
+| 0 parsed lines | **Blurry photo, nothing readable** | Chat: "We couldn't read any medicines in that photo…" with Upload and Try a sample. Console: "No medicines were read", Approve is disabled, reject with a note |
+| Typed Rx-only | type `azithral 500` | "Azithral 500 needs a prescription. Upload one?" |
+| Slow parse | `?latency=20000` | After 8 s the typing bubble changes to "Still reading… handwritten prescriptions take a little longer." At 90 s the client gives up (fetch is aborted) and shows a 504-style message with Try a sample |
+| 400 | `?fail=unsupported_image` | "That file isn't a photo we can read…", followed by the server's message |
+| 413 / 502 / 504 / 422 | `?fail=…` | Shows `error.message` verbatim. If a proxy returns a non-JSON body, friendly fallback copy is used |
+| 429 | `?fail=rate_limited` | "Try again in N minutes", with N read from the server's message |
+| 409 | e.g. swapping after the pharmacist reviewed | The chat reloads the order and shows its current state. The console reloads the order and says it was already reviewed |
+
+**Production bundle.** The mock is loaded with a dynamic `import()` behind `VITE_MOCKS`, which Vite
+constant-folds. A production build (`VITE_MOCKS` unset) contains no mock code and no fixtures; a grep for
+fixture strings finds nothing. JS is 261.9 kB (80.7 kB gzip) for the entry, plus 365.8 kB (105.6 kB gzip)
+for the lazily loaded forecast tab with Recharts. The build still needs `../contracts` on disk to resolve
+the (dropped) mock import, which holds when Pages builds from the repo root with root dir `frontend/`.
+
+| | |
+|---|---|
+| Slow parse reassurance | ![](feat-frontend/10-slow-parse-reassurance.png) |
+| Edge cases: long name, unmatched line | ![](feat-frontend/11-demo-edge-cases.png) |
+| Zero lines parsed (390 px) | ![](feat-frontend/12-mobile-zero-lines.png) |
+| 429 with retry minutes (390 px) | ![](feat-frontend/13-mobile-rate-limited.png) |
 
 ## Wave 2 notes
 
