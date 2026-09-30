@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     openrouter_api_key: str | None = None
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_timeout_s: float = 45.0
+    openrouter_max_tokens: int = 8000
     vision_model: str = ""
     rerank_model: str = ""
 

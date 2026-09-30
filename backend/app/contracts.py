@@ -72,11 +72,7 @@ class ParsedLine(Contract):
     quantity: int | None = Field(
         None,
         ge=0,
-        description=(
-            "Explicit count written on the Rx, in the same units as SKU.pack_size: tablets or "
-            "capsules for solid forms ('#10' -> 10), bottles/tubes/sachets/inhalers otherwise. "
-            "Null when absent or when written in packs ('2 strips')"
-        ),
+        description="Explicit count in SKU.pack_size units ('#10' tablets -> 10); null if absent or written in packs",
     )
     illegible_fields: list[ParsedField] = Field(
         default_factory=list, description="Fields the model could not read with confidence"
@@ -119,11 +115,7 @@ class SKU(Contract):
     form: Form
     pack_size: int = Field(
         ge=1,
-        description=(
-            "Dispensable units per pack: tablets/capsules per strip or bottle (strip of 10 -> 10); "
-            "vials per pack for injections; 1 for anything sold by volume or weight (syrup, drops, "
-            "cream, inhaler) and for sachets, with the volume in pack_label"
-        ),
+        description="Countable units per pack (tablets, capsules, rotacaps, vials); 1 for bottles, tubes, sachets, inhalers",
     )
     pack_label: str = Field(description="Human label, e.g. 'strip of 10 tablets'")
     mrp_inr: float = Field(ge=0, description="Price per pack in rupees")

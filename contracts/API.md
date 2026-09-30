@@ -50,7 +50,7 @@ Every error is `ErrorResponse`: `{"error": {"code": "...", "message": "..."}}`.
 | 404 | `no_forecast` | Forecast has never run |
 | 409 | `invalid_transition` | e.g. reviewing an order that is not `pending_review` |
 | 413 | `image_too_large` | Over `MAX_UPLOAD_MB` |
-| 422 | `invalid_request` | Body failed validation |
+| 422 | `invalid_request` | Body failed validation, approving an item with no SKU, swapping an item with no generic, or a text order where nothing matches |
 | 429 | `rate_limited` | Over `PARSE_RATE_LIMIT_PER_HOUR` for this IP; message says when to retry |
 | 502 | `parser_failed` | The vision model errored or returned junk; the UI offers a sample instead |
 | 504 | `parser_timeout` | The vision model exceeded `OPENROUTER_TIMEOUT_S` |
@@ -67,11 +67,11 @@ Every error is `ErrorResponse`: `{"error": {"code": "...", "message": "..."}}`.
   reason on the item. For text orders, a count the customer writes ("2 strips of crocin")
   is taken as packs.
 - Completeness counts drug, strength, frequency and duration. A written `quantity`
-  covers both frequency and duration.
+  stands in for duration.
 - Items with status `removed` don't count toward `total_inr`.
 - Swap: `use_generic: true` sets `sku` to the generic, so `sku == generic_alternative`,
-  and `savings_inr` keeps showing the saving. The UI reads that equality as "generic
-  taken". `use_generic: false` restores the brand. Allowed in `pending_review` and `confirmed_otc`, otherwise 409
-  `invalid_transition`.
+  and `savings_inr` keeps showing the saving. `use_generic: false` restores the brand.
+  Repeating the same swap changes nothing. Allowed in `pending_review` and
+  `confirmed_otc`, otherwise 409 `invalid_transition`; an item with no generic is 422.
 - Approving an item with no SKU, or a text order where nothing matches, is 422
   `invalid_request` with a message saying which item or phrase failed.
