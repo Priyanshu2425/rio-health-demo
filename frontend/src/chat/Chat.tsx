@@ -180,7 +180,7 @@ export function Chat({ onOrderCreated }: ChatProps) {
         </span>
         <div>
           <div className="chat-title">Rio Pharmacy</div>
-          <div className="chat-sub">Pharmacist-checked orders · usually replies in minutes</div>
+          <div className="chat-sub">Every prescription checked by a pharmacist</div>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api, errorMessage, type Order } from '../api'
 import { Dots, Money, Stamp, TriageBadge, timeAgo } from '../components/bits'
 import { RxImage } from './RxImage'
@@ -16,6 +16,7 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
   const [note, setNote] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // The console keys this component by order id, so state starts fresh for each order.
@@ -63,6 +64,7 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
       const o = await api.review(orderId, body)
       setOrder(o)
       setRejecting(false)
+      bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
       onReviewed()
     } catch (e) {
       setSubmitError(errorMessage(e))
@@ -105,7 +107,7 @@ export function OrderView({ orderId, onReviewed, onNext }: { orderId: string; on
         )}
       </header>
 
-      <div className="ov-body">
+      <div className="ov-body" ref={bodyRef}>
         {order.has_image && <RxImage src={api.orderImageUrl(order.order_id)} />}
 
         <div className="ov-lines">

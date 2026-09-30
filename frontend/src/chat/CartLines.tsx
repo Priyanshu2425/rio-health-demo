@@ -134,6 +134,7 @@ export function DiffLines({ before, after }: { before: Order | undefined; after:
               {item.sku?.rx_only && <span className="pill pill-rx">Rx</span>}
             </div>
             {edited && <div className="cl-meta cl-note">Changed by the pharmacist</div>}
+            {item.status === 'edited' && !edited && <div className="cl-meta cl-note">Confirmed by the pharmacist</div>}
           </li>
         )
       })}

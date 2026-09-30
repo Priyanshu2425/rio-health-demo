@@ -20,6 +20,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
 }
 .phone {
   position: relative;
@@ -55,6 +56,7 @@
 .demo-console {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--panel);

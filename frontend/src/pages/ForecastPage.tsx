@@ -287,7 +287,7 @@ export function ForecastPage() {
                   <ReferenceArea x1={nowTs} x2={endTs} fill="var(--accent)" fillOpacity={0.06} />
                 )}
                 {nowTs && (
-                  <ReferenceLine x={nowTs} stroke="var(--muted)" strokeDasharray="4 4" label="now" />
+                  <ReferenceLine x={nowTs} stroke="var(--muted)" strokeDasharray="4 4" label={{ value: 'now', position: 'insideTopLeft', fill: 'var(--muted)', fontSize: 12 }} />
                 )}
                 <Line
                   type="monotone"
