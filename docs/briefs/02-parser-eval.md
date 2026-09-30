@@ -28,9 +28,12 @@ Touch nothing else. If you need a contract or dependency change, stop and report
    and form match the line.
 3. **`match_text(conn, text)`:** split typed requests ("crocin and 2 ORS, dolo") with a
    small rule-based splitter; an LLM is fine as a fallback. Match each part.
-4. **Samples:** `app/parser/samples/` with 3 demo images (2 synthetic, 1 of the
-   owner's handwritten ones) plus a cached `ParsedRx` JSON for each. Implement
-   `list_samples` and `load_sample`. `thumbnail_url` = `/api/samples/{id}/image`.
+4. **Samples:** 3 demo images (2 synthetic, 1 of the owner's handwritten ones) plus a
+   cached `ParsedRx` for each, stored in the `samples` table (migration 002). The image
+   and JSON files live in `eval/samples/` as ETL input only, and `eval/load_samples.py`
+   upserts them. `list_samples(conn)` and `load_sample(conn, id)` query the table; no
+   request path opens a file (contracts/README rule 0). `thumbnail_url` =
+   `/api/samples/{id}/image`.
 5. **Until the catalog lands:** `app.catalog.search` raises `NotImplementedError` on your
    branch. Unit-test `match_line` with a fake `search` (monkeypatch). The end-to-end
    SKU-accuracy eval runs after you rebase on the merged `feat/data-forecast`.

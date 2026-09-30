@@ -17,9 +17,11 @@ What every branch builds against. Frozen on `main`.
 
 0. At runtime the app reads only the database (and, in `RIO_USE_MOCKS=1` dev mode, the
    fixtures). Files under `data/`, `eval/` and sample images are ETL inputs that a script
-   loads into Neon; no request path opens a file.
+   loads into Neon (`scripts/etl/build_catalog.py` for `skus`,
+   `eval/load_samples.py` for `samples`); no request path opens a file.
 1. A feature branch never edits a file in the table above, apart from replacing the
-   function bodies it owns.
+   function bodies it owns in the `__init__.py` files and adding the imports those bodies
+   need. Signatures and their docstrings' promises stay as written.
 2. If you need a change, stop and report what you need and why. It lands on `main` as
    `chore/contracts-vN` and every branch rebases.
 3. After any change, regenerate everything and run
