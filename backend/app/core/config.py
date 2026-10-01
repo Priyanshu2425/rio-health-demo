@@ -20,7 +20,11 @@ class Settings(BaseSettings):
     rerank_model: str = ""
 
     use_mocks: bool = Field(False, validation_alias="RIO_USE_MOCKS")
-    cors_origins: list[str] = ["http://localhost:5173", "https://rio.buildspacelabs.com"]
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "https://rio.buildspacelabs.com",
+        "https://rio-health.pages.dev",
+    ]
     parse_rate_limit_per_hour: int = 10
     max_upload_mb: int = 5
 

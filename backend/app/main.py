@@ -48,6 +48,19 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def no_store_by_default(request: Request, call_next):
+    """API data changes on every request (orders, the queue), so no cache may keep it.
+
+    The buildspacelabs.com zone caches responses that carry no Cache-Control, which served
+    a stale pharmacist queue and order status. Routes that are safe to cache (sample
+    images) set their own header.
+    """
+    response = await call_next(request)
+    response.headers.setdefault("Cache-Control", "no-store")
+    return response
+
+
 @app.exception_handler(HTTPException)
 async def http_error(_: Request, exc: HTTPException) -> JSONResponse:
     """Every error leaves as ErrorResponse. Raise HTTPException(status, detail='code: message').

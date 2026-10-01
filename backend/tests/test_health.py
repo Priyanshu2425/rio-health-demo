@@ -42,3 +42,10 @@ def test_pool_checks_connections_before_use(monkeypatch):
     db._pool = None
     assert captured["check"] is AsyncConnectionPool.check_connection
     assert captured["max_idle"] <= 240
+
+
+def test_api_responses_are_not_cacheable():
+    """The zone caches responses without Cache-Control; API data must never be cached."""
+    with TestClient(app) as client:
+        for path in ("/api/health", "/api/does-not-exist"):
+            assert client.get(path).headers["cache-control"] == "no-store"
