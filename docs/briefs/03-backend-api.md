@@ -42,7 +42,7 @@ contract change.
 2. **Startup:** if `forecast_runs` is empty, call `app.forecast.run` once.
 3. **`deploy/`:**
    - `Dockerfile` (uv, non-root, `uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1`)
-   - `docker-compose.yml` bound to `127.0.0.1:8000`
+   - `docker-compose.yml` bound to `127.0.0.1:${RIO_HOST_PORT:-8001}` (8000 belongs to another app on the shared host)
    - `cloudflared/config.yml.example` for `rio-api.buildspacelabs.com`, and a systemd unit
    - `deploy.sh` (ssh → `git pull` → `docker compose up -d --build` → migrate → curl health)
    - `deploy/README.md` with the owner's one-time steps
