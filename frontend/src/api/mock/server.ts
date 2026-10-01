@@ -425,6 +425,10 @@ export class MockServer implements RioApi {
     await this.io()
     return { ok: true, mocks: true, database: false }
   }
+
+  async registerVisitor(_email: string): Promise<void> {
+    await this.io()
+  }
 }
 
 export function localStore(key: string): KeyValueStore | undefined {

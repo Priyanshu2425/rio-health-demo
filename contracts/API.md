@@ -35,6 +35,12 @@ Every error is `ErrorResponse`: `{"error": {"code": "...", "message": "..."}}`.
 | GET | `/api/forecast/summary` | — | `ForecastSummary` | 404 `no_forecast` before the first run. |
 | GET | `/api/forecast/sku/{sku_id}?area=` | — | `SkuForecast` | |
 
+## Visitors
+
+| Method | Path | Body | Returns | Notes |
+|---|---|---|---|---|
+| POST | `/api/visitors` | `VisitorRequest` | 204, no body | The email wall. Format check only (`x@y.z`), stored lowercased in `visitors`; a repeat visit bumps `last_seen` and `visits`. 422 `invalid_request` for a malformed email. |
+
 ## Health
 
 | Method | Path | Returns |

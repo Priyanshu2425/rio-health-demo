@@ -89,6 +89,7 @@ def nothing_matched(phrases: Iterable[str]) -> str:
 
 # Request bodies and query strings that fail validation, by field name.
 INVALID_FIELD = {
+    "email": "Please enter a valid email address, like name@example.com.",
     "text": "Please type the medicines you need, in 500 characters or fewer.",
     "image": "Please attach a photo of the prescription.",
     "q": "Please type at least one letter to search, in 100 characters or fewer.",

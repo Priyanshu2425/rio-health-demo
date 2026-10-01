@@ -25,7 +25,7 @@ def build() -> str:
         if isinstance(obj, type) and issubclass(obj, BaseModel) and obj.__module__ == contracts.__name__
     ]
     # Requests are what the client sends, so their defaulted fields stay optional.
-    requests = {"TextOrderRequest", "SwapRequest", "ItemDecision", "ReviewRequest"}
+    requests = {"TextOrderRequest", "SwapRequest", "ItemDecision", "ReviewRequest", "VisitorRequest"}
     pairs = [(m, "validation" if m.__name__ in requests else "serialization") for m in models]
     _, schema = models_json_schema(pairs, title="Rio contracts")
     return json.dumps(schema, indent=2, sort_keys=True) + "\n"

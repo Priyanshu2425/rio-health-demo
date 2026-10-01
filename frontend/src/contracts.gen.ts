@@ -422,3 +422,12 @@ export interface SwapRequest {
 export interface TextOrderRequest {
   text: string;
 }
+/**
+ * The email a visitor enters to open the demo. Format only; it is never verified.
+ *
+ * This interface was referenced by `RioContracts`'s JSON-Schema
+ * via the `definition` "VisitorRequest".
+ */
+export interface VisitorRequest {
+  email: string;
+}

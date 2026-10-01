@@ -222,6 +222,12 @@ class TextOrderRequest(Contract):
     text: str = Field(min_length=1, max_length=500)
 
 
+class VisitorRequest(Contract):
+    """The email a visitor enters to open the demo. Format only; it is never verified."""
+
+    email: str = Field(min_length=3, max_length=254, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
 class SwapRequest(Contract):
     item_id: str
     use_generic: bool

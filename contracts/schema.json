@@ -1219,6 +1219,23 @@
       ],
       "title": "TextOrderRequest",
       "type": "object"
+    },
+    "VisitorRequest": {
+      "description": "The email a visitor enters to open the demo. Format only; it is never verified.",
+      "properties": {
+        "email": {
+          "maxLength": 254,
+          "minLength": 3,
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+          "title": "Email",
+          "type": "string"
+        }
+      },
+      "required": [
+        "email"
+      ],
+      "title": "VisitorRequest",
+      "type": "object"
     }
   },
   "title": "Rio contracts"

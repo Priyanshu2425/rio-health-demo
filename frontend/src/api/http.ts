@@ -41,6 +41,7 @@ export function createHttpApi(baseUrl: string): RioApi {
       }
       throw new ApiRequestError(res.status, code, message)
     }
+    if (res.status === 204) return undefined as T
     return (await res.json()) as T
   }
 
@@ -78,6 +79,7 @@ export function createHttpApi(baseUrl: string): RioApi {
     searchCatalog: (q, limit = 10) =>
       request(`/api/catalog/search?q=${enc(q)}&limit=${Math.min(limit, 20)}`),
     forecastSummary: () => request('/api/forecast/summary'),
+    registerVisitor: (email) => request<void>('/api/visitors', json('POST', { email })),
     skuForecast: (sku, area) => request(`/api/forecast/sku/${enc(sku)}?area=${enc(area)}`),
     health: () => request('/api/health'),
   }

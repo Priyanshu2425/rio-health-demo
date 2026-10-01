@@ -2,8 +2,9 @@
 
 from fastapi import APIRouter
 
-from app.api import orders, pharmacist
+from app.api import orders, pharmacist, visitors
 
 router = APIRouter(prefix="/api")
 router.include_router(orders.router)
 router.include_router(pharmacist.router)
+router.include_router(visitors.router)

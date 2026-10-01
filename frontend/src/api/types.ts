@@ -39,6 +39,8 @@ export interface RioApi {
   forecastSummary(): Promise<ForecastSummary>
   skuForecast(skuId: string, area: string): Promise<SkuForecast>
   health(): Promise<Health>
+  /** The email wall: record the visitor's email. 204 on success. */
+  registerVisitor(email: string): Promise<void>
 }
 
 /** Every non-2xx response. `message` is ErrorResponse.error.message, safe to show a user. */
