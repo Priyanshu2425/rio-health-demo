@@ -33,6 +33,11 @@ async def open_pool() -> None:
         open=False,
         configure=_configure,
         kwargs={"row_factory": dict_row},
+        # Neon suspends idle compute and terminates open connections (AdminShutdown).
+        # Check every connection before handing it out, and recycle idle ones before
+        # Neon's suspend window, so a request never gets a dead connection.
+        check=AsyncConnectionPool.check_connection,
+        max_idle=120,
     )
     await _pool.open()
 
