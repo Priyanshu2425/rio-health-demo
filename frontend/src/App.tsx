@@ -10,9 +10,9 @@ import './shell.css'
 const ForecastPage = lazy(() => import('./pages/ForecastPage').then((m) => ({ default: m.ForecastPage })))
 
 const NAV: { to: Route; label: string }[] = [
+  // /chat and /pharmacist still work as direct links (e.g. on a phone); the demo already
+  // shows both side by side, so the nav keeps only Demo and Forecast.
   { to: '/', label: 'Demo' },
-  { to: '/chat', label: 'Customer chat' },
-  { to: '/pharmacist', label: 'Pharmacist' },
   { to: '/forecast', label: 'Forecast' },
 ]
 
