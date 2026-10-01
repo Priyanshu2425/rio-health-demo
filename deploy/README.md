@@ -144,9 +144,18 @@ deploy.
 
 ## Everyday deploy
 
-From your own machine, with `RIO_SSH_HOST` set (or passed as an argument):
+On the box, after the first bootstrap, update to the latest `main`:
 ```
-deploy/deploy.sh [ssh-host]
+bash /opt/rio/app/deploy/redeploy.sh
+```
+It pulls, builds, migrates, restarts `rio-api` on its saved port and checks
+`/api/health` and `/api/samples` locally. It does not touch tools, the tunnel or
+`/opt/rio/.env`; re-run `bootstrap.sh` for those.
+
+From your own machine instead:
+
+```
+deploy/deploy.sh [ssh-host]        # or set RIO_SSH_HOST
 ```
 This runs `bootstrap.sh` on the host over ssh, so a deploy does exactly what the first
 install did: pull `main`, build, migrate, restart `rio-api` on the saved port
