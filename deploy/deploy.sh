@@ -13,6 +13,7 @@ if [[ -z "${SSH_HOST}" ]]; then
 fi
 
 APP_DIR=/opt/rio/app
+PORT="${RIO_HOST_PORT:-8001}"
 COMPOSE="docker compose -f deploy/docker-compose.yml"
 
 echo "==> Deploying to ${SSH_HOST} (${APP_DIR})"
@@ -20,13 +21,14 @@ echo "==> Deploying to ${SSH_HOST} (${APP_DIR})"
 ssh "${SSH_HOST}" "set -euo pipefail
   cd '${APP_DIR}'
   git pull --ff-only
+  export RIO_HOST_PORT=${PORT}
   ${COMPOSE} build
   # Migrate before the new app starts, so its startup forecast check sees every table.
   ${COMPOSE} run --rm --no-deps api python -m app.core.migrate
   ${COMPOSE} up -d
   echo '==> Waiting for local health check'
   for i in \$(seq 1 15); do
-    if curl -fsS http://127.0.0.1:8000/api/health; then
+    if curl -fsS http://127.0.0.1:${PORT}/api/health; then
       echo
       exit 0
     fi

@@ -2,7 +2,25 @@
 
 One EC2 instance runs the FastAPI backend in Docker. Only SSH is open on the
 security group; public traffic reaches the box through a Cloudflare Tunnel at
-`rio-api.buildspacelabs.com`, which forwards to `http://127.0.0.1:8000`.
+`rio-api.buildspacelabs.com`, which forwards to `http://127.0.0.1:8001`
+(`RIO_HOST_PORT`; 8000 is taken by another app on the shared host).
+
+## Quick path: run the bootstrap on the box
+
+On the EC2 host, as the `ubuntu` user:
+
+```
+curl -fsSL https://raw.githubusercontent.com/Priyanshu2425/rio-health-demo/main/deploy/bootstrap.sh | bash
+```
+
+It installs git, Docker and cloudflared if missing, clones the repo to `/opt/rio/app`,
+stops and tells you what to put in `/opt/rio/.env` if it does not exist yet, then builds,
+migrates and starts `rio-api` on `127.0.0.1:8001`. It refuses a port another container
+or process already uses. For the tunnel it uses its own tunnel (`rio-api`), config
+(`/etc/cloudflared-rio/`) and service (`cloudflared-rio`), leaving any other app's
+tunnel alone. The first run asks you to open one Cloudflare login URL in a browser.
+Re-run it any time to deploy the latest `main`. The manual steps below do the same
+thing by hand.
 
 Repo lives at `/opt/rio/app` on the server. Environment values live in
 `/opt/rio/.env`, outside the repo, `chmod 600`.
@@ -24,7 +42,7 @@ bootstrap more than once. Do not raise `--workers` or scale the service.
 limiter keys on that header. That is safe only because compose binds the port
 to `127.0.0.1`, so every request arrives through the tunnel, where Cloudflare
 sets the header. Anyone reaching the port directly could forge it. Never
-publish port 8000 on a public interface.
+publish the port on a public interface.
 
 **Database prerequisites.** Neon schema `app_rio_health` must already hold the
 catalog (`skus`, loaded by `scripts/etl/build_catalog.py`) and the demo samples
@@ -87,7 +105,9 @@ deploy.
    ```
    Note the tunnel id printed by `tunnel create`.
 
-7. Install the tunnel config and service:
+7. Install the tunnel config and service. On a host where another app already
+   uses `/etc/cloudflared` and `cloudflared.service`, use separate names instead
+   (the bootstrap uses `/etc/cloudflared-rio` and `cloudflared-rio.service`):
    ```
    sudo mkdir -p /etc/cloudflared
    sudo cp /opt/rio/app/deploy/cloudflared/config.yml.example /etc/cloudflared/config.yml
@@ -114,7 +134,7 @@ deploy.
    docker compose -f deploy/docker-compose.yml build
    docker compose -f deploy/docker-compose.yml run --rm --no-deps api python -m app.core.migrate
    docker compose -f deploy/docker-compose.yml up -d
-   curl -fsS http://127.0.0.1:8000/api/health
+   curl -fsS http://127.0.0.1:8001/api/health
    ```
 
 9. Verify from your own machine:
