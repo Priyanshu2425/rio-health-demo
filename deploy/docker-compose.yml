@@ -10,6 +10,10 @@
 #   its per-IP rate limit. Never publish the port on 0.0.0.0.
 # - One container, one uvicorn worker (see the Dockerfile CMD). The rate limiter and
 #   the startup state (forecast bootstrap) live in process memory. Do not scale.
+# A fixed project name keeps compose from touching another app's containers on the
+# same host (both compose files live in a directory called deploy/).
+name: rio
+
 services:
   api:
     build:

@@ -130,10 +130,10 @@ deploy.
    ```
    Or run the equivalent commands by hand on the box:
    ```
-   cd /opt/rio/app
-   docker compose -f deploy/docker-compose.yml build
-   docker compose -f deploy/docker-compose.yml run --rm --no-deps api python -m app.core.migrate
-   docker compose -f deploy/docker-compose.yml up -d
+   C="sudo docker compose -p rio -f /opt/rio/app/deploy/docker-compose.yml"
+   $C build
+   $C run --rm -T --no-deps api python -m app.core.migrate
+   $C up -d
    curl -fsS http://127.0.0.1:8001/api/health
    ```
 
@@ -148,21 +148,26 @@ From your own machine, with `RIO_SSH_HOST` set (or passed as an argument):
 ```
 deploy/deploy.sh [ssh-host]
 ```
-This pulls the latest `main` on the server, rebuilds and restarts the `api`
-container, runs migrations inside it, waits for the local health check, then
-checks the public health endpoint from your machine.
+This runs `bootstrap.sh` on the host over ssh, so a deploy does exactly what the first
+install did: pull `main`, build, migrate, restart `rio-api` on the saved port
+(`/opt/rio/port`), refresh the tunnel config and check that the public hostname reaches
+Rio (`/api/samples`, which no other app serves). On the box itself, re-running the
+bootstrap one-liner does the same.
 
 ## Troubleshooting
 
-- App logs: `docker compose -f deploy/docker-compose.yml logs -f api`
-- Tunnel logs: `journalctl -u cloudflared -f`
-- Container won't start / crashes on boot: check `/opt/rio/.env` has all the
-  required names set and is readable by the `docker` user.
-- Health check fails locally but the container is running: exec in and hit
-  the endpoint directly (`docker compose -f deploy/docker-compose.yml exec api
-  python -c "..."`) since the slim image has no `curl`.
-- Public endpoint fails but local health check passes: check `cloudflared`
-  is active (`systemctl status cloudflared`) and that the tunnel's DNS route
-  still points at `rio-api.buildspacelabs.com`.
+Compose commands need the project name and run with sudo, because the bootstrap does:
+`C="sudo docker compose -p rio -f /opt/rio/app/deploy/docker-compose.yml"`.
+
+- App logs: `$C logs -f api`
+- Tunnel logs: `sudo journalctl -u cloudflared-rio -f`
+- Container won't start or restarts in a loop: check `/opt/rio/.env` has the
+  required names; real mode refuses to start without the database.
+- Health check fails locally but the container is running: exec in and hit the endpoint
+  directly (`$C exec api python -c "..."`), since the slim image has no `curl`.
+- Public endpoint fails but the local health check passes: check the tunnel service
+  (`sudo systemctl status cloudflared-rio`) and that `rio-api.buildspacelabs.com`
+  routes to the `rio-api` tunnel (`sudo cloudflared tunnel route dns --overwrite-dns
+  rio-api rio-api.buildspacelabs.com`).
 - Do not scale to more than one worker/replica; the rate limiter is
   in-memory and only correct for a single process.
